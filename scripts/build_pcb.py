@@ -19,6 +19,7 @@ from sexpr import dumps, find, find_all, parse
 import autoplace
 import build_schematic
 import placement
+import silk
 
 FOOTPRINT_DIR = Path(r"C:\Program Files\KiCad\10.0\share\kicad\footprints")
 NETLIST = PROJECT_DIR / "out" / "reports" / "netlist.net"
@@ -260,12 +261,18 @@ def main():
             for i, grp in enumerate(sheet.groups):
                 for p in grp.parts:
                     groups[p.ref] = f"{sheet.name}:{i}"
-        ox, oy = placement.ORIGIN
-        a = placement.AREA
-        failed = autoplace.run(board, (ox + a[0], oy + a[1], ox + a[2], oy + a[3]), [], groups)
+        area = placement.absolute(placement.AREA)
+        keepouts = [placement.absolute(k) for k in placement.KEEPOUTS]
+        failed = autoplace.run(board, area, keepouts, groups)
         parked = len(failed)
         if failed:
             print("not placed:", " ".join(failed))
+        ox, oy = placement.ORIGIN
+        marking = [(t, ox + x, oy + y, h) for t, x, y, h in placement.MARKING]
+        hidden = silk.run(board, placement.absolute((0.6, 0.6, 84.4, 54.4)),
+                          placement.refs_with_value(placement.HEADERS_BOTTOM),
+                          placement.refs_with_value(placement.HEADERS_RIGHT), marking)
+        print(f"{len(hidden)} references moved to F.Fab (no room on silkscreen)")
     board.BuildConnectivity()
     pcbnew.SaveBoard(str(pcb_path), board)
     write_stackup(pcb_path)

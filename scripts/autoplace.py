@@ -15,7 +15,9 @@ import pcbnew
 
 POWER_NETS = {"GND", "+3V3", "+5V", "VBUS", "VIO"}
 GRID = 0.25
-MARGIN = 0.25
+MARGIN = 0.25          # between ICs
+PASSIVE_MARGIN = 0.8   # around resistors: leaves some room for references
+DECOUPLING_MARGIN = 0.3
 MAX_RADIUS = 30.0
 
 
@@ -64,8 +66,22 @@ class Placer:
                     index.setdefault(name, []).append((fp, pad))
         return index
 
+    def _group_ic_pad(self, fp, nets):
+        group = self.groups.get(fp.GetReference())
+        for other in self.board.GetFootprints():
+            ref = other.GetReference()
+            if ref in self.placed and ref.startswith("U") and self.groups.get(ref) == group:
+                for pad in other.Pads():
+                    if pad.GetNetname() in nets and pad.GetNetname() != "GND":
+                        return to_mm(pad.GetPosition().x), to_mm(pad.GetPosition().y)
+        return None
+
     def target(self, fp, index):
         nets = [p.GetNetname() for p in fp.Pads() if p.GetNetname()]
+        if fp.GetReference().startswith("C"):
+            pad = self._group_ic_pad(fp, nets)
+            if pad:
+                return pad
         signal = [n for n in nets if n not in POWER_NETS and not n.startswith("unconnected")]
         best = None
         for n in signal:
@@ -88,16 +104,24 @@ class Placer:
         x0, y0, x1, y1 = self.area
         return (x0 + x1) / 2, (y0 + y1) / 2
 
-    def _fits(self, box):
+    def _fits(self, box, margin=MARGIN):
         x0, y0, x1, y1 = self.area
         if box[0] < x0 or box[1] < y0 or box[2] > x1 or box[3] > y1:
             return False
-        return not any(overlaps(box, other) for other in self.boxes)
+        return not any(overlaps(box, other, margin) for other in self.boxes)
 
     def place(self, fp):
         index = self._pads_by_net()
         tx, ty = self.target(fp, index)
-        rotations = [0, 90] if len(fp.Pads()) <= 3 else [0, 90, 180, 270]
+        small = len(fp.Pads()) <= 3
+        rotations = [0, 90] if small else [0, 90, 180, 270]
+        ref = fp.GetReference()
+        if ref.startswith("C"):
+            margin = DECOUPLING_MARGIN
+        elif small:
+            margin = PASSIVE_MARGIN
+        else:
+            margin = MARGIN
         steps = int(MAX_RADIUS / GRID)
         for r in range(0, steps):
             ring = []
@@ -115,7 +139,7 @@ class Placer:
                     fp.SetOrientationDegrees(rot)
                     fp.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
                     box = courtyard_box(fp)
-                    if self._fits(box):
+                    if self._fits(box, margin):
                         self.mark_placed(fp)
                         return True
         return False
@@ -138,8 +162,21 @@ def run(board, area, keepouts, groups):
             placer.mark_placed(fp)
         else:
             pending.append(fp)
+    # Each IC is followed by the capacitors of its schematic group, so decoupling gets the
+    # spots closest to the IC pins before anything else competes for them.
+    ordered = []
+    ics = [fp for fp in board.GetFootprints() if fp.GetReference().startswith("U")]
+    for ic in sorted(ics, key=lambda f: (not f.IsLocked(), priority(f))):
+        if not ic.IsLocked():
+            ordered.append(ic)
+        grp = groups.get(ic.GetReference())
+        for fp in sorted(pending, key=priority):
+            if (fp.GetReference().startswith("C") and groups.get(fp.GetReference()) == grp
+                    and fp not in ordered):
+                ordered.append(fp)
+    ordered += [fp for fp in sorted(pending, key=priority) if fp not in ordered]
     failed = []
-    for fp in sorted(pending, key=priority):
+    for fp in ordered:
         if not placer.place(fp):
             failed.append(fp.GetReference())
     return failed
