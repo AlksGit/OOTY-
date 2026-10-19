@@ -7,14 +7,26 @@ Tu travailles par **phases**, tu valides chaque phase avec les outils KiCad, et 
 
 ## 1. Le projet (à remplir)
 
-- **Nom** : `<nom_projet>`
-- **Fonction** : <ce que fait la carte>
-- **Alimentation** : <ex. LiPo 3.7 V + USB-C 5 V, conso max ...>
-- **MCU / composants imposés** : <ex. nRF52840 module, ESP32-C3, ...>
-- **Interfaces** : <USB, I2C, SPI, connecteurs, debug SWD, ...>
-- **Contraintes mécaniques** : <dimensions max, trous de fixation, hauteur max, position des connecteurs>
-- **Couches** : <2 / 4>
-- **Fabricant / assemblage** : <ex. JLCPCB, PCBWay, Eurocircuits> — **règles de fab** : <trace/espace min, via min, épaisseur>
+- **Nom** : `OOTY`
+- **Fonction** : carte HIL (Hardware-In-the-Loop) pilotée par USB depuis un PC, pour tester un DUT dans des workflows automatisés (notamment Claude) et faciliter le télétravail : alimenter / couper le DUT, le flasher et le debugger, mesurer sa consommation, piloter et lire ses IO, dialoguer en UART/I2C/SPI.
+- **Alimentation** : USB-C 5 V (la carte HIL et les rails fournis au DUT). Budget de puissance à établir en Phase 0.
+- **MCU / composants imposés** : STM32 (modèle à choisir en Phase 1), programmé via son propre connecteur JTAG/SWD.
+- **Interfaces** :
+  - USB-C vers le PC hôte
+  - Rails DUT : 3V3 et 5V fixes, 3V3 et 5V commutés (hard reboot), avec limitation de courant / eFuse + flag de défaut, et mesure tension/courant
+  - Sonde SWD/JTAG intégrée vers le DUT (CMSIS-DAP)
+  - Lignes RESET et BOOT open-drain vers le DUT
+  - UART TX/RX + GND
+  - 4 entrées + 4 sorties numériques
+  - Entrées analogiques (ADC) + sortie DAC
+  - Bus I2C et SPI exposés
+  - Tension d'IO réglable (1.8 / 3.3 / 5 V) via level shifters (UART, IO)
+  - Protection ESD (TVS) + résistances série sur toutes les pins exposées
+  - LED « alim OK » + LED « heartbeat » firmware
+  - Connecteur de programmation/debug du STM32 de la carte HIL
+- **Contraintes mécaniques** : 85 × 55 mm max (plus petit = mieux). Connecteurs DUT en headers 2.54 mm. Trous de fixation et hauteur max : à définir en Phase 0.
+- **Couches** : à décider en Phase 0 (2 vs 4 selon densité et coût, justification dans `NOTES.md`).
+- **Fabricant / assemblage** : le moins cher — PCBWay proposé, à comparer avec JLCPCB en Phase 0 — **règles de fab** : à fixer en Phase 0 selon le fabricant retenu.
 - **Préférence composants** : CMS, 0402 ou 0603 minimum, pièces en stock chez le fabricant si assemblage
 
 Si une info manque et qu'elle impacte le design, **demande avant de deviner**.
