@@ -176,16 +176,25 @@ Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils
 - Traversant (headers, support écran) : soudé par JLCPCB, 3.58 $ par commande + 0.0164 $/point (≈ 42 points ≈ 0.7 $). Moins cher que de souder à la main.
 - Sources : https://jlcpcb.com/help/article/pcb-assembly-price, https://jlcpcb.com/help/article/pcb-assembly-faqs, https://jlcpcb.com/capabilities/pcb-assembly-capabilities
 
-### Estimation de coût (5 cartes, `python scripts/bom_draft.py`)
+### Décisions du checkpoint BOM (2026-10-19)
+L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenues :
+1. **INA226** monté ; passage à l'INA228 possible plus tard sans modifier le PCB (même brochage), seul le firmware change.
+2. **STM32G431RBT6** confirmé (portage CMSIS-DAP à prévoir côté firmware).
+3. **TCA9517A** pour l'I2C DUT, à la place du PCA9306.
+4. **J_UART et J_ANA regroupés** en un header 1×7 `J_UART_ANA` (TX, RX, GND, AIN1, AIN2, AOUT, GND) : −2 références Extended.
+5. **Pull-ups 10 kΩ externes** sur les 4 FAULT des AP22653 et l'ALERT des INA226 (définies pendant le boot, sans dépendre de la configuration GPIO).
+- **Fabricant** : décision reportée à la Phase 6 sur devis réels JLCPCB et PCBWay. PCBWay ne facture pas de frais par référence mais revend les composants avec une marge (≈ ×2 rapporté) et a un PCB plus cher ; pour une petite série avec beaucoup de références, il peut être moins cher. Sources : https://www.pcbway.com/, https://forum.contextualelectronics.com/t/pcbway-assembly-service-my-experience/2541, https://www.anypcba.com/decoding-pcbway-assembly-cost-a-comprehensive-guide.html
+
+### Estimation de coût JLCPCB (5 cartes, `python scripts/bom_draft.py`)
 
 | Poste | Montant |
 |---|---|
 | Composants (14.51 $/carte × 5) | ≈ 73 $ |
-| Frais de chargement Extended (30 références × 3.07 $) | ≈ 92 $ |
+| Frais de chargement Extended (28 références × 3.07 $) | ≈ 86 $ |
 | Setup + pochoir Economic PCBA | ≈ 10 $ |
 | Soudure traversant (3.58 $ + ≈ 0.7 $/carte) | ≈ 7 $ |
 | PCB 4 couches ≈ 70 × 50 mm × 5 (non devisé) | ≈ 10–20 $ |
-| **Total hors port** | **≈ 190–200 $, soit ≈ 40 $/carte** |
+| **Total hors port** | **≈ 185–195 $, soit ≈ 38 $/carte** (≈ 28 $ à 10 cartes, ≈ 22 $ à 20) |
 
 - Premier poste de coût : les **frais Extended**. Ils sont fixes par commande et pèsent beaucoup sur 5 cartes, beaucoup moins sur 20+.
 - Pistes pour les réduire :

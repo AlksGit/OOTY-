@@ -64,10 +64,10 @@ flowchart LR
 | Buck 3V3 | Logique HIL + rails 3V3 du DUT | ≥ 1.5 A en sortie, pour garder de la marge sur une charge max ≈ 0.87 A (un LDO dissiperait ≈ 1.5 W, voir `NOTES.md`). Choix du composant en Phase 1. |
 | Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Limiteur de courant toujours actif** sur chaque rail fixe (interrupteur limité ou eFuse, EN tiré à l'état actif), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. |
 | Rails commutés 3V3_SW / 5V_SW | Hard reboot du DUT | Load switch / eFuse avec limitation de courant, enable piloté par le MCU, flag FAULT relu par le MCU, décharge de sortie (vrai 0 V à l'arrêt), état OFF au démarrage du MCU. |
-| Mesure V/I | Consommation du DUT | Un moniteur par rail commuté, haute résolution (orientation INA228, choix en Phase 1), shunt côté haut, sur le bus I2C **interne** (séparé de l'I2C exposé au DUT). |
+| Mesure V/I | Consommation du DUT | Un moniteur par rail commuté : **INA226** (résolution 50 µA sur 5V_SW, 25 µA sur 3V3_SW), remplaçable sans modifier le PCB par l'INA228 (même brochage, ≈ 6 / 3 µA) quand il sera disponible. Shunt côté haut, sur le bus I2C **interne** (séparé de l'I2C exposé au DUT). |
 | Écran | Affichage local | **Module OLED 0.91" 128 × 32, contrôleur SSD1306, I2C** (adresse 0x3C), 4 broches GND/VCC/SCL/SDA, ~36 × 12.5 mm. Sur le bus I2C interne. Monté sur un header 4 broches. Affiche par exemple la consommation de chaque rail commuté, l'état ON/OFF/FAULT des rails et la tension VIO. Référence exacte et approvisionnement en Phase 1. |
 | VIO | Tension des signaux côté DUT | Sélectionnable par logiciel : **1.8 / 3.3 / 5 V internes ou VIO externe** (référence VTref fournie par le DUT, comme une sonde de debug classique). |
-| Level shifters | Adapter 3V3 (MCU) ↔ VIO (DUT) | Lignes unidirectionnelles : buffers à direction fixe (famille 74LVC1T45/LVC8T245, 1.65–5.5 V). SWDIO : direction pilotée par le MCU. I2C : translateur open-drain (PCA9306 ou équivalent). Sortie haute impédance (OE) tant que VIO n'est pas établi. |
+| Level shifters | Adapter 3V3 (MCU) ↔ VIO (DUT) | Lignes unidirectionnelles : buffers à direction fixe (famille 74LVC1T45/LVC8T245, 1.65–5.5 V). SWDIO : direction pilotée par le MCU. I2C : buffer bidirectionnel TCA9517A (le PCA9306 ne couvre pas VIO de 1.8 à 5 V, voir `NOTES.md`). Sortie haute impédance (OE) tant que VIO n'est pas établi. |
 | RESET / BOOT | Reset doux, bootloader | Sorties **open-drain** (le DUT garde ses propres pull-ups), compatibles toutes tensions VIO. |
 | Sonde SWD DUT | Flash/debug | Firmware CMSIS-DAP sur le STM32. Signaux SWCLK, SWDIO, SWO, nRESET (= ligne RESET). |
 | Analogique | Mesures et stimuli | **2 entrées ADC 0–5 V** (diviseur + filtre, impédance d'entrée ≥ 100 kΩ). **1 sortie DAC 0–3.3 V** bufferisée (AOP), courant ≥ 5 mA. |
@@ -114,10 +114,9 @@ Tous les connecteurs DUT sont des **headers mâles 2.54 mm**, groupés sur un m�
 |---|---|
 | J_PWR | 5V, 5V_SW, 3V3, 3V3_SW, VIO, GND ×2 |
 | J_DBG (SWD DUT) | VTref / VIO, SWDIO, SWCLK, SWO, RESET, BOOT, GND |
-| J_UART | TX, RX, GND |
+| J_UART_ANA | TX, RX, GND, AIN1, AIN2, AOUT, GND |
 | J_IO | IN1..IN4, OUT1..OUT4, GND ×2 |
 | J_BUS | I2C SDA, SCL, SPI SCK, MOSI, MISO, CS, GND |
-| J_ANA | AIN1, AIN2, AOUT, GND |
 
 Le nombre exact et l'ordre des broches seront figés en Phase 2 (schéma).
 
@@ -164,7 +163,7 @@ Le nombre exact et l'ordre des broches seront figés en Phase 2 (schéma).
 
 ## 7. Fabrication
 
-- **Fabricant : JLCPCB** (PCB + assemblage). Voir `NOTES.md` pour la comparaison avec PCBWay.
+- **Fabricant : JLCPCB ou PCBWay, décision en Phase 6 sur devis réels** (voir `NOTES.md`). Les règles ci-dessous sont compatibles avec les deux. Les composants sont choisis chez LCSC, achetables aussi par PCBWay.
 - **Couches : 4** (Signal / GND / Power / Signal). Voir `NOTES.md`.
 - **Règles de conception (conservatrices, au-dessus des minima JLCPCB)** :
 
