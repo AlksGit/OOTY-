@@ -239,7 +239,8 @@ def sensing_sheet():
         sh.group(f"Current monitor {rail}")
         part(sh, "R", "Device:R", shunt, {"1": pre, "2": rail}, value=BOM[shunt].value, rot=90)
         part(sh, "U", "Sensor_Energy:INA226", "C49851", {
-            "Vin+": pre, "Vin-": rail, "Vbus": rail, "VS": "+3V3", "GND": "GND",
+            # Vbus upstream of the shunt: its ~1 MOhm input would otherwise add ~5 uA through it.
+            "Vin+": pre, "Vin-": rail, "Vbus": pre, "VS": "+3V3", "GND": "GND",
             "A1": "GND", "A0": a0, "SDA": "I2C_INT_SDA", "SCL": "I2C_INT_SCL",
             "~{Alert}": "INA_ALERT"})
         cap(sh, C100N, "+3V3")

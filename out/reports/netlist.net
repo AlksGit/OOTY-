@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "C:\\Users\\alexandr.perrot\\Documents\\Personal work\\Hard\\OOTY-\\OOTY.kicad_sch")
-		(date "2026-10-19T16:36:51")
+		(date "2026-10-19T16:46:59")
 		(tool "Eeschema 10.0.7")
 		(sheet
 			(number "1")
@@ -16047,7 +16047,7 @@
 		(net
 			(code "1")
 			(name "+3V3")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C14")
 				(pin "1")
@@ -16382,7 +16382,7 @@
 		(net
 			(code "2")
 			(name "+5V")
-			(class "Default")
+			(class "HighCurrent")
 			(node
 				(ref "C11")
 				(pin "1")
@@ -17137,7 +17137,7 @@
 		(net
 			(code "35")
 			(name "/power/SW_3V3")
-			(class "Default")
+			(class "HighCurrent")
 			(node
 				(ref "L1")
 				(pin "1")
@@ -17259,7 +17259,7 @@
 		(net
 			(code "40")
 			(name "3V3_DUT")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C18")
 				(pin "1")
@@ -17298,7 +17298,7 @@
 		(net
 			(code "41")
 			(name "3V3_SW")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "J4")
 				(pin "4")
@@ -17318,12 +17318,6 @@
 			)
 			(node
 				(ref "U10")
-				(pin "8")
-				(pinfunction "Vbus_8")
-				(pintype "input")
-			)
-			(node
-				(ref "U10")
 				(pin "9")
 				(pinfunction "Vin-_9")
 				(pintype "input")
@@ -17338,7 +17332,7 @@
 		(net
 			(code "42")
 			(name "3V3_SW_PRE")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C15")
 				(pin "1")
@@ -17361,6 +17355,12 @@
 				(pintype "input")
 			)
 			(node
+				(ref "U10")
+				(pin "8")
+				(pinfunction "Vbus_8")
+				(pintype "input")
+			)
+			(node
 				(ref "U6")
 				(pin "6")
 				(pinfunction "OUT_6")
@@ -17370,7 +17370,7 @@
 		(net
 			(code "43")
 			(name "5V_DUT")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C12")
 				(pin "1")
@@ -17409,7 +17409,7 @@
 		(net
 			(code "44")
 			(name "5V_SW")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "J4")
 				(pin "2")
@@ -17435,12 +17435,6 @@
 			)
 			(node
 				(ref "U9")
-				(pin "8")
-				(pinfunction "Vbus_8")
-				(pintype "input")
-			)
-			(node
-				(ref "U9")
 				(pin "9")
 				(pinfunction "Vin-_9")
 				(pintype "input")
@@ -17449,7 +17443,7 @@
 		(net
 			(code "45")
 			(name "5V_SW_PRE")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C10")
 				(pin "1")
@@ -17475,6 +17469,12 @@
 				(ref "U9")
 				(pin "10")
 				(pinfunction "Vin+_10")
+				(pintype "input")
+			)
+			(node
+				(ref "U9")
+				(pin "8")
+				(pinfunction "Vbus_8")
 				(pintype "input")
 			)
 		)
@@ -17864,7 +17864,7 @@
 		(net
 			(code "63")
 			(name "GND")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C1")
 				(pin "2")
@@ -19640,7 +19640,7 @@
 		(net
 			(code "111")
 			(name "USB_DM")
-			(class "Default")
+			(class "USB")
 			(node
 				(ref "J1")
 				(pin "A7")
@@ -19675,7 +19675,7 @@
 		(net
 			(code "112")
 			(name "USB_DP")
-			(class "Default")
+			(class "USB")
 			(node
 				(ref "J1")
 				(pin "A6")
@@ -19710,7 +19710,7 @@
 		(net
 			(code "113")
 			(name "VBUS")
-			(class "Default")
+			(class "HighCurrent")
 			(node
 				(ref "C1")
 				(pin "1")
@@ -19767,7 +19767,7 @@
 		(net
 			(code "114")
 			(name "VIO")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C39")
 				(pin "1")
@@ -19921,7 +19921,7 @@
 		(net
 			(code "115")
 			(name "VIO_MODE")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "R32")
 				(pin "1")
@@ -19943,7 +19943,7 @@
 		(net
 			(code "116")
 			(name "VIO_MON")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "C35")
 				(pin "1")
@@ -19969,7 +19969,7 @@
 		(net
 			(code "117")
 			(name "VIO_PR1")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "R30")
 				(pin "2")
@@ -19996,7 +19996,7 @@
 		(net
 			(code "118")
 			(name "VIO_VSEL")
-			(class "Default")
+			(class "Power")
 			(node
 				(ref "Q1")
 				(pin "1")

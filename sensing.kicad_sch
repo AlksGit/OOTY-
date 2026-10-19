@@ -2634,7 +2634,7 @@
 			)
 		)
 	)
-	(global_label "5V_SW"
+	(global_label "5V_SW_PRE"
 		(shape bidirectional)
 		(at 34.29 60.96 180)
 		(fields_autoplaced yes)
@@ -2778,7 +2778,7 @@
 			)
 		)
 	)
-	(global_label "3V3_SW"
+	(global_label "3V3_SW_PRE"
 		(shape bidirectional)
 		(at 35.56 140.97 180)
 		(fields_autoplaced yes)
