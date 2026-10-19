@@ -26,7 +26,18 @@ Décisions de design, calculs, versions d'outils, warnings justifiés.
 | `scripts/create_project.py` | Création idempotente du projet vide, des tables de librairies et de l'arborescence |
 | `scripts/run_checks.py` | ERC + DRC en JSON dans `out/reports/` (`--erc-only`, `--drc-only`, `--schematic-parity`) |
 
-## Décisions Phase 0 (TASK-003) — à valider au checkpoint
+## Décisions Phase 0 (TASK-003) — validées au checkpoint du 2026-10-19
+
+Validé par l'utilisateur : lecture CC, limites de courant par rail, limitation aussi sur les rails fixes, 2 ADC 0–5 V + 1 DAC 0–3.3 V, option VIO externe, 4 trous M3 sans contrainte de hauteur, JLCPCB, 4 couches. Ajout utilisateur : petit écran I2C bon marché.
+
+### Limitation des rails fixes
+Issue de la revue de la spec : le 3V3 fixe du DUT sort du même buck que le STM32 de la carte HIL. Sans limiteur dédié, un court-circuit sur ce rail ferait chuter le 3V3 du MCU et la carte deviendrait injoignable (Claude ne pourrait plus rien relancer). Chaque rail fixe passe donc par un limiteur toujours actif avec flag FAULT, comme les rails commutés.
+
+### Écran : module OLED 0.91" 128 × 32 SSD1306 I2C
+- Choix : le format le plus courant et le moins cher, piloté en I2C (2 fils, sur le bus interne déjà présent pour les moniteurs de courant, aucune broche MCU en plus), alimenté en 3.3 V, adresse 0x3C. Le module fait ~36 × 12.5 mm ; un 0.96" 128 × 64 serait plus lisible mais occupe ~27 × 27 mm, trop pour une carte visée à ~70 × 50 mm.
+- Module sur header 4 broches (GND/VCC/SCL/SDA) plutôt que dalle nue sur nappe FPC : pas de pompe de charge ni de connecteur FPC à concevoir, remplaçable.
+- Vérifier en Phase 1 : l'ordre des broches du module retenu (il varie selon les fabricants, GND/VCC parfois inversés), la disponibilité chez LCSC, l'absence de conflit d'adresse I2C avec les moniteurs de courant.
+- Source : https://waveshare.com/0.91inch-OLED-Module.htm (3.3/5 V, 36 × 12.5 mm, SSD1306, I2C).
 
 ### Couches : 4 (Signal / GND / Power / Signal)
 Le projet KiCad est encore initialisé en 2 couches ; le passage en 4 couches sera appliqué en Phase 3.
