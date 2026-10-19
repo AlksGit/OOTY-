@@ -61,7 +61,7 @@ flowchart LR
 |---|---|---|
 | USB-C | Alimentation et données | USB 2.0 Full Speed (12 Mbit/s), Rd 5.1 kΩ sur CC1/CC2 (sink), ESD sur D+/D-/VBUS. **Lecture des tensions CC1/CC2 par l'ADC** pour connaître le courant annoncé par la source (défaut USB / 1.5 A / 3 A). |
 | Protection d'entrée | Protéger le port USB du PC | Limitation du courant total tiré sur VBUS, TVS sur VBUS. Pas de protection contre l'inversion de polarité (inutile, USB-C détrompé). |
-| Buck 3V3 | Logique HIL + rails 3V3 du DUT | ≥ 1 A en sortie (un LDO dissiperait ≈ 1.5 W, voir `NOTES.md`). Choix du composant en Phase 1. |
+| Buck 3V3 | Logique HIL + rails 3V3 du DUT | ≥ 1.5 A en sortie, pour garder de la marge sur une charge max ≈ 0.87 A (un LDO dissiperait ≈ 1.5 W, voir `NOTES.md`). Choix du composant en Phase 1. |
 | Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Limiteur de courant toujours actif** sur chaque rail fixe (interrupteur limité ou eFuse, EN tiré à l'état actif), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. |
 | Rails commutés 3V3_SW / 5V_SW | Hard reboot du DUT | Load switch / eFuse avec limitation de courant, enable piloté par le MCU, flag FAULT relu par le MCU, décharge de sortie (vrai 0 V à l'arrêt), état OFF au démarrage du MCU. |
 | Mesure V/I | Consommation du DUT | Un moniteur par rail commuté, haute résolution (orientation INA228, choix en Phase 1), shunt côté haut, sur le bus I2C **interne** (séparé de l'I2C exposé au DUT). |
