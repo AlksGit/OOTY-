@@ -34,8 +34,24 @@ NOTES_HEIGHT = 30.0    # reserved band above the bottom border for sheet notes
 POWER_STUB = 3.81
 
 
-def uid():
-    return str(uuid.uuid4())
+_UUID_NS = uuid.UUID("6f6f7479-0000-4000-8000-000000000000")
+_uid_scope = {"name": "global", "count": 0}
+
+
+def uid(key=None):
+    """Deterministic UUID: from `key` if given, else from the current scope and a counter.
+
+    Stable UUIDs keep the schematic <-> PCB link (footprint paths) across regenerations.
+    """
+    if key is None:
+        _uid_scope["count"] += 1
+        key = f"{_uid_scope['name']}:{_uid_scope['count']}"
+    return str(uuid.uuid5(_UUID_NS, key))
+
+
+def uid_scope(name):
+    _uid_scope["name"] = name
+    _uid_scope["count"] = 0
 
 
 def snap(v):
@@ -109,7 +125,7 @@ class Sheet:
         self.paper = paper
         self.groups = []
         self.notes = []
-        self.uuid = uid()
+        self.uuid = uid(f"sheet:{name}")
 
     def group(self, title, column_break=False):
         self.groups.append(Group(title, column_break=column_break))
@@ -265,7 +281,7 @@ def instance_node(part, ref, sym, path, value, fields, pos, in_bom, on_board=Tru
     node = S("symbol", S("lib_id", part.lib_id), at(x, y, part.rot), S("unit", Sym(str(part.unit))),
              S("exclude_from_sim", Sym("no")), S("in_bom", yesno(in_bom)),
              S("on_board", yesno(on_board)), S("dnp", yesno(dnp)),
-             S("fields_autoplaced", Sym("yes")), S("uuid", uid()))
+             S("fields_autoplaced", Sym("yes")), S("uuid", uid(f"symbol:{path}:{ref}")))
     ref_hide = ref.startswith("#")
     # Field angles are stored in sheet orientation; keep text horizontal on rotated symbols.
     fa = 90 if part.rot in (90, 270) else 0
@@ -329,6 +345,7 @@ def sheet_header(sheet_uuid, title, paper, rev, date):
 
 
 def build_sheet(sheet, writer, global_nets, bom_fields, path, rev, date):
+    uid_scope(sheet.name)
     layout(sheet)
     lib_ids = {p.lib_id for p in sheet.parts}
     body = []
@@ -425,7 +442,7 @@ def write_project(sheets, bom_fields, title, rev, date, root_notes=()):
     global_nets = {n for s in nets_per_sheet.values() for n in s
                    if sum(n in other for other in nets_per_sheet.values()) > 1}
 
-    root_uuid = uid()
+    root_uuid = uid("root")
     writer = Writer(root_uuid)
     files = []
     for sheet in sheets:
@@ -434,6 +451,7 @@ def write_project(sheets, bom_fields, title, rev, date, root_notes=()):
         path = PROJECT_DIR / f"{sheet.name}.kicad_sch"
         path.write_text(dumps(node) + "\n", encoding="utf-8", newline="\n")
         files.append(path)
+    uid_scope("root")
     root = PROJECT_DIR / f"{PROJECT_NAME}.kicad_sch"
     root.write_text(dumps(build_root(root_uuid, title, sheets, rev, date, root_notes)) + "\n",
                     encoding="utf-8", newline="\n")
