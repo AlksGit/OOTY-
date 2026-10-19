@@ -357,6 +357,33 @@ L'empilement est écrit dans le fichier par script (non exposé par l'API pcbnew
 ### Vérification
 - DRC `--schematic-parity` : **0 erreur, 0 écart de parité** ; nets non routés attendus à ce stade ; 5 warnings de sérigraphie (références de headers) traités au placement.
 
+## Phase 4 — Placement (TASK-007)
+
+### Méthode
+- `scripts/placement.py` : connecteurs, trous et **ancres** placés à la main (MCU, USB, protections, buck, 4 limiteurs, INA226, mux VIO, 2 × 8T245, LED).
+- `scripts/autoplace.py` : placement glouton des autres composants. Chaque CI est suivi immédiatement des condensateurs de son groupe schéma, visés sur la broche d'alimentation correspondante. Les autres composants visent le pad du net le plus spécifique (ESD → broche du header, résistance série → ESD/translateur, etc.). Recherche en spirale sur une grille de 0.25 mm sans chevauchement de courtyards.
+- `scripts/silk.py` : références en 1.0 mm (hauteur minimale lisible JLCPCB), horizontales (verticales pour les composants verticaux), hors pads ; **nom de chaque broche** gravé à côté des headers DUT ; marquage « OOTY HIL rev A / 2026-10 », LED « PWR » / « HB ».
+- `scripts/check_placement.py` : distance de chaque condensateur de découplage à la broche qu'il découple.
+- `scripts/render_pcb.py` : rendus 3D dessus / dessous / isométrique, SVG du placement, plan de montage PDF (F.Fab).
+
+### Zones
+| Zone | Contenu |
+|---|---|
+| Bord gauche | USB-C, USBLC6, ESD CC, TVS, PTC |
+| Gauche-centre | 4 × AP22653 en carré avec leurs condensateurs et résistances ILIM |
+| Bas-gauche | Buck TLV62569 + inductance |
+| Haut (sous le module OLED) | 2 × INA226 + shunts, I2C interne |
+| Centre | STM32G431 + découplage |
+| Centre-droit / haut-droit | Mux VIO + LDO, SN74LVC1T45, TCA9517A |
+| Bas-droit | 2 × SN74LVC8T245, résistances série |
+| Le long des headers | ESD TPD4E05U06 |
+
+### Résultats
+- DRC `--schematic-parity` : **0 erreur, 0 écart de parité**, 2 warnings de sérigraphie (références touchant le contour sérigraphié de L1, sans impact).
+- Découplage : **35 condensateurs sur 37 à moins de 3 mm** de leur broche ; C49 à 3.5 mm (U16 VCCA), C5 à 3.4 mm (Cff non monté du buck).
+- Références : ≈ 88 sur la sérigraphie, **97 reportées sur le plan de montage** (`out/renders/pcb_placement_assembly_top.pdf`) faute de place autour des 0402 sans descendre sous 1 mm de hauteur de texte. Tous les CI, connecteurs, LED et points de test ont leur référence en sérigraphie.
+- À reprendre au routage si nécessaire : rapprocher C49 de U16, vérifier la boucle d'entrée / sortie du buck (Cin – VIN – GND – L – Cout) une fois routée.
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide

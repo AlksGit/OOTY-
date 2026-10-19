@@ -1,11 +1,6 @@
 # Backlog
 
 ## TODO
-- [ ] TASK-007 | Phase 4 — Placement
-  > Placement complet, rendus 3D dessus/dessous + SVG dans out/renders/.
-  > ⏸ Checkpoint : placement validé avant tout routage.
-  > Blocked by: TASK-006
-
 - [ ] TASK-008 | Phase 5 — Routage
   > Routage complet, zones remplies, DRC --schematic-parity : 0 erreur, 0 net non connecté. SVG par couche + rendu 3D.
   > ⏸ Checkpoint : routage relu.
@@ -36,7 +31,15 @@
   > Outline, trous de fixation, keepouts, stack-up, net classes, import du schéma, rendu 3D vide avec connecteurs placés.
   > ⏸ Checkpoint : outline + règles validés.
   > Branch: feat/task-006-pcb-setup (empilée sur feat/task-005-schematic)
-  > Blocked by: TASK-005 (import du schéma nécessaire) — travail avancé en mode autonome, checkpoint en attente
+  > Statut : setup fait en mode autonome (85×55, 4 couches, règles, classes de nets, connecteurs placés, DRC 0 erreur). ⏸ Checkpoint à valider.
+  > Blocked by: TASK-005
+
+- [ ] TASK-007 | Phase 4 — Placement
+  > Placement complet, rendus 3D dessus/dessous + SVG dans out/renders/.
+  > ⏸ Checkpoint : placement validé avant tout routage.
+  > Branch: feat/task-007-placement (empilée sur feat/task-006-pcb-setup)
+  > Statut : placement fait en mode autonome (DRC 0 erreur, parité 0, découplage vérifié). ⏸ Checkpoint placement à valider AVANT tout routage.
+  > Blocked by: TASK-006
 
 ## ON HOLD
 
