@@ -1,31 +1,6 @@
 # Backlog
 
 ## TODO
-- [ ] TASK-003 | Phase 0 — Spécification
-  > SPEC.md : blocs fonctionnels, budget de puissance, interfaces, contraintes méca, règles de fab.
-  > Schéma bloc Mermaid dans SPEC.md.
-  > Décision 2 vs 4 couches justifiée dans NOTES.md.
-  > Périmètre :
-  > Base :
-  > - Alimentation USB-C
-  > - Rails DUT : 3V3 et 5V fixes + 3V3 et 5V commutés (hard reboot du DUT)
-  > - UART TX/RX + GND
-  > - 4 entrées + 4 sorties numériques
-  > - MCU STM32 + connecteur de programmation (pour la carte HIL elle-même)
-  > Améliorations retenues :
-  > - (1) Sonde SWD/JTAG intégrée vers le DUT (CMSIS-DAP) pour flasher/debugger le DUT
-  > - (2) Mesure tension/courant de la consommation du DUT sur les rails commutés (plage de mesure à définir)
-  > - (3) Limitation de courant / eFuse sur les rails commutés + remontée du flag de défaut au MCU
-  > - (4) Lignes RESET et BOOT open-drain vers le DUT
-  > - (5) Tension d'IO réglable (1.8 / 3.3 / 5 V) avec level shifters sur UART et IO
-  > - (6) Entrées analogiques (ADC) + sortie DAC
-  > - (8) Bus I2C et SPI exposés
-  > - (9) Protection ESD (TVS) + résistances série sur toutes les pins exposées
-  > - LED "alim OK" (directement sur le rail) + LED "heartbeat" pilotée par le firmware
-  > Hors périmètre rev A : IO multifonction, LED par IO, entrée alim externe / USB-PD, isolation galvanique, switch USB DUT, n° de série custom, watchdog hôte.
-  > ⏸ Checkpoint : spec validée par l'utilisateur.
-  > Blocked by: TASK-001 (la spec reformule les infos projet de §1)
-
 - [ ] TASK-004 | Phase 1 — BOM préliminaire
   > bom/bom_draft.csv complet (Ref, Valeur, MPN, Fabricant, Package, Footprint, LCSC, Prix, Stock, Datasheet), chaque MPN vérifié avec source.
   > Calculs dimensionnants dans NOTES.md.
@@ -58,17 +33,37 @@
   > Blocked by: TASK-008 (DRC propre)
 
 ## IN PROGRESS
-- [ ] TASK-002 | Setup environnement + arborescence
-  > Versions kicad-cli / kiutils / pcbnew / java notées dans NOTES.md.
-  > Arborescence §5 créée (lib/, bom/, scripts/, out/reports, out/renders, out/fab).
-  > Projet KiCad vide créé, sym-lib-table et fp-lib-table projet en place (chemins ${KIPRJMOD}).
-  > Commit sur la branche de travail.
-  > Branch: feat/task-002-env-setup
-  > Blocked by: —
+- [ ] TASK-003 | Phase 0 — Spécification
+  > SPEC.md : blocs fonctionnels, budget de puissance, interfaces, contraintes méca, règles de fab.
+  > Schéma bloc Mermaid dans SPEC.md.
+  > Décision 2 vs 4 couches justifiée dans NOTES.md.
+  > Périmètre :
+  > Base :
+  > - Alimentation USB-C
+  > - Rails DUT : 3V3 et 5V fixes + 3V3 et 5V commutés (hard reboot du DUT)
+  > - UART TX/RX + GND
+  > - 4 entrées + 4 sorties numériques
+  > - MCU STM32 + connecteur de programmation (pour la carte HIL elle-même)
+  > Améliorations retenues :
+  > - (1) Sonde SWD/JTAG intégrée vers le DUT (CMSIS-DAP) pour flasher/debugger le DUT
+  > - (2) Mesure tension/courant de la consommation du DUT sur les rails commutés (plage de mesure à définir)
+  > - (3) Limitation de courant / eFuse sur les rails commutés + remontée du flag de défaut au MCU
+  > - (4) Lignes RESET et BOOT open-drain vers le DUT
+  > - (5) Tension d'IO réglable (1.8 / 3.3 / 5 V) avec level shifters sur UART et IO
+  > - (6) Entrées analogiques (ADC) + sortie DAC
+  > - (8) Bus I2C et SPI exposés
+  > - (9) Protection ESD (TVS) + résistances série sur toutes les pins exposées
+  > - LED "alim OK" (directement sur le rail) + LED "heartbeat" pilotée par le firmware
+  > Hors périmètre rev A : IO multifonction, LED par IO, entrée alim externe / USB-PD, isolation galvanique, switch USB DUT, n° de série custom, watchdog hôte.
+  > ⏸ Checkpoint : spec validée par l'utilisateur.
+  > Branch: feat/task-003-spec
+  > Blocked by: TASK-001 (la spec reformule les infos projet de §1) — levé
 
 ## ON HOLD
 
 ## DONE
+- [x] TASK-002 | Setup environnement + arborescence
+  > Merged in: devape (2026-10-19)
 - [x] TASK-001 | Remplir §1 de CLAUDE.md + créer la branche devape
   > Merged in: devape (2026-10-19)
 
