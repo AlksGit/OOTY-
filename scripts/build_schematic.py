@@ -31,6 +31,7 @@ R16K = "C25759"
 R39K = "C25783"
 R68K = "C36871"
 R100K = "C25741"
+R1M = "C26083"
 C1N = "C1523"
 C10N = "C15195"
 C100N = "C307331"
@@ -98,6 +99,8 @@ def power_sheet():
         "D+": "USB_DP", "D-": "USB_DM", "SBU1": None, "SBU2": None})
     res(sh, R5K1, "CC1", "GND")
     res(sh, R5K1, "CC2", "GND")
+    part(sh, "U", "Power_Protection:TPD4E05U06DQA", "C138714", {
+        "D1+": "CC1", "D1-": "CC2", "D2+": None, "D2-": None, "GND": "GND", "NC": None})
     part(sh, "U", "Power_Protection:USBLC6-2SC6", "C7519", {
         "I/O1": "USB_DP", "I/O2": "USB_DM", "VBUS": "VBUS", "GND": "GND"})
     cap(sh, C100N, "VBUS")
@@ -106,7 +109,6 @@ def power_sheet():
     part(sh, "D", "Device:D_Zener", "C83329", {"1": "VBUS", "2": "GND"})
     part(sh, "F", "Device:Polyfuse", "C21003", {"1": "VBUS", "2": "+5V"}, value="PTC 2.6A",
          rot=90)
-    cap(sh, C10U25, "+5V")
     cap(sh, C100N, "+5V")
     pwr_flag(sh, "VBUS")
     pwr_flag(sh, "+5V")
@@ -119,6 +121,8 @@ def power_sheet():
     cap(sh, C100N, "+5V")
     part(sh, "L", "Device:L", "C167206", {"1": "SW_3V3", "2": "+3V3"}, value="2.2uH", rot=90)
     res(sh, R100K, "+3V3", "FB_3V3")
+    sh.add("C", "Device:C", "6.8pF DNP", {"1": "+3V3", "2": "FB_3V3"}, rot=90, in_bom=False,
+           dnp=True, fields={"Footprint": "Capacitor_SMD:C_0402_1005Metric"})
     res(sh, R22K, "FB_3V3", "GND")
     cap(sh, C22U, "+3V3")
     cap(sh, C22U, "+3V3")
@@ -187,7 +191,7 @@ MCU_PINS = {
     # DUT RESET / BOOT open-drain drivers
     "PC6": "RESET_DUT_CTL", "PC7": "BOOT_DUT_CTL",
     "PA10": "LED_HB",
-    "PB4": None,
+    "PB4": "BOOT_DIR",
 }
 
 
@@ -222,8 +226,8 @@ def mcu_sheet():
 
     sh.note("USB FS runs crystal-less (HSI48 + CRS). BOOT0 test pad: short to 3V3 for the "
             "system bootloader.")
-    sh.note("PB4/PB6 carry UCPD dead-battery pull-downs at reset: PB4 unused, PB6 drives "
-            "I2C_DUT_EN (low = disabled, safe default).")
+    sh.note("PB4/PB6 may carry UCPD dead-battery pull-downs at reset; BOOT_DIR and I2C_DUT_EN "
+            "also have external pull-downs. Firmware sets PWR_CR3.UCPD1_DBDIS first.")
     return sh
 
 
@@ -280,8 +284,10 @@ def vio_sheet():
         "ST": None, "GND": "GND"})
     cap(sh, C1U, "+5V")
     cap(sh, C1U, "VIO_LDO")
-    cap(sh, C10U, "VIO")
-    res(sh, R10K, "VIO_PR1", "+3V3")
+    cap(sh, C1U, "VIO")
+    # PR1 pulled up from +5V (not +3V3): MODE=0/PR1=0 would select 5 V while 3V3 ramps up.
+    res(sh, R10K, "+5V", "VIO_PR1")
+    res(sh, R22K, "VIO_PR1", "GND")
     res(sh, R100K, "VIO_MODE", "GND")
     test_point(sh, "VIO")
 
@@ -307,7 +313,7 @@ def vio_sheet():
 def translators_sheet():
     sh = Sheet("translators", "Level translators 3V3 <-> VIO")
 
-    sh.group("Outputs MCU -> DUT (SN74LVC8T245, DIR = A to B)")
+    sh.group("Outputs 3V3 -> VIO (DIR = A to B)")
     outs = ["OUT1", "OUT2", "OUT3", "OUT4", "UART_TX", "SPI_SCK", "SPI_MOSI", "SPI_CS"]
     nets = {"V_{CCA}": "+3V3", "V_{CCB}": "VIO", "GND": "GND", "DIR": "+3V3", "~{OE}": "LS_OE_N"}
     for i, name in enumerate(outs, 1):
@@ -318,7 +324,7 @@ def translators_sheet():
     cap(sh, C100N, "VIO")
     res(sh, R10K, "LS_OE_N", "+3V3")
 
-    sh.group("Inputs DUT -> MCU (SN74LVC8T245, DIR = B to A)", column_break=True)
+    sh.group("Inputs VIO -> 3V3 (DIR = B to A)", column_break=True)
     ins = ["IN1", "IN2", "IN3", "IN4", "UART_RX", "SPI_MISO", "SWO_DUT"]
     nets = {"V_{CCA}": "+3V3", "V_{CCB}": "VIO", "GND": "GND", "DIR": "GND", "~{OE}": "LS_OE_N",
             "A8": None, "B8": "GND"}
@@ -329,7 +335,7 @@ def translators_sheet():
     cap(sh, C100N, "+3V3")
     cap(sh, C100N, "VIO")
 
-    sh.group("SWD probe (SN74LVC1T45)", column_break=True)
+    sh.group("SWD probe")
     for sig in ("SWCLK", "SWDIO"):
         part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
             "VCCA": "+3V3", "VCCB": "VIO", "GND": "GND", "A": f"{sig}_MCU", "B": f"{sig}_B",
@@ -338,7 +344,7 @@ def translators_sheet():
         cap(sh, C100N, "VIO")
         res(sh, R100K, f"{sig}_DIR", "GND")
 
-    sh.group("DUT I2C buffer (TCA9517A, A = DUT, B = MCU)")
+    sh.group("DUT I2C (A = DUT)")
     part(sh, "U", "Logic_LevelTranslator:TCA9517ADGK", "C201698", {
         "VCCA": "VIO", "SCLA": "I2C_SCL", "SDAA": "I2C_SDA", "GND": "GND", "EN": "I2C_DUT_EN",
         "SDAB": "I2C_DUT_SDA_MCU", "SCLB": "I2C_DUT_SCL_MCU", "VCCB": "+3V3"})
@@ -348,12 +354,24 @@ def translators_sheet():
     res(sh, R4K7, "I2C_SDA", "VIO")
     res(sh, R4K7, "I2C_DUT_SCL_MCU", "+3V3")
     res(sh, R4K7, "I2C_DUT_SDA_MCU", "+3V3")
+    res(sh, R10K, "I2C_DUT_EN", "GND")
 
-    sh.group("RESET / BOOT open-drain")
-    for sig in ("RESET", "BOOT"):
-        part(sh, "Q", "Transistor_FET:2N7002", "C8545", {
-            "G": f"{sig}_DUT_CTL", "S": "GND", "D": f"{sig}_OD"})
-        res(sh, R100K, f"{sig}_DUT_CTL", "GND")
+    sh.group("RESET (OD) / BOOT (3-state)")
+    part(sh, "Q", "Transistor_FET:2N7002", "C8545", {
+        "G": "RESET_DUT_CTL", "S": "GND", "D": "RESET_OD"})
+    res(sh, R100K, "RESET_DUT_CTL", "GND")
+    part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
+        "VCCA": "+3V3", "VCCB": "VIO", "GND": "GND", "A": "BOOT_DUT_CTL", "B": "BOOT_B",
+        "DIR": "BOOT_DIR"})
+    cap(sh, C100N, "+3V3")
+    cap(sh, C100N, "VIO")
+    res(sh, R100K, "BOOT_DIR", "GND")
+
+    sh.group("Input bias 1M")
+    for net in ("IN1_B", "IN2_B", "IN3_B", "IN4_B", "SPI_MISO_B", "SWCLK_B", "BOOT_B"):
+        res(sh, R1M, net, "GND")
+    for net in ("UART_RX_B", "SWO_DUT_B", "SWDIO_B"):
+        res(sh, R1M, net, "VIO")
 
     sh.note("All translators are Hi-Z until firmware drives LS_OE_N low / DIR high / I2C_DUT_EN high.")
     return sh
@@ -368,7 +386,7 @@ def connectors_sheet():
         ("SPI_CS_B", "SPI_CS"),
         ("IN1_B", "IN1"), ("IN2_B", "IN2"), ("IN3_B", "IN3"), ("IN4_B", "IN4"),
         ("UART_RX_B", "RX"), ("SPI_MISO_B", "SPI_MISO"), ("SWO_DUT_B", "SWO"),
-        ("SWCLK_B", "SWCLK"), ("SWDIO_B", "SWDIO"), ("RESET_OD", "RESET"), ("BOOT_OD", "BOOT"),
+        ("SWCLK_B", "SWCLK"), ("SWDIO_B", "SWDIO"), ("RESET_OD", "RESET"), ("BOOT_B", "BOOT"),
     ]
     sh.group("Series resistors")
     for i, (inner, outer) in enumerate(series):

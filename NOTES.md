@@ -157,7 +157,7 @@ Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils
 ### Entrées analogiques
 - Diviseur 100 kΩ / 100 kΩ (Basic, évite une référence Extended) : impédance 200 kΩ, gain 0.5 → 5.0 V → 2.50 V, 5.5 V → 2.75 V (550 mV de marge). Résolution 12 bits : 1.61 mV à l'entrée.
 - Filtre 10 nF : fc = 1/(2π × 50 kΩ × 10 nF) = 318 Hz. Erreur de partage de charge avec le condensateur d'échantillonnage ≈ 0.05 %.
-- Protection : R1 limite l'injection à (24 − 3.6)/100 k = 0.2 mA pour 24 V en entrée. Pas de BAT54S (fuite 2 µA → erreur de plusieurs dizaines de mV).
+- Protection : la TVS TPD4E05U06 est sur la broche du header, **avant** le 100 kΩ (VRWM 5.5 V, VBR 6.5–8.5 V) : la plage d'entrée est donc **0–5.5 V**, une tension plus élevée détruirait la TVS. (Correction de la revue du schéma : la tenue « 24 V » annoncée en Phase 1 était fausse.) Pas de BAT54S (fuite 2 µA → erreur de plusieurs dizaines de mV).
 
 ### Sortie DAC
 - TLV9001IDBVR en suiveur, RRIO, 1.8–5.5 V, ±40 mA en court-circuit ; 100 Ω en série en sortie. Brochage DBV : 1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+ (attention : la version TLV9001**U** a un brochage différent).
@@ -265,6 +265,25 @@ Fonctions alternatives vérifiées dans le symbole KiCad (`MCU_ST_STM32G4:STM32G
 
 ### Warning ERC justifié
 - `pin_to_pin` (warning) sur la feuille translators : la broche B8 (bidirectionnelle) du SN74LVC8T245 d'entrée est reliée à GND. C'est voulu : avec DIR = B→A, B8 est une entrée inutilisée, à tirer à un niveau fixe pour ne pas la laisser flotter (recommandation habituelle pour les entrées CMOS).
+
+### Revue électrique indépendante du schéma (2026-10-19) et corrections
+Relecture par un agent séparé, contre les datasheets TI / Diodes (le site ST n'était pas accessible : points STM32 vérifiés via les fonctions alternatives du symbole KiCad).
+
+| # | Gravité | Constat | Correction |
+|---|---|---|---|
+| 1 | MAJEUR | TPS2116 : avec MODE bas et PR1 bas, le mux passe la tension la plus haute (5 V). PR1 tiré à +3V3 → pendant la montée du buck (soft-start 800 µs) ou si le 3V3 tombe, **5 V sur VIO** possible. | PR1 tiré depuis **+5V** par un diviseur 10k / 22k (3.44 V, > VREF dès que VIN1 > ≈ 1.6 V). PC4 tire PR1 au niveau bas. Règle firmware : jamais PR1 bas avec MODE bas. |
+| 2 | MAJEUR | BOOT en open-drain (2N7002) ne peut pas mettre un BOOT0 STM32 (actif haut) au niveau haut. | BOOT via un **SN74LVC1T45** : sortie push-pull à VIO (DIR haut) ou haute impédance (DIR bas, état au reset). RESET reste open-drain (NRST / EN). |
+| 3 | mineur | TCA9517A : EN a un pull-up interne vers VCCB → buffer actif au reset. | Pull-down 10 kΩ sur I2C_DUT_EN. |
+| 4 | mineur | Entrées CMOS flottantes côté DUT des translateurs (« unused data inputs must be held high or low »). | 10 × 1 MΩ : pull-down sur IN1–4, MISO, SWCLK, BOOT ; pull-up à VIO sur RX, SWO, SWDIO (pratique SWD/UART). 1 MΩ pour ne pas perturber le DUT (ex. pull-up interne ESP32 IO0 ≈ 45 kΩ). |
+| 5 | mineur | Tenue « 24 V » des AIN fausse (TVS avant la résistance). | Note corrigée : 0–5.5 V. |
+| 6 | mineur | Capacité sur VBUS/+5V > 10 µF (limite USB 2.0). | 10 µF/25 V sur +5V retiré : reste buck Cin 10 µF + 2 × 1 µF + 100 nF (≈ 7 µF après derating). |
+| 7 | mineur | CC1/CC2 sans ESD. | TPD4E05U06 dédié près de l'USB-C (2 voies utilisées). |
+| 8 | mineur | Cff du buck absent du schéma. | 6.8 pF 0402 **non monté** (DNP) en parallèle sur le 100 kΩ. |
+| 9 | mineur | SMAJ5.0A : Vc 9.2 V > 6 V abs. max de TLV62569 / AP22653 / TPS2116. | Accepté et documenté : protection partielle contre les surtensions lentes ; le PTC + TVS absorbent les transitoires ESD/hot-plug usuels. Une TVS à clamp plus bas (ex. 5 V, Vc ≈ 7 V) pourra être évaluée en rev B. |
+| 10 | question | DFU USB sans quartz (AN2606) non vérifié. | SWD reste le chemin de programmation principal. |
+| 11 | question | 10 µF sur VIO à charger par le VTref du DUT en mode externe. | Réduit à 1 µF (+ 100 nF par translateur ≈ 1.6 µF). |
+
+Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 composants schéma = BOM.
 
 ## Rapports ERC / DRC justifiés
 

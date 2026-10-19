@@ -2,7 +2,7 @@
 	(version 20260306)
 	(generator "eeschema")
 	(generator_version "10.0")
-	(uuid "19648d5e-99ee-4b12-a05d-5b43fbb3a13c")
+	(uuid "8490c513-17c3-4259-b581-042cb539ff39")
 	(paper "A4")
 	(title_block
 		(title "OOTY - USB Hardware-in-the-Loop board")
@@ -20,7 +20,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "772c8faa-c269-46fa-aaee-c27ee4ef6a22")
+		(uuid "1525720a-8709-4806-a316-59f6af828190")
 	)
 	(text "Specification: SPEC.md - design notes and calculations: NOTES.md"
 		(exclude_from_sim no)
@@ -31,53 +31,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "aeb748ab-a0b3-4a9c-a792-1f1b3e38f9de")
-	)
-	(sheet
-		(at 220.5 40)
-		(size 50.8 20.32)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0)
-		)
-		(uuid "00d4191b-9383-4f51-90d8-91e064c914c0")
-		(property "Sheetname" "vio"
-			(at 220.5 39.37 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "vio.kicad_sch"
-			(at 220.5 60.96 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-			)
-		)
-		(instances
-			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
-					(page "5")
-				)
-			)
-		)
+		(uuid "aecc7d11-f467-4ad0-bce7-fd247d7b9d4b")
 	)
 	(sheet
 		(at 157 40)
@@ -94,7 +48,7 @@
 		(fill
 			(color 0 0 0 0)
 		)
-		(uuid "24f95168-fe5d-4a35-87a6-9505c5483f51")
+		(uuid "01d85806-83b2-4976-af58-924221c0a731")
 		(property "Sheetname" "sensing"
 			(at 157 39.37 0)
 			(show_name no)
@@ -119,54 +73,8 @@
 		)
 		(instances
 			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
 					(page "4")
-				)
-			)
-		)
-	)
-	(sheet
-		(at 93.5 40)
-		(size 50.8 20.32)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0)
-		)
-		(uuid "5c91fae5-2c37-4d5a-977a-1bfa8e3f6953")
-		(property "Sheetname" "mcu"
-			(at 93.5 39.37 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "mcu.kicad_sch"
-			(at 93.5 60.96 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-			)
-		)
-		(instances
-			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
-					(page "3")
 				)
 			)
 		)
@@ -186,7 +94,7 @@
 		(fill
 			(color 0 0 0 0)
 		)
-		(uuid "7d158de3-3aa5-4577-b3fe-0b2836d1020d")
+		(uuid "0b23fe53-6375-43a3-820f-a9235cd5ec70")
 		(property "Sheetname" "translators"
 			(at 30 80.01 0)
 			(show_name no)
@@ -211,8 +119,54 @@
 		)
 		(instances
 			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
 					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.5 40)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "33601b6c-04ab-43fe-b0bd-899e97c7d9b4")
+		(property "Sheetname" "mcu"
+			(at 93.5 39.37 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mcu.kicad_sch"
+			(at 93.5 60.96 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OOTY"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
+					(page "3")
 				)
 			)
 		)
@@ -232,7 +186,7 @@
 		(fill
 			(color 0 0 0 0)
 		)
-		(uuid "d6ab5967-12f5-424d-8624-6abb8d9d9610")
+		(uuid "83bad7a6-c566-46fa-bde0-a78cbc5aa4e0")
 		(property "Sheetname" "power"
 			(at 30 39.37 0)
 			(show_name no)
@@ -257,7 +211,7 @@
 		)
 		(instances
 			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
 					(page "2")
 				)
 			)
@@ -278,7 +232,7 @@
 		(fill
 			(color 0 0 0 0)
 		)
-		(uuid "ecaf4c00-939f-4a86-89cf-bdc4d82611b9")
+		(uuid "a192c98c-9b7a-4852-94d9-52674879499d")
 		(property "Sheetname" "connectors"
 			(at 93.5 80.01 0)
 			(show_name no)
@@ -303,8 +257,54 @@
 		)
 		(instances
 			(project "OOTY"
-				(path "/19648d5e-99ee-4b12-a05d-5b43fbb3a13c"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
 					(page "7")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 220.5 40)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "e0299850-005e-4b57-928f-9cbfb4067c9b")
+		(property "Sheetname" "vio"
+			(at 220.5 39.37 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "vio.kicad_sch"
+			(at 220.5 60.96 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OOTY"
+				(path "/8490c513-17c3-4259-b581-042cb539ff39"
+					(page "5")
 				)
 			)
 		)
