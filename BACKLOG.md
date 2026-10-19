@@ -1,13 +1,6 @@
 # Backlog
 
 ## TODO
-- [ ] TASK-002 | Setup environnement + arborescence
-  > Versions kicad-cli / kiutils / pcbnew / java notées dans NOTES.md.
-  > Arborescence §5 créée (lib/, bom/, scripts/, out/reports, out/renders, out/fab).
-  > Projet KiCad vide créé, sym-lib-table et fp-lib-table projet en place (chemins ${KIPRJMOD}).
-  > Commit sur la branche de travail.
-  > Blocked by: —
-
 - [ ] TASK-003 | Phase 0 — Spécification
   > SPEC.md : blocs fonctionnels, budget de puissance, interfaces, contraintes méca, règles de fab.
   > Schéma bloc Mermaid dans SPEC.md.
@@ -65,23 +58,18 @@
   > Blocked by: TASK-008 (DRC propre)
 
 ## IN PROGRESS
-- [ ] TASK-001 | Remplir §1 de CLAUDE.md + créer la branche devape
-  > Tous les champs de la section "1. Le projet" de CLAUDE.md sont renseignés (ou marqués "à décider" avec raison).
-  > Infos déjà collectées :
-  > - Fonction : carte HIL (Hardware-In-the-Loop) pilotable par USB pour tester un DUT dans des workflows automatisés (notamment Claude), télétravail
-  > - Alimentation : USB-C
-  > - MCU : STM32 (modèle à choisir en Phase 1), programmé via son propre connecteur JTAG/SWD
-  > - Interfaces : voir périmètre TASK-003
-  > - Méca : 85 x 55 mm max (plus petit = mieux), connecteurs DUT en headers 2.54 mm
-  > - Couches : à décider en Phase 0 (2 vs 4, selon densité et coût)
-  > - Fab/assemblage : le moins cher — PCBWay proposé, à comparer avec JLCPCB (à confirmer par l'utilisateur)
-  > - Contexte : conception from scratch, pas de schéma de référence (test des capacités de Claude en hardware)
-  > Branche git `devape` créée (nécessite un premier commit sur `main`, le dépôt n'en a aucun pour l'instant).
-  > Branch: main (commit initial) → création de devape
+- [ ] TASK-002 | Setup environnement + arborescence
+  > Versions kicad-cli / kiutils / pcbnew / java notées dans NOTES.md.
+  > Arborescence §5 créée (lib/, bom/, scripts/, out/reports, out/renders, out/fab).
+  > Projet KiCad vide créé, sym-lib-table et fp-lib-table projet en place (chemins ${KIPRJMOD}).
+  > Commit sur la branche de travail.
+  > Branch: feat/task-002-env-setup
   > Blocked by: —
 
 ## ON HOLD
 
 ## DONE
+- [x] TASK-001 | Remplir §1 de CLAUDE.md + créer la branche devape
+  > Merged in: devape (2026-10-19)
 
 ## CANCELLED
