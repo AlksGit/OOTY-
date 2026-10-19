@@ -210,6 +210,62 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 4. **Frais Extended** (≈ 92 $ par commande) : accepter, ou regrouper les headers J_UART et J_ANA en un seul 1×7.
 5. **Écran** : module enfiché à la main sur un support (non posé par JLCPCB).
 
+## Phase 2 — Schéma (TASK-005)
+
+### Méthode de génération
+- `kiutils` ne gère pas le format KiCad 10 : le schéma est produit par un générateur maison.
+  - `scripts/sexpr.py` : lecture/écriture S-expression.
+  - `scripts/symlib.py` : lecture des symboles des librairies KiCad 10 (aplatissement des `extends`, géométrie des broches, fonctions alternatives des broches STM32).
+  - `scripts/schgen.py` : placement automatique par blocs, fil court + label sur chaque broche, symboles power pour GND / +3V3 / +5V / VBUS, labels globaux pour les nets partagés entre feuilles. Écrit au format KiCad 8, puis `kicad-cli sch upgrade` convertit au format KiCad 10.
+  - `scripts/build_schematic.py` : **description du design** (broche → net), une fonction par feuille. Les champs Footprint / MPN / Manufacturer / Datasheet / LCSC viennent de `scripts/bom_draft.py` via le code LCSC (source unique).
+  - `scripts/build_symbols.py` : symboles absents des librairies officielles (`lib/OOTY.kicad_sym`).
+- **Vérifications automatiques** :
+  - `scripts/verify_netlist.py` : exporte la netlist KiCad et compare chaque net à la description → **159 nets, 0 écart**.
+  - `scripts/check_bom.py` : quantités par code LCSC schéma vs BOM → **156 composants, 0 écart** (le module OLED, enfiché à la main, est hors schéma).
+  - `scripts/run_checks.py --erc-only` → **0 erreur, 1 warning justifié** (ci-dessous).
+  - `scripts/render_schematic.py` : PDF `out/OOTY_schematic.pdf` + PNG par feuille dans `out/renders/`.
+
+### Feuilles
+| Feuille | Contenu |
+|---|---|
+| power | USB-C, ESD USB, TVS + PTC VBUS, buck 3V3, 4 × AP22653, LED alim, points de test |
+| mcu | STM32G431RBT6, découplage, BOOT0, connecteur SWD HIL, LED heartbeat |
+| sensing | 2 × INA226 + shunts, I2C interne, connecteur OLED, entrées ADC, moniteur VIO, buffer DAC |
+| vio | Mux TPS2116, LDO AP2127K-ADJ et sélection 1.8 / 3.3 V |
+| translators | 2 × SN74LVC8T245, 2 × SN74LVC1T45 (SWD), TCA9517A, RESET/BOOT open-drain |
+| connectors | Résistances série, 8 × TPD4E05U06, 5 headers DUT, trous M3 |
+
+### Symboles projet (`lib/OOTY.kicad_sym`)
+- `AP22653W6` : brochage SOT26 de la datasheet DS41186 Rev. 5-2 (« Pin Descriptions ») : 1 IN, 2 GND, 3 EN (actif haut), 4 FAULT, 5 ILIM, 6 OUT.
+- `TLV9001IDBV` : graphique du symbole officiel OPA333xxDBV, même brochage DBV (1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+), vérifié contre la datasheet TLV9001.
+
+### Affectation des broches du STM32G431RBT6
+Fonctions alternatives vérifiées dans le symbole KiCad (`MCU_ST_STM32G4:STM32G431RBTx`, champs `alternate`) :
+
+| Fonction | Broches |
+|---|---|
+| USB FS | PA11 DM, PA12 DP |
+| SWD carte HIL | PA13 SWDIO, PA14 SWCLK, PB3 SWO, PG10 NRST, PB8 BOOT0 |
+| I2C interne (I2C1) | PA15 SCL, PB7 SDA |
+| I2C DUT (I2C3) | PC8 SCL, PC9 SDA |
+| SPI DUT (SPI1) | PA5 SCK, PA6 MISO, PA7 MOSI, PA8 CS (GPIO) |
+| UART DUT (USART3) | PB10 TX, PB11 RX |
+| SWO DUT (USART2_RX) | PA3 |
+| Sonde SWD DUT | PB13 SWCLK (SPI2_SCK), PB15 SWDIO (SPI2_MOSI), PB2 SWCLK_DIR, PB12 SWDIO_DIR |
+| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PB0 |
+| IN1–4 | PC10, PC11, PC12, PD2 |
+| ADC | PC0 AIN1, PC1 AIN2, PC2 CC1, PC3 CC2, PB1 VIO_MON |
+| DAC | PA4 (DAC1_OUT1) |
+| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
+| VIO / translateurs | PC4 PR1, PC5 MODE, PB14 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
+| Divers | PA10 LED heartbeat, PC6 RESET DUT, PC7 BOOT DUT, PB4 libre |
+
+- PB4 et PB6 portent les pull-downs « dead battery » de l'UCPD au reset : PB4 n'est pas utilisée, PB6 commande I2C_DUT_EN (bas = buffer désactivé, état sûr). À confirmer dans le RM0440 avant le firmware.
+- PC13–PC15 ont une sortance limitée (3 mA, 2 MHz) : utilisées seulement pour EN et FAULT (signaux lents).
+
+### Warning ERC justifié
+- `pin_to_pin` (warning) sur la feuille translators : la broche B8 (bidirectionnelle) du SN74LVC8T245 d'entrée est reliée à GND. C'est voulu : avec DIR = B→A, B8 est une entrée inutilisée, à tirer à un niveau fixe pour ne pas la laisser flotter (recommandation habituelle pour les entrées CMOS).
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide
