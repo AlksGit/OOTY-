@@ -54,6 +54,10 @@
   > - (8) Bus I2C et SPI exposés
   > - (9) Protection ESD (TVS) + résistances série sur toutes les pins exposées
   > - LED "alim OK" (directement sur le rail) + LED "heartbeat" pilotée par le firmware
+  > - Petit écran I2C bon marché (2-3 infos : consommation, état des rails...) — ajout utilisateur 2026-10-19
+  > Validé au checkpoint (2026-10-19) : lecture CC, limites 5V 0.5 A / 5V_SW 1 A / 3V3 0.3 A / 3V3_SW 0.5 A,
+  >   limitation de courant aussi sur les rails fixes, 2 ADC 0-5 V + 1 DAC 0-3.3 V, option VIO externe (VTref),
+  >   4 trous M3 sans contrainte de hauteur, JLCPCB, 4 couches.
   > Hors périmètre rev A : IO multifonction, LED par IO, entrée alim externe / USB-PD, isolation galvanique, switch USB DUT, n° de série custom, watchdog hôte.
   > ⏸ Checkpoint : spec validée par l'utilisateur.
   > Branch: feat/task-003-spec
