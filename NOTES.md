@@ -73,6 +73,134 @@ Pire cas ≈ 2.2 A @5V (détail dans `SPEC.md` §3) : il faut une source USB-C 3
 - INA228 (20 bits) : plage ±163.84 mV, LSB 312.5 nV. Avec 50 mΩ : pleine échelle 3.3 A, résolution ≈ 6.25 µA.
 - Orientation : INA228 (ou équivalent haute résolution) si disponible en stock LCSC à coût raisonnable. Valeurs à revérifier dans les datasheets en Phase 1.
 
+## Phase 1 — Choix des composants (TASK-004)
+
+Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils bougent vite, à revérifier avant commande). Détail ligne par ligne dans `bom/bom_draft.csv`.
+
+### MCU : STM32G431RBT6 (LQFP-64)
+- **Seul candidat réellement en stock** chez JLCPCB/LCSC (≈ 2 600 pcs). STM32G0B1RET6 et STM32F072RBT6 : stock 0 le 2026-10-19.
+- DS12589 : USB FS sans quartz (HSI48 + CRS, §3.34/§3.36), 128 KiB flash, 32 KiB SRAM, 3× I2C, 3× SPI, 4 U(S)ART, DAC (2 voies sur broches), 2 ADC, 52 GPIO en LQFP-64 (besoin ≈ 46).
+- USB : 8 endpoints, 1 KiB de PMA → EP0 + 2 × CDC + CMSIS-DAP v2 ≈ 6 endpoints, ≈ 600 octets (estimation).
+- Point faible : pas de port open-source CMSIS-DAP existant sur G4 (dap42 vise F042/F072). Le portage de la couche GPIO de la référence ARM CMSIS-DAP est simple ; à prévoir côté firmware.
+- Découplage (DS12589 §5.1.6, Figure 16) : VDD 4 × 100 nF + 1 × 4.7 µF ; VDDA 10 nF + 1 µF ; VREF+ 100 nF + 1 µF ; NRST 100 nF (Figure 27) ; VBAT relié au 3V3 avec 100 nF (pratique de conception, pas une exigence de la datasheet).
+- BOOT0 (PB8, broche 61) : pull-down 10 kΩ + pastille vers 3V3 pour forcer le bootloader en secours. Le fonctionnement du DFU USB sans quartz (AN2606) reste à vérifier ; le SWD est le chemin de programmation principal.
+
+### Buck 5 V → 3.3 V : TLV62569DBVR
+- Entrée 2.5–5.5 V (couvre l'USB 4.4–5.5 V), 2 A, SOT-23-5.
+- **Diviseur** (SLVSDG1C §8.2.2.2) : Vout = 0.6 × (1 + R1/R2). R1 = 100 kΩ, R2 = 22 kΩ → **3.327 V** (+0.8 %), plage 3.26–3.39 V avec la tolérance de VFB.
+- **Inductance** (§8.2.2.4) : ΔIL = Vout·(1 − Vout/Vin)/(L·fsw) = 3.3 × 0.4 / (2.2 µH × 1.5 MHz) ≈ 0.40 A à Vin = 5.5 V. Pic à 1.2 A de charge ≈ 1.4 A → FXL0420-2R2 (Isat 5 A, au-dessus de la limite de 3 A du buck : pas de saturation en court-circuit).
+- Cin 10 µF + 100 nF ; Cout 2 × 22 µF 0805 (compense la perte de capacité sous tension DC). Empreinte Cff 0402 non montée.
+- **Charge 3V3 max** : 3V3 fixe (limite max 405 mA) + 3V3_SW (limite max 718 mA) + HIL 70 mA ≈ 1.2 A < 2 A.
+
+### Limiteurs de courant : AP22653W6-7 (× 4)
+- Un seul modèle pour les 4 rails : 3.0–5.5 V, FAULT open-drain (filtre 6 ms), **décharge de sortie** (600 Ω), **blocage du courant inverse** à l'arrêt, repli du courant en court-circuit. Préféré au TPS2553 (pas de décharge de sortie, blocage inverse limité) et au SY6280 (pas de FAULT).
+- **RLIM** (DS41186 p.10, à VIN = 5 V) : ILIM_typ = 30321 / R^1.055 (mA, R en kΩ) ; min = 28955 / R^1.075 ; max = 31033 / R^1.031.
+
+| Rail | Cible | RLIM | min / typ / max |
+|---|---|---|---|
+| 5V_SW | 1.0 A DUT | 22 kΩ | 1033 / 1163 / 1295 mA |
+| 5V fixe | 0.5 A | 39 kΩ | 558 / 636 / 718 mA |
+| 3V3_SW | 0.5 A | 39 kΩ | 558 / 636 / 718 mA |
+| 3V3 fixe | 0.3 A | 68 kΩ | 307 / 354 / 405 mA |
+
+- Équations caractérisées à VIN = 5 V : la limite réelle sur les rails 3V3 est à **mesurer au banc**.
+- Rails fixes : EN relié à IN. Rails commutés : EN piloté par le MCU avec pull-down 100 kΩ (OFF pendant le boot ; VIH min 1.5 V).
+
+### Protection d'entrée VBUS
+- PTC 1812 SMD1812P260TF (8 V, Ihold 2.6 A, Itrip 5 A) : dernier recours pour un défaut sur 5V_SYS lui-même ; la limitation fine est faite par les 4 AP22653. Chute ≈ 30 mV à 2.2 A.
+- Somme des limites typiques des 4 rails ≈ 2.6 A (≈ 2.95 A aux limites max) : ne dépasse Ihold que si tous les rails sont en limitation en même temps (double défaut). La charge nominale max (2.2 A) reste sous Ihold.
+- TVS SMAJ5.0A sur VBUS (VBR 6.4 V, Vc 9.2 V) ; USBLC6-2SC6 sur D+/D-.
+- CC1/CC2 : Rd 5.1 kΩ vers GND, tension lue par l'ADC. Seuils de la spec USB Type-C (vRd) : < 0.66 V = USB par défaut, 0.66–1.23 V = 1.5 A, > 1.23 V = 3 A (à confirmer en Phase 2).
+
+### Mesure de courant
+- **INA228 introuvable** chez LCSC/JLCPCB (stock 0 sur toutes les variantes le 2026-10-19) → décision au checkpoint.
+- Shunts : 50 mΩ sur 5V_SW, 100 mΩ sur 3V3_SW (1206, 1 W, 1 %, 50 ppm/°C).
+
+| Rail / shunt | Moniteur | Pleine échelle | Résolution |
+|---|---|---|---|
+| 5V_SW, 50 mΩ | INA226 | 1.638 A | 50 µA |
+| 5V_SW, 50 mΩ | INA228 (ADCRANGE=0 / 1) | 3.277 A / 819 mA | 6.25 µA / 1.56 µA |
+| 3V3_SW, 100 mΩ | INA226 | 819 mA | 25 µA |
+| 3V3_SW, 100 mΩ | INA228 (ADCRANGE=0 / 1) | 1.638 A / 410 mA | 3.1 µA / 0.78 µA |
+
+- Dissipation : 5V_SW 1.1² × 0.05 = 61 mW ; 3V3_SW 0.55² × 0.1 = 30 mW (shunts 1 W : large marge). Chute : 50–55 mV.
+- Adresses I2C : 0x40 et 0x41 (A1/A0), pas de conflit avec l'écran (0x3C).
+
+### Bus I2C interne (moniteurs + écran)
+- Cb estimée 100 pF, 400 kHz : Rmax = 300 ns / (0.8473 × 100 pF) = 3.54 kΩ ; Rmin = (3.3 − 0.4) / 3 mA = 967 Ω.
+- **2.2 kΩ**. Le module OLED a déjà 4.7 kΩ de pull-up : équivalent 1.5 kΩ, 1.9 mA au niveau bas (≤ 3 mA).
+
+### Écran : module HS91L02W2C01 (LCSC C5248081)
+- 0.91" 128 × 32, SSD1306, I2C 0x3C, 38 × 12 × 2.6 mm, brochage **1 GND, 2 VCC, 3 SCL, 4 SDA** (datasheet p.6–7). Régulateur, pompe de charge et pull-ups 4.7 kΩ intégrés : aucun composant externe.
+- Monté sur un support femelle 1×4 2.54 mm (remplaçable). Alimenté en 3.3 V (VCC max illisible dans la datasheet).
+
+### VIO
+- **Mux TPS2116** : VIN1 = 5V_SYS (choix 5 V), VIN2 = sortie du LDO AP2127K-ADJ (1.8 ou 3.3 V), VOUT = VIO.
+  - Table de vérité (§7.3.1) : MODE haut + PR1 haut → VIN1 ; MODE haut + PR1 bas → VIN2 ; **MODE bas + PR1 haut → arrêt, VOUT haute impédance = mode VIO externe**. MODE bas + PR1 bas = priorité à la tension la plus haute (5 V), **à éviter** : PR1 pull-up 10 kΩ, MODE pull-down 100 kΩ → VIO coupé au reset.
+  - Blocage du courant inverse si VOUT − VIN > 42 mV typ : en mode externe, le DUT ne réalimente ni 5V_SYS ni le LDO.
+  - Commutation sans chevauchement : passer par l'arrêt avant de descendre de 5 V à 1.8 V (firmware).
+- **LDO AP2127K-ADJ** : Vout = 0.8 × (1 + R1/R2), R2 entre 5 et 200 kΩ.
+  - R1 = 30 kΩ, R2 = 24 kΩ → **1.800 V** (par défaut).
+  - R2b = 16 kΩ commuté en parallèle par un 2N7002 (gate pull-down 100 kΩ) : R2 ∥ R2b = 9.6 kΩ → **3.300 V**.
+  - Cff = 1 nF (1/(2π·R1·Cff) = 5.3 kHz, dans la plage 0.7–15 kHz). RDS(on) du 2N7002 à VGS = 3.3 V non spécifié : quelques dizaines d'Ω → erreur < 0.3 %, à vérifier.
+  - Chute 170 mV à 300 mA, marge de 1.7 V.
+- **VIO_MON** : diviseur 100 k / 100 k vers l'ADC (5.5 V → 2.75 V). Le firmware mesure le VTref externe avant d'activer une source interne.
+- Broches MCU supplémentaires : PR1, MODE, VSEL, LS_OE, I2C_EN, VIO_MON (ADC) → budget ≈ 46 broches sur 52 disponibles.
+
+### Level shifters
+- 2 × SN74LVC8T245 : un en sortie seule (DIR = VCCA : OUT1–4, TX, SCK, MOSI, CS), un en entrée seule (DIR = GND : IN1–4, RX, MISO, SWO, 1 libre). /OE commun avec pull-up 10 kΩ → haute impédance jusqu'à ce que le firmware active.
+- 2 × SN74LVC1T45 pour SWCLK et SWDIO (DIR piloté par GPIO, pull-down 100 kΩ = côté DUT en haute impédance au reset).
+- Ioff / isolation VCC (datasheets) : si VIO est absent, les deux ports passent en haute impédance.
+- **I2C DUT : TCA9517** (VCCA 0.9–5.5 V côté DUT, VCCB 2.7–5.5 V côté MCU). Le **PCA9306 prévu dans la spec ne convient pas** : il impose VREF1 ≤ VREF2 − 0.6 V, impossible avec un MCU fixe à 3.3 V et un VIO qui passe de 1.8 à 5 V.
+- RESET / BOOT : 2N7002 en open-drain (gate pull-down 100 kΩ), tient 60 V, compatible pull-ups DUT jusqu'à 5 V.
+
+### Entrées analogiques
+- Diviseur 100 kΩ / 100 kΩ (Basic, évite une référence Extended) : impédance 200 kΩ, gain 0.5 → 5.0 V → 2.50 V, 5.5 V → 2.75 V (550 mV de marge). Résolution 12 bits : 1.61 mV à l'entrée.
+- Filtre 10 nF : fc = 1/(2π × 50 kΩ × 10 nF) = 318 Hz. Erreur de partage de charge avec le condensateur d'échantillonnage ≈ 0.05 %.
+- Protection : R1 limite l'injection à (24 − 3.6)/100 k = 0.2 mA pour 24 V en entrée. Pas de BAT54S (fuite 2 µA → erreur de plusieurs dizaines de mV).
+
+### Sortie DAC
+- TLV9001IDBVR en suiveur, RRIO, 1.8–5.5 V, ±40 mA en court-circuit ; 100 Ω en série en sortie. Brochage DBV : 1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+ (attention : la version TLV9001**U** a un brochage différent).
+
+### ESD et résistances série
+- TPD4E05U06 (4 voies, VRWM 5.5 V, ≈ 0.5 pF) : 7 boîtiers pour ≈ 26 signaux + 1 boîtier pour les broches d'alimentation des headers (5V, 5V_SW, 3V3, 3V3_SW).
+- Ordre : connecteur → TVS → résistance série → circuit.
+- 100 Ω en série sur les signaux (les 22 Ω et 33 Ω Basic sont en rupture chez LCSC). Pas de résistance série sur l'I2C DUT (TCA9517 + TVS suffisent).
+
+### LED
+- Alim OK : XL-1608SYGC-06 (jaune-vert, Vf ≈ 2 V) + 1 kΩ → ≈ 1.3 mA. Les LED vert « émeraude » (Vf ≈ 3.1 V) sont exclues : pas assez de marge sous 3.3 V.
+- Heartbeat : KT-0603R rouge (Basic) + 1 kΩ.
+
+### Assemblage JLCPCB
+- **Economic PCBA** compatible : 2/4/6 couches, ≤ 1.6 mm, stack-up standard, une seule face. Frais : setup 8.18 $, pochoir 1.53 $, **3.07 $ par référence Extended** (Basic gratuites).
+- Traversant (headers, support écran) : soudé par JLCPCB, 3.58 $ par commande + 0.0164 $/point (≈ 42 points ≈ 0.7 $). Moins cher que de souder à la main.
+- Sources : https://jlcpcb.com/help/article/pcb-assembly-price, https://jlcpcb.com/help/article/pcb-assembly-faqs, https://jlcpcb.com/capabilities/pcb-assembly-capabilities
+
+### Estimation de coût (5 cartes, `python scripts/bom_draft.py`)
+
+| Poste | Montant |
+|---|---|
+| Composants (14.51 $/carte × 5) | ≈ 73 $ |
+| Frais de chargement Extended (30 références × 3.07 $) | ≈ 92 $ |
+| Setup + pochoir Economic PCBA | ≈ 10 $ |
+| Soudure traversant (3.58 $ + ≈ 0.7 $/carte) | ≈ 7 $ |
+| PCB 4 couches ≈ 70 × 50 mm × 5 (non devisé) | ≈ 10–20 $ |
+| **Total hors port** | **≈ 190–200 $, soit ≈ 40 $/carte** |
+
+- Premier poste de coût : les **frais Extended**. Ils sont fixes par commande et pèsent beaucoup sur 5 cartes, beaucoup moins sur 20+.
+- Pistes pour les réduire :
+  - utiliser le même header 1×7 pour J_UART et J_ANA (−2 références) ;
+  - remplacer les résistances ILIM/VIO Extended par des valeurs Basic proches (au prix de limites de courant moins précises) ;
+  - ne passer en Basic que là où ça ne dégrade pas la fonction.
+- Le STM32G431 (5.14 $) représente un tiers du coût composants.
+
+### Points à valider au checkpoint
+1. **Moniteur de courant** : INA226 en stock (résolution 50 µA / 25 µA) **ou** INA228 envoyé à JLCPCB par nos soins (résolution ≈ 6 µA / 3 µA, mesure de veille au µA). Les deux ont le **même brochage** : on peut monter l'INA226 maintenant et passer à l'INA228 plus tard sans refaire le PCB (le firmware change).
+2. **MCU STM32G431RBT6** : seul STM32 adapté en stock ; pas de firmware CMSIS-DAP open-source existant sur cette famille (portage à faire).
+3. **TCA9517A au lieu du PCA9306** pour l'I2C DUT (le PCA9306 ne couvre pas VIO 1.8 → 5 V).
+4. **Frais Extended** (≈ 92 $ par commande) : accepter, ou regrouper les headers J_UART et J_ANA en un seul 1×7.
+5. **Écran** : module enfiché à la main sur un support (non posé par JLCPCB).
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide
