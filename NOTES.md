@@ -317,6 +317,46 @@ Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 
 - Firmware : auto-range ADCRANGE (INA228), calibration du zéro quand le rail est coupé.
 - Un vrai 10 µA ±1 % demanderait une architecture double gamme (shunt commuté type Nordic PPK2 / Joulescope) : commutation rapide de MOSFET, creux d'alimentation sur le DUT, layout critique → **hors rev A** (risque élevé), à étudier pour une rev B.
 
+## Phase 3 — Setup PCB (TASK-006)
+
+Généré par `scripts/build_pcb.py` (Python de KiCad) à partir de la netlist du schéma ; positions dans `scripts/placement.py`.
+
+### Carte
+- **85 × 55 mm**, coins arrondis R2, 4 trous M3 (Ø 3.2 mm) à 3.5 mm des bords.
+- Les headers DUT imposent la taille : J_PWR + J_DBG + J_IO = 61 mm sur le grand côté (entre les trous : 85 − 2 × 7 = 71 mm), J_BUS + J_UART_ANA = 34 mm sur le petit côté droit (55 − 14 = 41 mm). Une carte plus petite ne laisse pas la place aux 5 headers 2.54 mm hors des trous.
+- Disposition : USB-C sur le bord gauche (bouche au ras du bord), J_PWR / J_DBG / J_IO en bas, J_BUS / J_UART_ANA à droite, SWD HIL et support OLED en haut à gauche (le module 38 × 12 mm couvre la bande haute, des CMS bas peuvent passer dessous), LED en haut à droite (visibles par webcam).
+
+### Empilement (JLC04161H-7628, 1.6 mm)
+| Couche | Rôle | Épaisseur |
+|---|---|---|
+| F.Cu | Signaux + composants | 35 µm |
+| prepreg 7628 | | 0.2104 mm |
+| In1.Cu | **Plan GND continu** | 15.2 µm |
+| core | | 1.065 mm |
+| In2.Cu | Plans d'alimentation (+5V, +3V3) | 15.2 µm |
+| prepreg 7628 | | 0.2104 mm |
+| B.Cu | Signaux | 35 µm |
+
+L'empilement est écrit dans le fichier par script (non exposé par l'API pcbnew).
+
+### Règles et classes de nets
+- Défaut : piste 0.2 mm (min 0.15), isolement 0.15 mm, via 0.6 / 0.3 mm, cuivre–bord 0.3 mm, trou–trou 0.5 mm, anneau min 0.13 mm. Au-dessus des minima JLCPCB (0.09 / 0.09, via 0.45 / 0.2).
+- Largeurs IPC-2221 (ΔT = 10 °C) :
+
+| Courant | Externe 1 oz | Interne 0.5 oz |
+|---|---|---|
+| 0.5 A | 0.12 mm | 0.60 mm |
+| 1.2 A | 0.39 mm | 2.0 mm |
+| 2.5 A | 1.06 mm | 5.5 mm |
+
+- **Power** (0.5 mm, isolement 0.15, via 0.8 / 0.4) : +3V3, 5V_SW*, 5V_DUT, 3V3_SW*, 3V3_DUT, VIO*, GND — jusqu'à ≈ 1.5 A en externe.
+- **HighCurrent** (1.0 mm, isolement 0.2) : VBUS, +5V, SW_3V3 — 2.5 A en externe ; en interne, +5V et +3V3 passent par des zones larges sur In2.
+- **USB** (0.25 mm, paire différentielle écart 0.2 mm) : USB_DP / USB_DM. USB Full Speed (12 Mbit/s, fronts ≥ 4 ns) : impédance 90 Ω non critique sur < 30 mm ; paire courte, symétrique, au-dessus du plan GND In1.
+- L'isolement de la classe Power a été ramené de 0.2 à 0.15 mm : 0.2 mm était incompatible avec les boîtiers au pas de 0.5 mm (INA226, TCA9517A).
+
+### Vérification
+- DRC `--schematic-parity` : **0 erreur, 0 écart de parité** ; nets non routés attendus à ce stade ; 5 warnings de sérigraphie (références de headers) traités au placement.
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide
