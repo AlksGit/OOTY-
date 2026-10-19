@@ -26,8 +26,41 @@ Décisions de design, calculs, versions d'outils, warnings justifiés.
 | `scripts/create_project.py` | Création idempotente du projet vide, des tables de librairies et de l'arborescence |
 | `scripts/run_checks.py` | ERC + DRC en JSON dans `out/reports/` (`--erc-only`, `--drc-only`, `--schematic-parity`) |
 
-## Couches
-Le projet est initialisé en **2 couches** cuivre (F.Cu / B.Cu) par défaut. Le choix définitif 2 vs 4 couches sera fait et justifié en Phase 0 (TASK-003) puis appliqué en Phase 3.
+## Décisions Phase 0 (TASK-003) — à valider au checkpoint
+
+### Couches : 4 (Signal / GND / Power / Signal)
+Le projet KiCad est encore initialisé en 2 couches ; le passage en 4 couches sera appliqué en Phase 3.
+
+Justification :
+- **Densité** : ~40 signaux MCU, une dizaine de level shifters / TVS, 2 eFuses, 2 moniteurs de courant, un régulateur à découpage et 6 connecteurs sur ≤ 85 × 55 mm. En 2 couches, le plan de masse serait très découpé.
+- **Plan GND continu** sous tout le routage : retour de courant propre pour l'USB, le buck et les mesures analogiques (ADC, shunts de courant à faible tension).
+- **Distribution d'alimentation** : la couche interne Power porte 5V_SYS / 3V3 en zones larges, ce qui libère les couches externes pour les signaux.
+- **Coût** : chez JLCPCB, l'écart 2 → 4 couches pour un prototype de 5 pièces de cette taille est de l'ordre de quelques dollars à une dizaine de dollars (un relevé utilisateur de 2024 donne ~9.55 $ pour 5 pièces 100 × 100 mm en 4 couches ; non officiel, à confirmer par devis). Négligeable devant l'assemblage et les composants.
+
+### Fabricant : JLCPCB recommandé (au lieu de PCBWay)
+Critère imposé : le moins cher.
+- Les comparatifs consultés s'accordent : JLCPCB est le moins cher pour les cartes simples et l'assemblage de petites séries, PCBWay offre plus d'options et plus de support humain. Un test utilisateur (2023, 114 × 114 mm) donnait PCBWay 2.8× plus cher en 2 couches et 2× en 4 couches.
+- L'assemblage JLCPCB s'appuie sur la bibliothèque LCSC : les pièces « Basic » n'ont pas de frais de chargement, les « Extended » en ont. On privilégiera les Basic en Phase 1.
+- Sources (tierces, à confirmer par un devis réel avec notre BOM en Phase 1) :
+  - https://lcamtuf.substack.com/p/comparing-hobby-pcb-vendors
+  - https://forums.atariage.com/topic/349426-pcbway-vs-jlcpcb-which-is-cheaper
+  - https://jlcpcb.com/news/discount-on-quality-4-layer-pcbs
+  - https://eevblog.com/forum/manufacture/a-good-pcb-manufacture-for-hobby-pcb/msg5569241
+
+### Règles de fab (proposées)
+- Minima JLCPCB multicouche relevés sur leur page de capacités : piste/espace 0.09 mm, via perçage 0.2 mm / diamètre 0.45 mm (https://api.jlcpcb.com/capabilities/Capabilities, https://jlcpcb.com/help/article/243-BGA-Design-Guidelines---PCB-Layout-Recommendations-for-BGA-packages).
+- Valeurs retenues avec marge : piste/espace 0.15 / 0.15 mm, via 0.3 / 0.6 mm, 1.6 mm. Pas besoin de s'approcher des minima vu la densité attendue ; évite tout surcoût lié aux petits perçages.
+
+### Régulateur 3V3 : buck plutôt que LDO (orientation, choix du composant en Phase 1)
+Charge 3V3 max ≈ 0.3 + 0.5 (DUT) + 0.055 (HIL) ≈ 0.86 A. Un LDO 5 → 3.3 V dissiperait (5 − 3.3) × 0.86 ≈ 1.46 W : trop pour un boîtier CMS compact sans grande surface de cuivre. Un buck (η ≈ 85 %) dissipe ≈ 0.5 W au total, réparti.
+
+### Budget VBUS
+Pire cas ≈ 2.2 A @5V (détail dans `SPEC.md` §3) : il faut une source USB-C 3 A pour exploiter toutes les limites. D'où la proposition de lire les lignes CC pour connaître la capacité de la source.
+
+### Mesure de courant (orientation)
+- INA226 : plage ±81.92 mV, LSB 2.5 µV. Avec un shunt de 50 mΩ : pleine échelle 1.64 A, résolution 50 µA. Insuffisant pour mesurer une veille au µA.
+- INA228 (20 bits) : plage ±163.84 mV, LSB 312.5 nV. Avec 50 mΩ : pleine échelle 3.3 A, résolution ≈ 6.25 µA.
+- Orientation : INA228 (ou équivalent haute résolution) si disponible en stock LCSC à coût raisonnable. Valeurs à revérifier dans les datasheets en Phase 1.
 
 ## Rapports ERC / DRC justifiés
 
