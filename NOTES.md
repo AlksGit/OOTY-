@@ -285,6 +285,38 @@ Relecture par un agent séparé, contre les datasheets TI / Diodes (le site ST n
 
 Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 composants schéma = BOM.
 
+### Réévaluation MCU et mesure de courant (2026-10-19, demande de l'utilisateur)
+
+**MCU : STM32G431RBT6 conservé.**
+| Candidat (LQFP64) | Stock / prix (JLC) | Verdict |
+|---|---|---|
+| STM32G431RBT6 | 2659 / 5.76 $ | Retenu : USB FS sans quartz, DAC, 170 MHz, 128K/32K, stock solide |
+| STM32H503RBT6 | 242 / 5.96 $ | Équivalent (250 MHz) mais stock faible, aucun gain réel |
+| STM32H562RGT6 | 709 / 8.40 $ | Seule évolution crédible si RAM/flash manquent (640K RAM) ; ré-affectation complète des broches |
+| STM32G474RET6, U535/U545 | 15 / 0–21 | Stock insuffisant |
+| STM32G0B1RET6, F072RBT6 | 0 | Rupture |
+| STM32C071RBT6 | 960 / 5.12 $ | Pas de DAC, 24K RAM |
+
+- **Vitesse de la sonde SWD** : limitée par la latence des transactions USB (trames 1 ms) et la qualité du firmware, pas par l'horloge MCU ni par le débit FS. Mesures publiées (cible STM32H743) : CMSIS-DAP v2 FS ≈ 54 kB/s, ST-Link V2 (FS) ≈ 160–180 kB/s, sondes HS ≈ 0.3–1.1 MB/s. Un firmware v2 qui regroupe les transferts peut viser la classe ST-Link V2 → quelques secondes pour 64–256 Ko. Aucun STM32 LQFP64 en stock n'a de PHY USB HS intégré ; le HS n'est pas justifié ici.
+- SWCLK/SWDIO du DUT sont sur SPI2 (PB13/PB15) : SWD cadencé par le SPI possible (plusieurs MHz), sinon bit-bang à 170 MHz.
+- Aucun firmware de sonde open-source n'existe pour G4 (ni H5) : le portage passe par les sources CMSIS-DAP d'Arm (`DAP.c`, `SW_DP.c`) + TinyUSB (driver `stm32_fsdev`, 1 Ko de PMA suffisant : ≈ 610–740 o pour EP0 + DAP v2 + 2 CDC).
+- Source benchmark : https://9names.github.io/embedded/rust/debug/2022/04/07/cmsisdap-probe-performance.html
+
+**Mesure de courant : INA226 monté, INA228 recommandé dès disponibilité (même empreinte).**
+- INA228 : 0 en stock chez LCSC/JLC et DigiKey (réassort annoncé janvier 2027), seulement chez des brokers (risque de contrefaçon). Le global sourcing JLC ne peut rien tant que DigiKey est à 0 ; reste la consignation (l'utilisateur envoie les pièces).
+- Performances attendues (shunt 100 mΩ sur 3V3_SW, 50 mΩ sur 5V_SW, après calibration du zéro rail coupé) :
+
+| Courant | INA226 (monté) | INA228 (évolution) |
+|---|---|---|
+| 10 µA | non mesurable (LSB 25–50 µA) | résolution 0.8–1.6 µA, ±2–3 µA |
+| 1 mA | ≈ ±5–10 % | ≈ ±1.2 % |
+| 100 mA – 1 A | ≈ ±1.1 % | ≈ ±1.05 % (≈ 0.2 % avec calibration de gain) |
+
+- Shunt 5V_SW gardé à **50 mΩ** (et pas 100 mΩ) : avec l'INA226 la pleine échelle serait sinon 819 mA, sous la limite de 1.1 A du rail.
+- **Correction** : la broche Vbus des INA est maintenant reliée **en amont** du shunt (`*_PRE`) ; son impédance d'entrée (≈ 0.8–1 MΩ) faisait passer ≈ 3–5 µA dans le shunt, invisibles à la calibration du zéro. Le firmware corrige V_charge = V_bus − I·R.
+- Firmware : auto-range ADCRANGE (INA228), calibration du zéro quand le rail est coupé.
+- Un vrai 10 µA ±1 % demanderait une architecture double gamme (shunt commuté type Nordic PPK2 / Joulescope) : commutation rapide de MOSFET, creux d'alimentation sur le DUT, layout critique → **hors rev A** (risque élevé), à étudier pour une rev B.
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide
