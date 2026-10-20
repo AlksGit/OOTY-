@@ -126,6 +126,52 @@
 		)
 	)
 	(sheet
+		(at 220.5 80.64)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "70d0b34b-4ca5-5dc5-a612-89032563a239")
+		(property "Sheetname" "range_3v3_sw"
+			(at 220.5 80.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "range_3v3_sw.kicad_sch"
+			(at 220.5 101.6 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86"
+					(page "9")
+				)
+			)
+		)
+	)
+	(sheet
 		(at 93.5 80.64)
 		(size 50.8 20.32)
 		(exclude_from_sim no)
@@ -305,6 +351,98 @@
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86"
 					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 157 80.64)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "eb4cb3e3-18a9-5628-8a14-32dd5ae47935")
+		(property "Sheetname" "range_5v_sw"
+			(at 157 80.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "range_5v_sw.kicad_sch"
+			(at 157 101.6 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86"
+					(page "8")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 30 121.28)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "f182e370-3a9f-547c-86b8-1aab164f8ff2")
+		(property "Sheetname" "readback"
+			(at 30 120.65 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "readback.kicad_sch"
+			(at 30 142.24 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86"
+					(page "10")
 				)
 			)
 		)

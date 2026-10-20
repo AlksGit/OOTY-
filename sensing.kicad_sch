@@ -1297,7 +1297,7 @@
 		)
 		(uuid "a531177e-e393-53b3-8318-6c26380f33e6")
 	)
-	(text "Shunts: Kelvin connection to IN+/IN- required at layout."
+	(text "Shunts: Kelvin connection to IN+/IN- required at layout. The low-range 100R shunt between *_MID and the rail output is on the dual-range sheet."
 		(exclude_from_sim no)
 		(at 20 260.35 0)
 		(effects
@@ -2130,7 +2130,7 @@
 			)
 		)
 	)
-	(global_label "3V3_SW"
+	(global_label "3V3_SW_MID"
 		(shape bidirectional)
 		(at 48.26 120.65 0)
 		(fields_autoplaced yes)
@@ -2322,7 +2322,7 @@
 			)
 		)
 	)
-	(global_label "5V_SW"
+	(global_label "5V_SW_MID"
 		(shape bidirectional)
 		(at 34.29 73.66 180)
 		(fields_autoplaced yes)
@@ -2706,7 +2706,7 @@
 			)
 		)
 	)
-	(global_label "5V_SW"
+	(global_label "5V_SW_MID"
 		(shape bidirectional)
 		(at 46.99 40.64 0)
 		(fields_autoplaced yes)
@@ -2730,7 +2730,7 @@
 			)
 		)
 	)
-	(global_label "3V3_SW"
+	(global_label "3V3_SW_MID"
 		(shape bidirectional)
 		(at 35.56 153.67 180)
 		(fields_autoplaced yes)

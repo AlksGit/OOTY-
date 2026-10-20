@@ -16,7 +16,7 @@ import pcbnew
 POWER_NETS = {"GND", "+3V3", "+5V", "VBUS", "VIO"}
 GRID = 0.25
 MARGIN = 0.25          # between ICs
-PASSIVE_MARGIN = 0.8   # around resistors: leaves some room for references
+PASSIVE_MARGIN = 0.4   # around resistors (their references are on the assembly drawing)
 DECOUPLING_MARGIN = 0.1
 MAX_RADIUS = 30.0
 
@@ -35,6 +35,12 @@ def courtyard_box(fp):
         poly = fp.GetCourtyard(pcbnew.B_CrtYd)
     bb = poly.BBox() if poly.OutlineCount() else fp.GetBoundingBox(False)
     return (to_mm(bb.GetX()), to_mm(bb.GetY()), to_mm(bb.GetRight()), to_mm(bb.GetBottom()))
+
+
+def bottom_only(fp):
+    """True for a footprint on the bottom side with no through-hole pad: it does not take any
+    room on the top side (test points, solder jumpers, unfitted parts)."""
+    return fp.IsFlipped() and all(p.GetAttribute() != pcbnew.PAD_ATTRIB_PTH for p in fp.Pads())
 
 
 def overlaps(a, b, margin=MARGIN):
@@ -56,7 +62,8 @@ class Placer:
 
     def mark_placed(self, fp):
         self.placed.add(fp.GetReference())
-        self.boxes.append(courtyard_box(fp))
+        if not bottom_only(fp):
+            self.boxes.append(courtyard_box(fp))
 
     def _pads_by_net(self):
         index = {}

@@ -4,7 +4,7 @@
 - [ ] TASK-008 | Phase 5 — Routage
   > Routage complet, zones remplies, DRC --schematic-parity : 0 erreur, 0 net non connecté. SVG par couche + rendu 3D.
   > ⏸ Checkpoint : routage relu.
-  > Blocked by: TASK-007 (placement validé)
+  > Blocked by: TASK-012 (placement final validé)
 
 - [ ] TASK-009 | Phase 6 — Fabrication
   > Gerbers + drill + CPL + BOM fab zippés dans out/fab/<projet>_<rev>.zip, checklist finale dans NOTES.md.
@@ -12,6 +12,26 @@
   > Blocked by: TASK-008 (DRC propre)
 
 ## IN PROGRESS
+- [ ] TASK-012 | Placement — intégration des nouveaux blocs + finition de la sérigraphie
+  > Blocs de mesure au plus près des shunts (Kelvin, boucle de bascule courte). Toutes les pièces clés ont leur référence en sérigraphie, sans ambiguïté. DRC + parité 0 erreur, découplage dans les limites, rendus 3D. Relecture indépendante « prêt pour le routage ». Clôt aussi TASK-005/006/007 (merge de toute la pile après accord utilisateur).
+  > Branch: feat/task-010-dual-range
+  > Statut : placement fait et relu (revue + contre-revue indépendantes : prêt pour le routage ; DRC 0 erreur, parité 0, découplage 59/59, toutes les pièces clés référencées). ⏸ En attente : réponses utilisateur (face arrière non assemblée, paires Kelvin en B.Cu) puis go pour merger la pile dans devape.
+  > Blocked by: TASK-011 — levé
+
+- [ ] TASK-011 | Schéma — mesure double calibre ×2 + retours de tension des rails fixes
+  > Blocs double calibre sur 3V3_SW et 5V_SW, diviseurs 5V_DUT / 3V3_DUT vers l'ADC, générés par script. ERC 0 erreur, netlist et BOM sans écart, PDF + rendus exportés. Relecture indépendante contre les datasheets.
+  > Branch: feat/task-010-dual-range (même branche que TASK-010)
+  > Statut : ✅ terminé (ERC 0 erreur, netlist 196 nets et BOM 242 pièces sans écart, relecture indépendante sans bloquant ni majeur, mineurs appliqués) ; mergée avec la pile après TASK-012.
+  > Blocked by: TASK-010 — levé
+
+- [ ] TASK-010 | Spec + composants — mesure double calibre (3V3_SW, 5V_SW) et retours de tension des rails fixes
+  > Mesure de courant double calibre sur 3V3_SW et 5V_SW : shunt fort (veille, ~1 µA min, résolution ~0.1 µA) + shunt faible (éveil), bascule matérielle en quelques µs, chute de tension max vue par le DUT bornée. Retour de tension 5V_DUT / 3V3_DUT par diviseurs vers l'ADC.
+  > Livrables : SPEC.md + NOTES.md (architecture, valeurs des shunts, seuil/temps de bascule, chute max, plage et précision par calibre, débit), MPN vérifiés (datasheet + stock) ajoutés à bom/bom_draft.csv, broches MCU réaffectées.
+  > ⏸ Checkpoint : relecture indépendante + décisions utilisateur.
+  > Branch: feat/task-010-dual-range (empilée sur fix/task-005-007-review)
+  > Statut : ✅ validée par l'utilisateur le 2026-10-20 (revue indépendante appliquée) ; mergée avec la pile après TASK-012.
+  > Blocked by: —
+
 - [ ] TASK-005 | Phase 2 — Schéma
   > Schéma complet selon conventions CLAUDE.md, ERC 0 erreur (warnings justifiés dans NOTES.md), PDF dans out/, commit "phase 2: ...".
   > ⏸ Checkpoint : schéma relu par l'utilisateur.

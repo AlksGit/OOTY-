@@ -242,6 +242,8 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 - `TLV9001IDBV` : graphique du symbole officiel OPA333xxDBV, même brochage DBV (1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+), vérifié contre la datasheet TLV9001.
 
 ### Affectation des broches du STM32G431MBT6 (LQFP-80, mise à jour du 2026-10-20)
+> Table mise à jour en TASK-011 avec l'affectation de TASK-010 (double calibre, relecture des rails fixes).
+
 Brochage du symbole KiCad `MCU_ST_STM32G4:STM32G431MBTx` vérifié broche par broche contre DS12589 Rev 1 Figure 11 (LQFP80). Fonctions alternatives vérifiées dans le symbole (champs `alternate`) :
 
 | Fonction | Broches |
@@ -254,15 +256,18 @@ Brochage du symbole KiCad `MCU_ST_STM32G4:STM32G431MBTx` vérifié broche par br
 | UART DUT (USART3) | PB10 TX, PB11 RX |
 | SWO DUT (USART2_RX) | PA3 |
 | Sonde SWD DUT | PB13 SWCLK (SPI2_SCK), PB15 SWDIO (SPI2_MOSI), PB2 SWCLK_DIR, PB12 SWDIO_DIR |
-| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PB0 |
+| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PE9 |
 | IN1–4 | PC10, PC11, PC12, PD2 |
 | ADC | PC0 AIN1, PC1 AIN2, PC2 CC1, PC3 CC2, PB1 VIO_MON |
+| Double calibre (ADC1 / ADC2) | PB14 I_5VSW_LO, PC4 I_5VSW_HI (IN5) ; PF0 I_3V3SW_LO, PF1 I_3V3SW_HI (IN10) |
+| Relecture rails fixes | PB0 V_5V_DUT (ADC1_IN15), PC5 V_3V3_DUT (ADC2_IN11) |
+| Bascules de calibre | PA10 RANGE_CLK_5VSW, PB4 RANGE_CLK_3V3SW, PD0 RANGE_5VSW, PD1 RANGE_3V3SW |
 | DAC | PA4 (DAC1_OUT1) |
-| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PD8 EN_5V, PD9 EN_3V3, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
-| VIO / translateurs | PC4 PR1, PC5 MODE, PB14 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
+| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PD8 EN_5V, PD9 EN_3V3, FAULT : PC15 5V_SW, PE8 3V3_SW, PE7 5V, PB5 3V3 ; PB9 INA_ALERT |
+| VIO / translateurs | PE14 PR1, PE15 MODE, PE13 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
 | RESET / BOOT DUT | PC6 RESET, PC7 BOOT (donnée), PD10 BOOT_DIR |
 | Interface locale | PE12 LED heartbeat, PE11 BTN1, PE10 BTN2 |
-| Libres | PA10, PB4, PD0, PD1, PE7, PE8, PE9, PE13, PE14, PE15 |
+| Libres | aucune |
 
 - **BOOT_DIR n'est plus sur PB4** : après reset, PB4 = NJTRST avec pull-up interne 25–55 kΩ (DS12589 Table 12, note 4), plus fort que le pull-down 100 kΩ → DIR haut et broche BOOT du DUT pilotée pendant chaque reset de la carte HIL. PD10 n'a pas de pull au reset.
 - Le choix des broches suit le plan de placement (MCU tourné de 180°) : EN / BOOT_DIR sur le côté tourné vers l'alimentation et le debug, boutons et LED sur le côté tourné vers le coin haut-droit.
@@ -322,6 +327,7 @@ Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 
 - **Correction** : la broche Vbus des INA est maintenant reliée **en amont** du shunt (`*_PRE`) ; son impédance d'entrée (≈ 0.8–1 MΩ) faisait passer ≈ 3–5 µA dans le shunt, invisibles à la calibration du zéro. Le firmware corrige V_charge = V_bus − I·R.
 - Firmware : auto-range ADCRANGE (INA228), calibration du zéro quand le rail est coupé.
 - Un vrai 10 µA ±1 % demanderait une architecture double gamme (shunt commuté type Nordic PPK2 / Joulescope) : commutation rapide de MOSFET, creux d'alimentation sur le DUT, layout critique → **hors rev A** (risque élevé), à étudier pour une rev B.
+- **Mise à jour du 2026-10-20** : l'utilisateur demande la double gamme en rev A → voir « Mesure double calibre et relecture des rails fixes (TASK-010) ».
 
 ## Revue des checkpoints Phases 2–4 (2026-10-20)
 
@@ -447,6 +453,176 @@ L'empilement est écrit dans le fichier par script (non exposé par l'API pcbnew
 - Ratsnest des signaux : 2583 mm sur 117 nets (2481 mm sur 108 nets avant la revue). La longueur totale baisse peu, mais les liaisons critiques sont courtes : USB ≈ 25 mm en ligne droite, chaque ESD à côté de son header, résistances série groupées. Les plus longues restent des signaux lents (5V_DUT vers le mux VIO, I2C interne, CC1/CC2 vers l'ADC, FAULT/EN).
 - Sérigraphie : toutes les pièces clés (CI, connecteurs, LED, Q, D, boutons, TP, pont de soudure) ont leur référence ; 91 références de passifs sont sur le plan de montage seulement (`out/renders/pcb_placement_assembly_top.pdf`). La BOM interactive (iBOM HTML) sera générée avec les fichiers de fabrication (Phase 6).
 - Modèles 3D absents dans la librairie KiCad pour le TPD4E05U06 (USON-10) : sans incidence sur la fabrication.
+
+## Mesure double calibre et relecture des rails fixes (TASK-010, 2026-10-20)
+
+Demande de l'utilisateur : mesurer la veille du DUT à partir de **~1 µA** (résolution ~0.1 µA) sur **3V3_SW et 5V_SW**, avec une bascule de calibre **matérielle et rapide**, et relire la tension des rails fixes 5V_DUT / 3V3_DUT par l'ADC. Cette section remplace la conclusion « double gamme hors rev A » de la réévaluation du 2026-10-19. Composants vérifiés le 2026-10-20 (datasheets + API JLC ; stocks à revérifier avant commande). Conception relue par un agent indépendant ; ses corrections (M1–M4, m5–m11) sont intégrées ci-dessous.
+
+### Architecture (par rail commuté)
+
+```
+AP22653 OUT (*_PRE) -- R_low (50 / 100 mOhm, existant) -- *_MID -- R_high 100 Ohm 0.1 % -- 5V_SW / 3V3_SW -- ESD -- J_PWR
+                         | INA226 (I2C, existant)            |  M7 (diode silicium 1 A), anode cote MID
+                         | INA190A2 "HI" -> ADC2              |  AO3401A (S = MID, D = sortie) : bypass
+                                                             |  INA190A2 "LO" -> ADC1
+                                                             |  TLV7021 : IN+ = sortie (via 1 kOhm), IN- = seuil
+```
+
+- **Calibre fin (LO)** : courant à travers R_high = 100 Ω, lu par un INA190A2 (gain 50) → 5 mV/µA, sur ADC1.
+- **Calibre fort (HI)** : le P-MOSFET AO3401A court-circuite R_high ; le courant est lu sur le shunt existant par un second INA190A2 (ADC2, rapide) et par l'INA226 (I2C, lent et précis), inchangé. **Les entrées IN− de l'INA226 et de l'INA190 HI vont sur `*_MID`** (et plus sur la sortie) : sinon le courant de polarisation de l'INA226 traverserait R_high.
+- **Bascule vers HI (matérielle)** : le comparateur TLV7021 (sortie open-drain) compare la sortie au seuil ; quand la chute sur R_high dépasse le seuil, il tire PRE̅ d'une bascule SN74LVC1G74 → Q = 1 → 2N7002 passant → grille de l'AO3401A à GND → bypass fermé. La bascule mémorise l'état : une fois le bypass fermé, la chute sur R_high disparaît mais Q reste à 1. PRE̅ domine CLK (table 8-1 du SN74LVC1G74) : aucune commande du firmware ne peut rouvrir le bypass tant que le courant dépasse le seuil.
+- **Commande firmware (bascule en T)** : **D relié à Q̅**, CLR̅ à +3V3. Chaque front montant de CLK inverse l'état ; le firmware lit Q (RANGE_*) avant et après. Il peut donc **forcer HI** (par exemple avant d'activer un rail, ou en permanence pour un DUT sensible à la chute) et **revenir en LO**. Un retour automatique en matériel est impossible : en HI, le seuil de retour (~0.3 mA) correspond à 15–30 µV sur le shunt fort, sous l'offset de tout comparateur.
+- **Diode M7** (redresseur silicium 1 A, SMA) en parallèle sur R_high : limite la chute pendant le temps de bascule et à la mise sous tension en HI (tant que V_MID est sous le V_th de l'AO3401A, l'appel de courant passe par elle). I_FSM 30 A (8.3 ms), V_F 1.1 V max à 1 A. Silicium et pas Schottky : à ~50 mV en direct, le courant détourné suit le courant de saturation (Is ≈ 7 nA pour une 1N4007 → ≈ 7 MΩ en parallèle sur 100 Ω, 15 ppm, ≈ 20 nA à 64 mV ; une Schottky avec Is ≈ 1 µA ferait 0.4 % d'erreur). La 1N4148W initialement prévue (150 mA, 0.5 A sur 1 s) ne tenait pas le court-circuit franc en HI (voir ci-dessous).
+- **Seuil** : diviseur pris sur `*_PRE` (en amont des deux shunts, côté pastille de R_low) pour que son courant ne traverse aucun shunt. **5V_SW : 1 kΩ / 150 kΩ** (0.662 %) ; **3V3_SW : 1 kΩ / 100 kΩ** (0.990 %). Pile de tolérances (V_PRE 4.45–5.5 V / 3.25–3.36 V, rapport ±2 %, offset TLV7021 ±8 mV, demi-hystérésis 0.6–7 mV) : déclenchement **21.5–52.1 mV** (5V_SW) et **24.5–48.9 mV** (3V3_SW), soit 0.22–0.52 mA, typiquement 0.33 mA. La pleine échelle du calibre LO est de **62 mV** (sortie INA190 max VS − 40 mV, moins REF à 0.1 V, gain 50 ± 0.3 %) : 10 mV de marge, le calibre LO ne sature jamais avant la bascule.
+- **Pilotage du bypass** : grille de l'AO3401A tirée vers `*_PRE` par 100 kΩ (V_GS ≥ 0 à l'arrêt, courant hors des shunts), tirée à GND par le 2N7002 (commande sur Q, 3.3 V). Fermeture rapide (décharge de ~1.5 nC pour passer sous V_th : 100–200 ns) ; ouverture lente (≈ 100 kΩ × 0.9 nF ≈ 0.1–0.2 ms). Conséquence utile : lors d'un retour en LO alors que le courant est encore haut, la chute monte progressivement jusqu'au seuil et le comparateur referme le bypass, **sans impulsion dans la diode**.
+- **Référence des INA190** : REF des 4 INA190 polarisé à **≈ 0.1 V** par un diviseur 30 kΩ / 1 kΩ depuis +3V3 (106 mV, ratiométrique avec VREF+), 100 nF, et un **TLV9001 en suiveur** (même référence que le tampon DAC) découplé par 100 nF. Raison (INA190 §6.5 et §7.4) : avec REF à GND, la sortie à courant nul peut rester à +3 mV (V_ZL) et le gain n'est spécifié qu'au-dessus de 0.1 V ; le zéro ne serait ni linéaire ni calibrable (0.6 µA d'erreur en LO, 1.2 mA en HI sur 5V_SW). Avec REF à 0.1 V, la calibration rail coupé mesure REF + offset en zone linéaire (CMRR 132 dB : < 0.013 µA d'écart entre V_CM = 0 et 5 V).
+- **Alimentations** : INA190 sur +3V3 (sortie ≤ 3.26 V, compatible ADC). TLV7021 sur **+5V** : mode commun jusqu'à VCC + 0.1 V, les nœuds de 5V_SW restent ≤ +5V ; entrées « fault tolerant » 5.5 V même sans VCC (retour d'alimentation par le DUT sans danger) ; POR qui garde la sortie haute impédance pendant la montée de VCC. Sortie open-drain tirée à +3V3 par 10 kΩ (tenue 6 V indépendante de VCC). **1 kΩ en série sur IN+** (côté sortie, exposé au connecteur : le résidu de l'ESD dépasse les 6 V du comparateur ; retard ≈ 5 ns). Bascule sur +3V3.
+- Sorties INA190 vers l'ADC par 100 Ω + 1 nF (charge capacitive max de l'INA190 : 1 nF ; réservoir pour l'échantillonneur).
+
+### Temps de bascule
+TLV7021 : t_PHL 260 ns à 100 mV d'overdrive (plus lent près du seuil, ~0.5–1 µs pour un front lent) ; SN74LVC1G74 PRE̅ → Q ≈ 5 ns ; 2N7002 + grille de l'AO3401A 100–200 ns. **Total ≈ 0.4–1.2 µs.** Un DUT avec 10 µF de découplage et un appel de 100 mA perd 0.1 A × 1 µs / 10 µF = 10 mV pendant ce temps ; la diode borne la chute (≈ 1–1.1 V) si le DUT a peu de capacité.
+
+### Performances attendues
+
+| Calibre | Rail | Sensibilité | Plage | Pas ADC 12 bits | Suréchantillonnage ×16 |
+|---|---|---|---|---|---|
+| LO (100 Ω, ×50) | les deux | 5 mV/µA | 0 → bascule (≥ 0.22 mA garanti, 0.33 mA typ) | 0.16 µA | ≈ 0.04 µA |
+| HI rapide (×50) | 3V3_SW, 100 mΩ | 5 mV/mA | 0.63 A | 161 µA | ≈ 40 µA |
+| HI rapide (×50) | 5V_SW, 50 mΩ | 2.5 mV/mA | 1.26 A | 322 µA | ≈ 80 µA |
+| HI précis (INA226) | 3V3_SW / 5V_SW | — | 0.82 / 1.64 A | 25 / 50 µA (≥ 140 µs par conversion) | — |
+
+- **Calibre LO** : après calibration du zéro (REF polarisé), erreur ≈ ±(0.05 µA + 0.4 %) : offset INA190 ±15 µV max retiré par la calibration, dérive 80 nV/°C max (< 0.01 µA sur 10 °C), gain ±0.3 %, R_high ±0.1 %. Bruit 75 nV/√Hz → 0.18 µA rms sur toute la bande (37 kHz), ≈ 0.02 µA rms moyenné à 1 kS/s. **Visé : 1 µA ± 0.05 µA ; 100 µA ± 0.4 %**, à confirmer au banc.
+- Courants parasites dans le calibre LO, comptés comme courant du DUT : fuite de l'ESD TPD4E05U06 du rail (≤ 10 nA à 2.5 V, non spécifiée à 5 V), polarisation de IN− de l'INA190 LO (≤ 3 nA), comparateur (pA). Total ≈ 15–20 nA au pire, < 2 % à 1 µA. Diode et AO3401A bloqué : erreurs de gain de quelques ppm.
+- **Zone grossière** : en mesure rapide, entre la bascule (~0.3 mA) et ~20 mA, le calibre HI n'a que quelques pas d'ADC (±0.2–0.3 mA brut). L'INA226 couvre cette zone en moyenné (pas de 25 / 50 µA, conversion ≥ 140 µs). Un troisième calibre comblerait ce trou mais n'est pas demandé.
+- **Échantillonnage** : chaque paire LO/HI arrive sur le même numéro de voie des deux ADC (IN5 pour 5V_SW, IN10 pour 3V3_SW) → mode double ADC simultané : les deux calibres d'un rail sont pris au même instant. Les deux signaux RANGE (Q) sont sur le port D (PD0, PD1) : un seul transfert DMA de GPIOD→IDR, déclenché par le même timer. Bande passante de l'INA190A2 : 37 kHz ; établissement 30 µs à 1 % après une bascule.
+- **Contraintes ADC** (retour de charge de l'échantillonneur, ~5 pF sur 1 nF : 16 mV pour un saut de 3.3 V, soit 3 µA en LO) : dédier les rangs de séquence aux voies LO/HI sans voie très différente juste avant, ou espacer les échantillons d'une même voie de ≥ 30 µs ; ≥ 47.5 cycles d'échantillonnage, identiques sur les deux ADC (IN10 est une voie lente). Ne pas convertir en même temps sur les deux ADC une voie partagée ADC12_INx (PC0–PC3). Relecture des rails fixes (source 50 kΩ + 100 nF) : ≤ 1 kS/s.
+
+### Chute de tension vue par le DUT
+
+| Situation | 3V3_SW | 5V_SW |
+|---|---|---|
+| Calibre LO (sous le seuil) | ≤ 52 mV (+ R_low, négligeable) | ≤ 52 mV |
+| Bascule (≤ ~1 µs) | ≤ ≈ 1.1 V (diode), filtrée par le découplage du DUT | idem |
+| Calibre HI, typique (0.5 A / 1 A, 25 °C) | 50 mV (R_low) + 0.5 A × ≈ 60 mΩ = **80 mV** | 50 mV + 1 A × ≈ 50 mΩ = **100 mV** |
+| Calibre HI, pire cas (ILIM max, R_DS(on) max à chaud) | 0.72 A × (100 + ~95 mΩ) ≈ **140 mV** | 1.1 A × (50 + ~80 mΩ) ≈ **145 mV** |
+
+- Par rapport au seul shunt, l'AO3401A ajoute 30–95 mV selon le courant et la température (R_DS(on) max 85 mΩ à −2.5 V, 60 mΩ à −4.5 V, ×1.3–1.5 à chaud). Le 5V_SW au pire cas (VBUS 4.75 V) passe d'environ 4.45 V à environ **4.30 V**, avant la chute du câble.
+- La tension DUT estimée en HI (V_bus de l'INA226 sur PRE moins I·R) devient incertaine de ±I·ΔR_DS(on) (≈ ±25 mV à 1 A). Le firmware peut estimer R_DS(on) en ligne : en HI, le calibre LO lit I·R_DS(on).
+
+### Court-circuit du DUT
+- **En HI** (Q = 1) : grille et drain à 0 V, l'AO3401A est monté en diode et ne conduit que si V_MID > |V_th| (0.5–1.3 V). À l'ILIM de 5V_SW (1.16 A typ), V_MID ≈ 1.15–1.55 V : l'AO3401A dissipe **1.3–1.8 W** et la diode M7 prend 0.15–0.4 A. L'AO3401A tient ≈ 10–100 ms (Zth transitoire), pas le régime établi (R_θJA 125 °C/W). D'où la règle firmware : **sur FAULT d'un rail commuté, EN bas immédiatement** (le FAULT de l'AP22653 a déjà un filtre de 6 ms), et du cuivre de dissipation sur le drain et la source.
+- **En LO** : la chute monte au seuil, le comparateur ferme le bypass → cas précédent.
+- **Bascule bloquée en LO (panne)** : la M7 tient 1 A en continu (≈ 1.1 W en SMA, à la limite) ; le firmware coupe le rail (règle ci-dessous).
+- À vérifier au banc : le seuil de repli de courant (foldback) de l'AP22653, dont la sortie reste maintenant à 1.2–1.5 V en court-circuit au lieu de 0 V ; court-circuit franc en HI et en LO ; DUT avec 1000 µF.
+
+### Règles firmware
+- Au démarrage : lire Q ; si Q = 0, un front de CLK pour forcer HI **avant** d'activer un rail commuté (l'appel de courant passe par le bypass, pas par la diode).
+- Retour en LO : tentative périodique (toutes les 1–10 ms) quand l'INA226 moyenné ou le HI calibré indique < ~2 mA ; données invalides pendant 1 ms après chaque front de CLK. Pas de risque pour la diode (ouverture lente du bypass, voir plus haut).
+- **Bascule défaillante** seulement si les trois conditions sont vraies : calibre LO saturé, Q = 0, et calibre HI (INA190 HI ou INA226) > 1.5 mA pendant > 100 µs ; règle ignorée pendant 1 ms après chaque front de CLK. Action : couper le rail (EN) et signaler l'erreur.
+- **FAULT d'un rail commuté → EN bas immédiatement.**
+- Mode « sans chute » : forcer HI et ne jamais revenir en LO.
+- Calibration du zéro rail coupé (REF + offset des INA190), puis soustraction. Point de bascule réel de chaque carte mesuré au banc (rampe de charge) et stocké en calibration.
+- `PWR_CR3.UCPD1_DBDIS = 1` en premier (voir PA10 / PB4 ci-dessous), puis PB4 en sortie (CLK).
+
+### Solutions de repli (rev A, bloc expérimental)
+- **Pont de soudure ouvert en parallèle sur R_high** (empreinte seule) : le fermer ramène au comportement d'avant TASK-010 (shunt fort seul).
+- **Empreinte de condensateur non montée côté sortie** (1 µF X7R, fuite ≤ 10 nA à 5 V) pour les DUT très peu découplés : atténue le creux de bascule, au prix d'un filtrage du calibre LO (τ = 100 µs).
+- **Points de test** par rail : `*_MID`, RANGE (Q), sorties des deux INA190.
+
+### Relecture de tension des rails fixes
+- 5V_DUT et 3V3_DUT : diviseur 100 kΩ / 100 kΩ (×0.5) + 100 nF sur l'entrée ADC. Pleine échelle 6.6 V ; 5.5 V → 2.75 V. Courant 25 / 17 µA pris sur le rail fixe (non mesuré). Constante de temps 5 ms : surveillance lente (rail effondré par un court-circuit ou coupé sur FAULT).
+
+### Composants ajoutés
+
+| Fonction | MPN | LCSC | Type JLC | Qté | Prix unitaire |
+|---|---|---|---|---|---|
+| Ampli de shunt ×50 | INA190A2IDCKR (SC-70-6 : 1 REF, 2 GND, 3 VS, 4 IN+, 5 IN−, 6 OUT) | C2870223 | Extended | 4 | 1.54 $ |
+| Comparateur open-drain | TLV7021DBVR (SOT-23-5 : 1 OUT, 2 VEE, 3 IN+, 4 IN−, 5 VCC) | C2860939 | Extended | 2 | 0.37 $ |
+| Bascule D | SN74LVC1G74DCUR (VSSOP-8 : 1 CLK, 2 D, 3 Q̅, 4 GND, 5 Q, 6 CLR̅, 7 PRE̅, 8 VCC) | C70285 | Extended | 2 | 0.30 $ |
+| MOSFET P de bypass | AO3401A (SOT-23 : 1 G, 2 S, 3 D) | C15127 | Basic | 2 | 0.10 $ |
+| Diode de limitation | M7 (1 A, 1000 V, SMA) | C95872 | Basic | 2 | 0.01 $ |
+| Shunt fin 100 Ω 0.1 % 25 ppm | RT0603BRD07100RL (0603, 100 mW) | C122970 | Extended | 2 | 0.03 $ |
+| Seuil 5V_SW | 150 kΩ 1 % 0402 (0402WGF1503TCE) | C25755 | Extended (préféré) | 2 | 0.001 $ |
+| Tampon de REF | TLV9001IDBVR (existant) | C398363 | Extended (déjà dans la BOM) | +1 | 0.09 $ |
+| Commande du bypass | 2N7002 (existant) | C8545 | Basic | +2 | 0.02 $ |
+| Passifs existants | 1 k, 30 k, 100 k, 10 k, 100 Ω, 1 nF, 100 nF | — | — | voir BOM | — |
+
+- Surcoût ≈ **8 $ par carte** + 4 nouvelles références Extended (INA190, TLV7021, SN74LVC1G74, résistance 0.1 %) : ≈ 12 $ de frais de chargement par commande. L'INA190A1 (gain 25) n'a que 427 pièces : le gain 50 (3732 pièces) est retenu. Le TLV7021 en SC-70 est en rupture : boîtier SOT-23-5. Option non retenue : TLV3201 (offset ±5 mV, push-pull), la marge du seuil suffit avec le TLV7021.
+- Aucun composant validé n'est remplacé (INA226, shunts et AP22653 conservés).
+
+### Nouvelle affectation des broches du MCU (appliquée au schéma en TASK-011)
+
+| Signal | Avant | Après | Raison |
+|---|---|---|---|
+| I_5VSW_LO (ADC1_IN5) | — | **PB14** | côté gauche, proche du bloc |
+| I_5VSW_HI (ADC2_IN5) | — | **PC4** | même voie que LO (double ADC simultané) |
+| I_3V3SW_LO (ADC1_IN10) | — | **PF0** | |
+| I_3V3SW_HI (ADC2_IN10) | — | **PF1** | même voie que LO |
+| V_5V_DUT (ADC1_IN15) | — | **PB0** | |
+| V_3V3_DUT (ADC2_IN11) | — | **PC5** | |
+| FAULT_3V3SW | PF0 | PE8 | libère l'ADC |
+| FAULT_5V | PF1 | PE7 | libère l'ADC |
+| VIO_VSEL | PB14 | PE13 | côté haut-gauche, vers le mux VIO |
+| VIO_PR1 | PC4 | PE14 | idem ; PE14 est FT (3.44 V du diviseur depuis +5V) |
+| VIO_MODE | PC5 | PE15 | idem |
+| OUT4_MCU | PB0 | PE9 | sortie simple (pas de PWM sur PB0) |
+| RANGE_CLK_5VSW | — | PA10 | bas-gauche, vers le bloc 5V_SW |
+| RANGE_CLK_3V3SW | — | PB4 | côté bas |
+| RANGE_5VSW (Q) | — | PD0 | les deux Q sur le même port (une lecture DMA) |
+| RANGE_3V3SW (Q) | — | PD1 | |
+
+- Vérifié dans le symbole KiCad et DS12589 Table 12 : canaux ADC exacts ; aucune de ces broches n'a de pull au reset sauf PB4 (pull-up NJTRST 25–55 kΩ) ; PE7 est TT_a (FAULT tiré à +3V3, sans problème).
+- Toutes les nouvelles entrées ADC restent ≤ 3.3 V par construction (INA190 alimentés en 3V3, diviseurs ×0.5) : la question de la tolérance 5 V d'une broche FT_a en mode analogique ne se pose pas pour elles.
+- CLK tirés à GND par 100 kΩ. Sur PB4, le pull-up NJTRST l'emporte au reset (≈ 2.2–2.6 V) : un front CLK possible au reset, inoffensif (rail coupé, le firmware relit Q avant d'activer le rail).
+- PA10 est DBCC2 de l'UCPD1 : maintenu bas par le 100 kΩ, il n'active pas le Rd « dead battery » sur PB4 (CC2) ; le firmware désactive de toute façon ce mode en premier.
+- Après ce changement, **plus aucune broche libre** sur le LQFP-80.
+
+### Décisions de l'utilisateur (checkpoint TASK-010, 2026-10-20)
+Recommandations de la revue acceptées : calibre fin garanti jusqu'à ≥ 0.22 mA ; chute en calibre fort (pire cas ≈ 145 mV) et creux de ≈ 1 µs à chaque bascule acceptés ; plus aucune broche MCU libre ; diode M7 en SMA et solutions de repli (pont, condensateur non monté, points de test).
+
+### Schéma (TASK-011)
+- Trois feuilles ajoutées **en fin de hiérarchie** (pour ne pas renuméroter les composants déjà placés) : `range_5v_sw`, `range_3v3_sw` (shunt 100 Ω, pont de repli, M7, AO3401A + 2N7002, comparateur, bascule, 2 INA190, filtres ADC, points de test) et `readback` (référence 0.1 V des INA190, diviseurs des rails fixes).
+- Feuille `sensing` : shunts R22 / R23 entre `*_PRE` et `*_MID` ; Vin− des INA226 sur `*_MID`.
+- Symboles projet ajoutés (`scripts/build_symbols.py`) : `INA190A2xDCK`, `TLV7021DBV`, `74LVC1G74DCU`, copies des symboles officiels INA199xxDCK, TLV7041DBV et 74AUP1G74 au brochage identique (vérifié contre SBOS863D, SLVSDM5F, SCES794G).
+- ERC : 0 erreur, les 2 warnings justifiés habituels (U15 A8/B8). Netlist : 196 nets, 0 écart. BOM : 242 = 242.
+- **Placement à reprendre (TASK-012)** : les nets `5V_SW_MID` / `3V3_SW_MID` doivent rejoindre la classe HighCurrent / Power (courant DUT complet).
+
+### Contraintes de layout (pour TASK-012)
+1. **Boucle de bypass compacte** : R_low → MID → (R_high ∥ AO3401A ∥ M7) → sortie, pièces accolées, nœud MID réduit à un point.
+2. **Kelvin** : R_low vers l'INA226 et l'INA190 HI en paires prises sur les pastilles du shunt ; R_high vers l'INA190 LO idem ; le diviseur de seuil prend PRE côté pastille de R_low.
+3. **Nœud de sortie (µA)** : pistes vers IN− de l'INA190 LO et la résistance d'entrée du comparateur courtes, ≥ 0.3 mm des autres nets, loin du nœud SW du buck, de l'USB et de SPI / SWCLK, plan GND continu dessous.
+4. **Chaîne rapide** comparateur → bascule → 2N7002 → grille adjacents ; PRE̅ très court (un parasite force HI).
+5. **Cuivre de dissipation** sur drain et source de l'AO3401A.
+6. **Découplage** 100 nF au plus près de VS de chaque INA190, VCC du TLV7021, VCC du SN74LVC1G74, V+ du TLV9001 de REF.
+7. **100 Ω + 1 nF** des sorties INA190 près des broches ADC du MCU.
+8. Le bloc ajoute ≈ 45 composants : nouveau checkpoint de placement.
+
+## Placement des blocs double calibre (TASK-012, 2026-10-20)
+
+### Méthode
+- **Chaîne de puissance placée à la main** entre chaque limiteur et sa broche de J_PWR : shunt fort horizontal sous la rangée des limiteurs (pastille `*_PRE` côté sortie du limiteur), puis 100 Ω, M7 et AO3401A en parallèle de `*_MID` vers la sortie, résistance de grille 100 kΩ contre le MOSFET. L'ESD des rails (U27) est déplacée à gauche de la broche 1.
+- **Comparateurs** (U28, U32) dans la rangée entre le couloir USB et les limiteurs, avec leur diviseur de seuil, la résistance d'entrée et le pull-up de PRE̅ sur le côté libre (broches VCC / IN−). **Bascule U29 juste à côté de U28** (PRE̅ ≈ 10 mm), U33 sous le MCU au plus près de U32 (PRE̅ ≈ 15 mm) : PRE̅ est le net dont un parasite forcerait le calibre HI.
+- **2N7002 Q4 / Q6 sous le MCU** : la liaison 2N7002 → grille de l'AO3401A est longue (≈ 36 / 29 mm en Manhattan) mais peu sensible (grille chargée par Ciss ≈ 650 pF : un couplage de 2 pF depuis un front de 3.3 V ne fait que ≈ 10 mV).
+- **Amplis INA190** (U30, U31, U34, U35) en rangée sous le MCU près des entrées ADC, au pas de 4 mm (canaux de 1 mm pour les paires Kelvin), tournés de 180° pour que leur 100 nF de VS soit au-dessus ; **tampon de REF U36 juste à côté** (ISENSE_REF 3–15 mm au lieu de ≈ 50 mm). Condensateurs de 1 nF de PF0 / PF1 contre les broches.
+- Lignes Kelvin des INA190 : 21–33 mm, à router en **paires serrées, de préférence en B.Cu** (pas de chemin en F.Cu qui évite les translateurs SWD U16 / U17). **Écart accepté** à la contrainte 3 de TASK-010 (« plan GND continu dessous ») : en B.Cu, la référence est le plan d'alimentation In2, découplé ; le nœud µA (sortie du rail vers IN− de l'INA190 LO, 12–17 mm) et les paires Kelvin restent en paires serrées, et l'INA190 rejette le mode commun (CMRR ≥ 132 dB). À tenter d'abord en F.Cu au routage.
+- ESD des rails U27 sous l'étiquette de J4, à gauche de la broche 1 (liaisons 8–14 mm en Manhattan, à router en B.Cu depuis les pastilles traversantes).
+- R60 (1 MΩ de SWDIO_B) ancré près des résistances série de J_DBG (l'autoplace l'avait poussé dans le front-end du comparateur) ; zone libre réservée entre les deux chaînes (x 20–23, y 38.9–41.8) pour le routage de `*_PRE` / Kelvin ; bas du keepout du couloir USB ramené à y = 28.6 (couloir de 3.3 mm).
+- **Face arrière, sans assemblage** : tous les points de test (TP1–TP12, étiquetés par leur net), les ponts de repli JP2 / JP3 (sous les 100 Ω) et les condensateurs non montés C58 / C65. Rien n'est monté par JLC en face arrière : pas de surcoût d'assemblage double face.
+- `autoplace.py` ignore les pièces de la face arrière (sans trou métallisé) comme obstacles ; marge autour des résistances ramenée de 0.8 à 0.4 mm (leurs références sont sur le plan de montage).
+- Classe de nets Power : les nets de puissance des rails double calibre sont listés explicitement (`*_PRE`, `*_MID`, sortie) ; les nets locaux (seuil, entrée du comparateur, grille) restent en Default.
+- Correction de `build_pcb.py` : l'empreinte est ajoutée à la carte avant `Flip()` (plantage sinon) ; les pièces DNP sont exclues de la BOM et du fichier de position (parité avec le schéma).
+
+### Sérigraphie
+- Chaque pièce clé (CI, connecteur, D, Q, F, L, SW, TP, JP) a sa référence. Quand la face avant n'a plus de place, la référence est imprimée **en face arrière, à l'aplomb de la pièce** (même position vue à travers la carte, donc sans ambiguïté avec un voisin) : U1, U4, U6, U16, U17, U19, U20, U22, U25–U28, U30, U31, U33–U36, Q2–Q5, D3–D5 (25 pièces). Plans de montage : `out/renders/pcb_placement_assembly_top.pdf` et `out/renders/pcb_placement_assembly_bottom.pdf`.
+- 164 références de passifs sur le plan de montage seulement (décision D4).
+
+### Revue indépendante du placement (2026-10-20)
+5 points majeurs (aucun bloquant) appliqués : chaîne rapide raccourcie (PRE̅), rangée d'amplis élargie, R60 réancré, ESD des rails rapprochée de J4, référence des INA190 à côté des amplis ; mineurs : condensateurs ADC, points de test hors du corps du MCU, C65 écarté de la référence de D5, R17 hors de la zone entre les chaînes. Contre-revue : prêt pour le routage ; corrections suivantes appliquées : diviseur de REF (R106 / R107 / C72) contre U36, résistances série de OUT1–4 et SPI (R69–R72, R75, R76) ramenées entre U14 / U15 et J8. Restent acceptés : tirages statiques R49 / R56 / R57 / R103 à 9–19 mm de leur CI (signaux lents, effet sur la longueur de ratsnest seulement) ; liaisons PRE̅ de 3V3_SW à router à y ≥ 30 (couloir USB à 1.3 mm).
+
+### Résultats
+- DRC `--schematic-parity` : **0 erreur, 0 écart de parité**, 2 warnings `silk_edge_clearance` sur J1 (justifiés plus haut). 499 connexions non routées : attendu avant le routage.
+- Découplage : **59 / 59** dans leur limite.
+- Ratsnest des signaux : 3029 mm sur 145 nets (2469 mm sur 117 nets avant TASK-010 : +45 composants, +28 nets). Les plus longs restent les rails (5V_DUT, 3V3_DUT vers le mux VIO et la relecture ADC) et les nets `*_MID` / `*_PRE` qui rejoignent les amplis sous le MCU (lignes Kelvin, à router en paires).
 
 ## Rapports ERC / DRC justifiés
 

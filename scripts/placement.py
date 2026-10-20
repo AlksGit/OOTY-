@@ -42,10 +42,10 @@ PLACEMENT = {
     "R2": ("5.1k", 12.6, 33.2, 0, "F"),
     "F1": ("PTC 2.6A", 4.6, 37.5, 270, "F"),
     "D1": ("SMAJ5.0A", 4.8, 43.0, 0, "F"),
-    "TP1": ("VBUS", 16.8, 30.8, 0, "F"),
-    "TP2": ("+5V", 9.7, 41.8, 0, "F"),
-    "TP3": ("+3V3", 9.5, 8.6, 0, "F"),
-    "TP4": ("GND", 13.5, 8.6, 0, "F"),
+    "TP1": ("VBUS", 9.5, 36.5, 0, "B"),
+    "TP2": ("+5V", 5.0, 38.0, 0, "B"),
+    "TP3": ("+3V3", 9.5, 8.6, 0, "B"),
+    "TP4": ("GND", 13.5, 8.6, 0, "B"),
     # 3V3 buck (TLV62569, SLVSDG1C section 10): Cin on VIN with its ground via next to the GND pin,
     # inductor straight off SW, Cout at the inductor output, feedback divider on the FB side.
     "U3": ("TLV62569DBVR", 14.0, 13.0, 0, "F"),
@@ -75,10 +75,86 @@ PLACEMENT = {
     "R6": ("22k", 21.25, 37.5, 90, "F"),
     "R15": ("68k", 27.85, 37.5, 90, "F"),
     "R12": ("39k", 34.45, 37.5, 90, "F"),
-    # Shunts: switch side (pad 1, *_PRE) up, header side down
-    "R22": ("50mR 1% 1W", 14.54, 43.2, 270, "F"),
-    "R23": ("100mR 1% 1W", 19.62, 43.2, 270, "F"),
-    "U27": ("TPD4E05U06DQAR", 17.08, 44.6, 0, "F"),
+    # Dual-range current sensing (NOTES.md, TASK-010), between each switched rail's limiter and
+    # its J_PWR pin: shunt horizontal under the switch row (pad 1 *_PRE towards the limiter OUT,
+    # pad 2 *_MID), then the 100R low-range shunt, the M7 clamp and the AO3401A bypass in
+    # parallel from *_MID to the rail. Rail ESD moved left of pin 1.
+    "R22": ("50mR 1% 1W", 16.0, 40.6, 180, "F"),
+    "D4": ("M7", 11.9, 43.6, 0, "F"),
+    "Q3": ("AO3401A", 17.9, 43.8, 270, "F"),
+    "R88": ("100R 0.1%", 14.0, 46.2, 180, "F"),
+    "R23": ("100mR 1% 1W", 29.5, 40.6, 180, "F"),
+    "D5": ("M7", 23.45, 43.6, 0, "F"),
+    "Q5": ("AO3401A", 29.0, 43.8, 270, "F"),
+    "R97": ("100R 0.1%", 25.5, 46.2, 180, "F"),
+    "U27": ("TPD4E05U06DQAR", 8.4, 48.75, 0, "F"),
+    # Range comparators in the row between the USB corridor and the limiters, with their
+    # threshold dividers on the free side; each flip-flop right next to its comparator (short
+    # /PRE, the net whose glitches would force the HI range). 2N7002 drivers under the MCU
+    # (their gate nets are slow and heavily loaded by the AO3401A Ciss).
+    "U28": ("TLV7021DBVR", 15.9, 30.85, 0, "F"),
+    "U29": ("SN74LVC1G74DCUR", 24.3, 30.95, 90, "F"),
+    "U32": ("TLV7021DBVR", 29.0, 30.85, 0, "F"),
+    "U33": ("SN74LVC1G74DCUR", 39.0, 32.6, 0, "F"),
+    "Q4": ("2N7002", 43.6, 32.6, 90, "F"),
+    "Q6": ("2N7002", 48.0, 32.6, 90, "F"),
+    # Comparator front ends on the free side of each comparator (VCC and IN- pins)
+    "C59": ("100nF/50V", 19.2, 29.45, 0, "F"),
+    "R91": ("1k", 19.2, 30.85, 0, "F"),
+    "R92": ("150k", 19.2, 32.25, 0, "F"),
+    "R93": ("10k", 21.3, 29.45, 0, "F"),
+    "R90": ("1k", 21.3, 32.25, 0, "F"),
+    "C66": ("100nF/50V", 32.3, 29.45, 0, "F"),
+    "R100": ("1k", 32.3, 30.85, 0, "F"),
+    "R101": ("100k", 32.3, 32.25, 0, "F"),
+    "R102": ("10k", 34.4, 29.45, 0, "F"),
+    "R99": ("1k", 34.4, 32.25, 0, "F"),
+    # Bypass gate pull-ups (gate -> *_PRE) next to the AO3401A
+    "R89": ("100k", 19.4, 40.6, 90, "F"),
+    "R98": ("100k", 31.6, 44.5, 90, "F"),
+    # 1 MOhm bias of SWDIO_B, next to the J_DBG series resistors (the auto-placer had pushed it
+    # into the comparator front end)
+    "R60": ("1M", 32.0, 46.0, 0, "F"),
+    # ADC reservoir capacitors (1 nF) of the 3V3_SW amplifiers at PF0 / PF1
+    "C69": ("1nF/50V", 53.2, 24.75, 0, "F"),
+    "C71": ("1nF/50V", 53.2, 23.6, 0, "F"),
+    # INA190 reference buffer (shared by the four amplifiers), next to them
+    "U36": ("TLV9001IDBVR", 53.0, 41.0, 0, "F"),
+    "C72": ("100nF/50V", 51.6, 43.4, 0, "F"),
+    "R107": ("1k", 53.6, 43.4, 0, "F"),
+    "R106": ("30k", 55.6, 43.4, 0, "F"),
+    # Series resistors of OUT1-4 and SPI (the auto-placer had pushed them above U14 once the
+    # dual-range parts took their spots): back between U14/U15 and J8 / near U14
+    "R69": ("100R", 59.5, 45.12, 0, "F"),
+    "R70": ("100R", 62.22, 41.49, 90, "F"),
+    "R72": ("100R", 61.6, 45.12, 0, "F"),
+    "R71": ("100R", 64.44, 43.36, 0, "F"),
+    "R75": ("100R", 62.6, 26.12, 0, "F"),
+    "R76": ("100R", 58.82, 25.11, 0, "F"),
+    # Shunt amplifiers under the MCU, next to the ADC pins, 4 mm pitch (routing channels for
+    # the Kelvin pairs)
+    # (rotated 180: VS pin up, decoupled by the capacitor row above)
+    "U30": ("INA190A2IDCKR", 38.0, 37.0, 180, "F"),
+    "U31": ("INA190A2IDCKR", 42.0, 37.0, 180, "F"),
+    "U34": ("INA190A2IDCKR", 46.0, 37.0, 180, "F"),
+    "U35": ("INA190A2IDCKR", 50.0, 37.0, 180, "F"),
+    "C61": ("100nF/50V", 38.8, 35.0, 0, "F"),
+    "C63": ("100nF/50V", 42.8, 35.0, 0, "F"),
+    "C68": ("100nF/50V", 46.8, 35.0, 0, "F"),
+    "C70": ("100nF/50V", 50.8, 35.0, 0, "F"),
+    # Bottom side, not assembled: bypass bridges, unfitted output capacitors, test points
+    "JP2": ("BYPASS", 14.0, 46.2, 0, "B"),
+    "JP3": ("BYPASS", 25.5, 46.2, 0, "B"),
+    "C58": ("1uF/25V X7R", 10.3, 46.4, 0, "B"),
+    "C65": ("1uF/25V X7R", 20.6, 46.4, 0, "B"),
+    "TP5": ("5V_SW_MID", 16.2, 42.4, 0, "B"),
+    "TP9": ("3V3_SW_MID", 27.0, 42.4, 0, "B"),
+    "TP6": ("RANGE_5VSW", 24.0, 22.0, 0, "B"),
+    "TP7": ("I_5VSW_LO_AMP", 33.0, 18.0, 0, "B"),
+    "TP8": ("I_5VSW_HI_AMP", 33.0, 24.5, 0, "B"),
+    "TP10": ("RANGE_3V3SW", 30.0, 36.0, 0, "B"),
+    "TP11": ("I_3V3SW_LO_AMP", 56.0, 18.0, 0, "B"),
+    "TP12": ("I_3V3SW_HI_AMP", 56.0, 24.5, 0, "B"),
     # SWD probe, RESET and BOOT drivers above J_DBG
     "U17": ("SN74LVC1T45DBVR", 34.5, 41.8, 0, "F"),
     "U16": ("SN74LVC1T45DBVR", 39.2, 41.8, 0, "F"),
@@ -123,7 +199,8 @@ KEEPOUTS = [
     (78.0, 0.0, 85.0, 7.0),
     (0.0, 48.0, 7.0, 55.0),
     (78.0, 48.0, 85.0, 55.0),
-    (14.2, 25.3, 36.3, 28.9),   # USB D+/D- corridor from the USBLC6 to the MCU
+    (14.2, 25.3, 36.3, 28.6),   # USB D+/D- corridor from the USBLC6 to the MCU
+    (20.0, 38.9, 23.0, 41.8),   # routing room between the two dual-range chains
 ]
 
 # Copper keepout around the mounting holes (M3 pan head, DIN 7985: 5.6 mm, plus margin).

@@ -361,7 +361,15 @@
       },
       {
         "netclass": "Power",
-        "pattern": "5V_SW*"
+        "pattern": "5V_SW"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "5V_SW_PRE"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "5V_SW_MID"
       },
       {
         "netclass": "Power",
@@ -369,7 +377,15 @@
       },
       {
         "netclass": "Power",
-        "pattern": "3V3_SW*"
+        "pattern": "3V3_SW"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "3V3_SW_PRE"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "3V3_SW_MID"
       },
       {
         "netclass": "Power",
