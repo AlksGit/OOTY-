@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "C:\\Users\\alexandr.perrot\\Documents\\Personal work\\Hard\\OOTY-\\OOTY.kicad_sch")
-		(date "2026-10-20T11:01:02")
+		(date "2026-10-20T11:14:56")
 		(tool "Eeschema 10.0.7")
 		(sheet
 			(number "1")
@@ -17353,6 +17353,11 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "R11")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
 				(ref "R13")
 				(pin "2")
 				(pintype "passive")
@@ -17597,11 +17602,6 @@
 			)
 			(node
 				(ref "F1")
-				(pin "2")
-				(pintype "passive")
-			)
-			(node
-				(ref "R11")
 				(pin "2")
 				(pintype "passive")
 			)

@@ -16,6 +16,8 @@ from autoplace import courtyard_box, overlaps, to_mm
 TEXT_H = 1.0
 TEXT_T = 0.15
 GAP = 0.25
+# A reference must be within OWN_MAX of its own courtyard and closer to it than to any other.
+OWN_MAX = 2.0
 # Reference prefixes that always get a silkscreen reference (placed before the passives).
 KEY_PARTS = ("U", "J", "D", "Q", "F", "L", "SW", "TP", "JP")
 
@@ -32,6 +34,13 @@ PIN_LABELS = {
 
 def mm(v):
     return pcbnew.FromMM(v)
+
+
+def box_distance(point, box):
+    """Distance from a point to a box (0 inside)."""
+    dx = max(box[0] - point[0], 0.0, point[0] - box[2])
+    dy = max(box[1] - point[1], 0.0, point[1] - box[3])
+    return (dx * dx + dy * dy) ** 0.5
 
 
 def text_box(item):
@@ -66,8 +75,12 @@ class Silk:
             return False
         if any(overlaps(box, t, GAP) for t in self.texts):
             return False
-        return not any(overlaps(box, c, 0.0) for ref, c in self.courtyards.items()
-                       if ref != owner)
+        if any(overlaps(box, c, 0.0) for ref, c in self.courtyards.items() if ref != owner):
+            return False
+        centre = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+        own = box_distance(centre, self.courtyards[owner])
+        return own <= OWN_MAX and all(own < box_distance(centre, c)
+                                      for ref, c in self.courtyards.items() if ref != owner)
 
     def place_reference(self, fp):
         """Place the reference (the net name for a test point) on the silkscreen."""

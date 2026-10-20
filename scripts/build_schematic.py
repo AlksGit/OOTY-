@@ -145,11 +145,12 @@ def power_sheet():
     res(sh, R1K, "+3V3", "LED_PWR_A")
     part(sh, "D", "Device:LED", "C965805", {"A": "LED_PWR_A", "K": "GND"}, value="PWR", rot=180)
 
-    # Switched rails start off (EN pulled down). Fixed rails start on (EN pulled up to IN), but the
-    # firmware can still cut them (USB power budget, persistent fault).
+    # Switched rails start off (EN pulled down). Fixed rails start on (EN pulled up to +3V3, not to
+    # IN: the MCU pin must not see 5 V while its supply is still off), but the firmware can still
+    # cut them (USB power budget, persistent fault).
     switches = [
         ("5V_SW (switched, 1 A)", "+5V", "EN_5VSW", "5V_SW_PRE", "FAULT_5VSW", R22K, C10U25, "GND"),
-        ("5V fixed (0.5 A)", "+5V", "EN_5V", "5V_DUT", "FAULT_5V", R39K, C10U25, "+5V"),
+        ("5V fixed (0.5 A)", "+5V", "EN_5V", "5V_DUT", "FAULT_5V", R39K, C10U25, "+3V3"),
         ("3V3_SW (switched, 0.5 A)", "+3V3", "EN_3V3SW", "3V3_SW_PRE", "FAULT_3V3SW", R39K, C10U,
          "GND"),
         ("3V3 fixed (0.3 A)", "+3V3", "EN_3V3", "3V3_DUT", "FAULT_3V3", R68K, C10U, "+3V3"),

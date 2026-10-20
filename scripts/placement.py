@@ -36,6 +36,7 @@ PLACEMENT = {
     "J2": ("SWD_HIL", 28.0, 19.5, 0, "F"),
     # USB input, PTC, TVS, internal rail test points
     "U2": ("USBLC6-2SC6", 12.0, 27.5, 0, "F"),
+    "C1": ("100nF/50V", 14.7, 24.6, 90, "F"),
     "U1": ("TPD4E05U06DQAR", 10.6, 32.4, 0, "F"),
     "R1": ("5.1k", 12.6, 31.6, 0, "F"),
     "R2": ("5.1k", 12.6, 33.2, 0, "F"),
@@ -69,8 +70,14 @@ PLACEMENT = {
     "U4": ("AP22653W6-7", 18.6, 37.5, 0, "F"),
     "U7": ("AP22653W6-7", 25.2, 37.5, 0, "F"),
     "U6": ("AP22653W6-7", 31.8, 37.5, 0, "F"),
-    "R22": ("50mR 1% 1W", 14.54, 43.2, 90, "F"),
-    "R23": ("100mR 1% 1W", 19.62, 43.2, 90, "F"),
+    # ILIM resistors next to pin 5 of their switch
+    "R9": ("39k", 14.65, 37.5, 90, "F"),
+    "R6": ("22k", 21.25, 37.5, 90, "F"),
+    "R15": ("68k", 27.85, 37.5, 90, "F"),
+    "R12": ("39k", 34.45, 37.5, 90, "F"),
+    # Shunts: switch side (pad 1, *_PRE) up, header side down
+    "R22": ("50mR 1% 1W", 14.54, 43.2, 270, "F"),
+    "R23": ("100mR 1% 1W", 19.62, 43.2, 270, "F"),
     "U27": ("TPD4E05U06DQAR", 17.08, 44.6, 0, "F"),
     # SWD probe, RESET and BOOT drivers above J_DBG
     "U17": ("SN74LVC1T45DBVR", 34.5, 41.8, 0, "F"),
@@ -79,6 +86,12 @@ PLACEMENT = {
     "U19": ("SN74LVC1T45DBVR", 47.6, 41.8, 0, "F"),
     "U25": ("TPD4E05U06DQAR", 37.4, 45.4, 90, "F"),
     "U26": ("TPD4E05U06DQAR", 44.4, 45.4, 90, "F"),
+    # Series resistors between the drivers and the ESD of J_DBG
+    "R85": ("100R", 33.6, 45.4, 90, "F"),
+    "R83": ("100R", 35.0, 45.4, 90, "F"),
+    "R84": ("100R", 39.8, 45.4, 90, "F"),
+    "R86": ("100R", 41.2, 45.4, 90, "F"),
+    "R87": ("100R", 47.0, 45.4, 90, "F"),
     # Translators above J_IO: A side (pins 1-12) up towards the MCU, B side down to the header
     "U14": ("SN74LVC8T245PWR", 57.0, 34.5, 270, "F"),
     "U15": ("SN74LVC8T245PWR", 68.0, 34.5, 270, "F"),
@@ -110,6 +123,7 @@ KEEPOUTS = [
     (78.0, 0.0, 85.0, 7.0),
     (0.0, 48.0, 7.0, 55.0),
     (78.0, 48.0, 85.0, 55.0),
+    (14.2, 25.3, 36.3, 28.9),   # USB D+/D- corridor from the USBLC6 to the MCU
 ]
 
 # Copper keepout around the mounting holes (M3 pan head, DIN 7985: 5.6 mm, plus margin).
