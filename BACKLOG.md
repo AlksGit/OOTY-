@@ -1,11 +1,6 @@
 # Backlog
 
 ## TODO
-- [ ] TASK-006 | Phase 3 — Setup PCB
-  > Outline, trous de fixation, keepouts, stack-up, net classes, import du schéma, rendu 3D vide avec connecteurs placés.
-  > ⏸ Checkpoint : outline + règles validés.
-  > Blocked by: TASK-005 (import du schéma nécessaire)
-
 - [ ] TASK-007 | Phase 4 — Placement
   > Placement complet, rendus 3D dessus/dessous + SVG dans out/renders/.
   > ⏸ Checkpoint : placement validé avant tout routage.
@@ -34,7 +29,14 @@
   >   6. connectors : headers DUT, ESD TPD4E05U06, résistances série
   >   7. ERC global 0 erreur, export PDF dans out/, rendu SVG vérifié visuellement
   > Branch: feat/task-005-schematic
+  > Statut : terminé côté dev/revue (ERC 0 erreur, netlist et BOM vérifiées, revue électrique indépendante appliquée). ⏸ En attente du checkpoint utilisateur avant merge (merge sans relecture refusé par le mode auto).
   > Blocked by: TASK-004 (BOM validée), TASK-002 (projet KiCad + libs) — levés
+
+- [ ] TASK-006 | Phase 3 — Setup PCB
+  > Outline, trous de fixation, keepouts, stack-up, net classes, import du schéma, rendu 3D vide avec connecteurs placés.
+  > ⏸ Checkpoint : outline + règles validés.
+  > Branch: feat/task-006-pcb-setup (empilée sur feat/task-005-schematic)
+  > Blocked by: TASK-005 (import du schéma nécessaire) — travail avancé en mode autonome, checkpoint en attente
 
 ## ON HOLD
 
