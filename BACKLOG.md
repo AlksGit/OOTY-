@@ -1,10 +1,18 @@
 # Backlog
 
 ## TODO
+- [ ] TASK-011 | Schéma — mesure double calibre ×2 + retours de tension des rails fixes
+  > Blocs double calibre sur 3V3_SW et 5V_SW, diviseurs 5V_DUT / 3V3_DUT vers l'ADC, générés par script. ERC 0 erreur, netlist et BOM sans écart, PDF + rendus exportés. Relecture indépendante contre les datasheets.
+  > Blocked by: TASK-010 (composants et valeurs à choisir avant le câblage)
+
+- [ ] TASK-012 | Placement — intégration des nouveaux blocs + finition de la sérigraphie
+  > Blocs de mesure au plus près des shunts (Kelvin, boucle de bascule courte). Toutes les pièces clés ont leur référence en sérigraphie, sans ambiguïté. DRC + parité 0 erreur, découplage dans les limites, rendus 3D. Relecture indépendante « prêt pour le routage ». Clôt aussi TASK-005/006/007 (merge de toute la pile après accord utilisateur).
+  > Blocked by: TASK-011 (on ne place que ce qui existe au schéma)
+
 - [ ] TASK-008 | Phase 5 — Routage
   > Routage complet, zones remplies, DRC --schematic-parity : 0 erreur, 0 net non connecté. SVG par couche + rendu 3D.
   > ⏸ Checkpoint : routage relu.
-  > Blocked by: TASK-007 (placement validé)
+  > Blocked by: TASK-012 (placement final validé)
 
 - [ ] TASK-009 | Phase 6 — Fabrication
   > Gerbers + drill + CPL + BOM fab zippés dans out/fab/<projet>_<rev>.zip, checklist finale dans NOTES.md.
@@ -12,6 +20,13 @@
   > Blocked by: TASK-008 (DRC propre)
 
 ## IN PROGRESS
+- [ ] TASK-010 | Spec + composants — mesure double calibre (3V3_SW, 5V_SW) et retours de tension des rails fixes
+  > Mesure de courant double calibre sur 3V3_SW et 5V_SW : shunt fort (veille, ~1 µA min, résolution ~0.1 µA) + shunt faible (éveil), bascule matérielle en quelques µs, chute de tension max vue par le DUT bornée. Retour de tension 5V_DUT / 3V3_DUT par diviseurs vers l'ADC.
+  > Livrables : SPEC.md + NOTES.md (architecture, valeurs des shunts, seuil/temps de bascule, chute max, plage et précision par calibre, débit), MPN vérifiés (datasheet + stock) ajoutés à bom/bom_draft.csv, broches MCU réaffectées.
+  > ⏸ Checkpoint : relecture indépendante + décisions utilisateur.
+  > Branch: feat/task-010-dual-range (empilée sur fix/task-005-007-review)
+  > Blocked by: —
+
 - [ ] TASK-005 | Phase 2 — Schéma
   > Schéma complet selon conventions CLAUDE.md, ERC 0 erreur (warnings justifiés dans NOTES.md), PDF dans out/, commit "phase 2: ...".
   > ⏸ Checkpoint : schéma relu par l'utilisateur.
