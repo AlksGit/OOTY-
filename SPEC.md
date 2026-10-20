@@ -25,19 +25,20 @@ flowchart LR
     USBC -- VBUS 5V --> INPROT[Protection d'entrée<br/>limitation + TVS]
     INPROT -- 5V_SYS --> REG33[Buck 3V3]
     REG33 -- 3V3_HIL --> MCU
-    INPROT -- 5V_SYS --> SW5F[Limiteur 5V fixe<br/>~0.5 A, toujours actif]
+    INPROT -- 5V_SYS --> SW5F[Limiteur 5V fixe<br/>~0.5 A, actif par défaut]
     INPROT -- 5V_SYS --> SW5[Interrupteur 5V_SW<br/>eFuse ~1 A]
-    REG33 -- 3V3 --> SW33F[Limiteur 3V3 fixe<br/>~0.3 A, toujours actif]
+    REG33 -- 3V3 --> SW33F[Limiteur 3V3 fixe<br/>~0.3 A, actif par défaut]
     REG33 -- 3V3 --> SW33[Interrupteur 3V3_SW<br/>eFuse ~0.5 A]
-    INPROT --> VIOGEN[Sélection VIO<br/>1.8 / 3.3 / 5 V / externe]
+    INPROT -- 5V_SYS --> VIOGEN[Sélection VIO<br/>1.8 / 3.3 / 5 V / externe]
+    SW5F -- 5V limité --> VIOGEN
     SW5 --> INA5[Mesure V/I 5V_SW]
     SW33 --> INA33[Mesure V/I 3V3_SW]
     USBC -- D+/D- --> MCU[STM32<br/>USB FS composite]
     USBC -- CC1/CC2 --> MCU
     MCU -- EN / FAULT --> SW5
     MCU -- EN / FAULT --> SW33
-    SW5F -- FAULT --> MCU
-    SW33F -- FAULT --> MCU
+    MCU -- EN / FAULT --> SW5F
+    MCU -- EN / FAULT --> SW33F
     MCU -- I2C interne --> INA5
     MCU -- I2C interne --> INA33
     MCU -- I2C interne --> OLED[Écran OLED 0.91 pouces<br/>128x32 SSD1306]
@@ -53,6 +54,7 @@ flowchart LR
     SW33F --> HDR
     MCU --- DBG[Connecteur SWD<br/>programmation HIL]
     MCU --- LED[LED heartbeat]
+    BTN[2 boutons] --> MCU
     REG33 --- LEDP[LED alim OK]
     HDR --> DUT[(DUT)]
 ```
@@ -62,18 +64,19 @@ flowchart LR
 | USB-C | Alimentation et données | USB 2.0 Full Speed (12 Mbit/s), Rd 5.1 kΩ sur CC1/CC2 (sink), ESD sur D+/D-/VBUS. **Lecture des tensions CC1/CC2 par l'ADC** pour connaître le courant annoncé par la source (défaut USB / 1.5 A / 3 A). |
 | Protection d'entrée | Protéger le port USB du PC | Limitation du courant total tiré sur VBUS, TVS sur VBUS. Pas de protection contre l'inversion de polarité (inutile, USB-C détrompé). |
 | Buck 3V3 | Logique HIL + rails 3V3 du DUT | ≥ 1.5 A en sortie, pour garder de la marge sur une charge max ≈ 0.87 A (un LDO dissiperait ≈ 1.5 W, voir `NOTES.md`). Choix du composant en Phase 1. |
-| Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Limiteur de courant toujours actif** sur chaque rail fixe (interrupteur limité ou eFuse, EN tiré à l'état actif), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. |
+| Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Limiteur de courant** sur chaque rail fixe, **actif dès la mise sous tension** (EN tiré à l'état actif) mais **coupable par le firmware** (budget USB insuffisant, FAULT persistant), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. Les rails 5 V ne sont pas régulés : ≈ 4.45 V au pire cas (VBUS 4.75 V moins les chutes du PTC, du limiteur et du shunt), avant la chute du câble USB. |
 | Rails commutés 3V3_SW / 5V_SW | Hard reboot du DUT | Load switch / eFuse avec limitation de courant, enable piloté par le MCU, flag FAULT relu par le MCU, décharge de sortie (vrai 0 V à l'arrêt), état OFF au démarrage du MCU. |
 | Mesure V/I | Consommation du DUT | Un moniteur par rail commuté : **INA226** (résolution 50 µA sur 5V_SW, 25 µA sur 3V3_SW), remplaçable sans modifier le PCB par l'INA228 (même brochage, ≈ 6 / 3 µA) quand il sera disponible. Shunt côté haut, sur le bus I2C **interne** (séparé de l'I2C exposé au DUT). |
 | Écran | Affichage local | **Module OLED 0.91" 128 × 32, contrôleur SSD1306, I2C** (adresse 0x3C), 4 broches GND/VCC/SCL/SDA, ~36 × 12.5 mm. Sur le bus I2C interne. Monté sur un header 4 broches. Affiche par exemple la consommation de chaque rail commuté, l'état ON/OFF/FAULT des rails et la tension VIO. Référence exacte et approvisionnement en Phase 1. |
-| VIO | Tension des signaux côté DUT | Sélectionnable par logiciel : **1.8 / 3.3 / 5 V internes ou VIO externe** (référence VTref fournie par le DUT, comme une sonde de debug classique). |
+| VIO | Tension des signaux côté DUT | Sélectionnable par logiciel : **1.8 / 3.3 / 5 V internes ou VIO externe** (référence VTref fournie par le DUT, comme une sonde de debug classique). Le 5 V est pris en sortie du limiteur du rail 5 V fixe : un court-circuit sur VIO ne peut pas faire tomber la carte HIL. |
 | Level shifters | Adapter 3V3 (MCU) ↔ VIO (DUT) | Lignes unidirectionnelles : buffers à direction fixe (famille 74LVC1T45/LVC8T245, 1.65–5.5 V). SWDIO : direction pilotée par le MCU. I2C : buffer bidirectionnel TCA9517A (le PCA9306 ne couvre pas VIO de 1.8 à 5 V, voir `NOTES.md`). Sortie haute impédance (OE) tant que VIO n'est pas établi. |
-| RESET / BOOT | Reset doux, bootloader | Sorties **open-drain** (le DUT garde ses propres pull-ups), compatibles toutes tensions VIO. |
+| RESET / BOOT | Reset doux, bootloader | RESET en **open-drain** (le DUT garde ses propres pull-ups). BOOT en **push-pull à VIO ou haute impédance** (un BOOT0 STM32 est actif haut : l'open-drain ne peut pas le forcer), haute impédance au démarrage de la carte HIL. |
 | Sonde SWD DUT | Flash/debug | Firmware CMSIS-DAP sur le STM32. Signaux SWCLK, SWDIO, SWO, nRESET (= ligne RESET). |
-| Analogique | Mesures et stimuli | **2 entrées ADC 0–5 V** (diviseur + filtre, impédance d'entrée ≥ 100 kΩ). **1 sortie DAC 0–3.3 V** bufferisée (AOP), courant ≥ 5 mA. |
-| MCU STM32 | Contrôle + USB | USB FS sans quartz (HSI48 + CRS) ou avec quartz, DAC, ≥ 4 entrées ADC libres (2 AIN + CC1/CC2), 2× I2C, SPI, 2× UART, ≥ 128 KiB flash. Candidats à évaluer en Phase 1 : STM32G0B1, STM32F072, STM32G431. |
-| Debug HIL | Programmer la carte elle-même | Connecteur SWD ARM Cortex 10 broches 1.27 mm (compatible ST-Link V3 / J-Link). Le bootloader USB DFU intégré reste une solution de secours (BOOT0 accessible). |
+| Analogique | Mesures et stimuli | **2 entrées ADC 0–5 V** (diviseur + filtre, impédance d'entrée ≥ 100 kΩ). **1 sortie DAC 0–3.3 V à vide** bufferisée (AOP), courant ≥ 5 mA ; la résistance série de 100 Ω est hors de la boucle : erreur = I × 100 Ω (0.5 V à 5 mA). |
+| MCU STM32 | Contrôle + USB | USB FS sans quartz (HSI48 + CRS) ou avec quartz, DAC, ≥ 4 entrées ADC libres (2 AIN + CC1/CC2), 2× I2C, SPI, 2× UART, ≥ 128 KiB flash. Retenu : **STM32G431MBT6 (LQFP-80)** — voir `NOTES.md`. |
+| Debug HIL | Programmer la carte elle-même | Connecteur SWD ARM Cortex 10 broches 1.27 mm (compatible ST-Link V3 / J-Link). Le bootloader USB DFU intégré reste une solution de secours (pont de soudure BOOT0 ↔ 3V3). |
 | LED | État | LED « alim OK » câblée directement sur 3V3. LED « heartbeat » pilotée par le firmware. |
+| Boutons | Interaction locale | **2 boutons poussoirs** sur la carte, lus par le STM32 (actifs bas, anti-rebond RC). Fonction définie par le firmware. |
 
 ## 3. Budget de puissance
 
@@ -81,9 +84,9 @@ flowchart LR
 
 | Rail | Source | Courant max DUT | Protection |
 |---|---|---|---|
-| 5V (fixe) | 5V_SYS via limiteur | 0.5 A | Limiteur toujours actif + FAULT |
+| 5V (fixe) | 5V_SYS via limiteur | 0.5 A (VIO 5 V compris) | Limiteur actif par défaut, coupable + FAULT |
 | 5V_SW | 5V_SYS via eFuse | 1.0 A | eFuse, limite ~1.1 A + FAULT |
-| 3V3 (fixe) | Buck 3V3 via limiteur | 0.3 A | Limiteur toujours actif + FAULT |
+| 3V3 (fixe) | Buck 3V3 via limiteur | 0.3 A | Limiteur actif par défaut, coupable + FAULT |
 | 3V3_SW | Buck 3V3 via eFuse | 0.5 A | eFuse, limite ~0.55 A + FAULT |
 
 Les seuils exacts dépendent des composants retenus en Phase 1 (précision de la limite de courant).
@@ -139,6 +142,8 @@ Le nombre exact et l'ordre des broches seront figés en Phase 2 (schéma).
 | Lecture CC1/CC2 (ADC) | 2 |
 | LED heartbeat | 1 |
 | **Total** | **~42** → boîtier 48 broches au minimum, **64 broches recommandé** pour la marge |
+
+En pratique, le schéma a utilisé les 52 GPIO du LQFP-64 (directions SWCLK / BOOT, sélection VIO sur 3 broches, CC1/CC2, I2C_DUT_EN…) ; l'ajout de la coupure des rails fixes et des boutons a imposé le **LQFP-80** (66 GPIO, 10 encore libres).
 
 ## 5. Logiciel (hors PCB, impacte le choix du MCU)
 

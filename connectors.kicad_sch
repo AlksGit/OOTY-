@@ -6,7 +6,7 @@
 	(paper "A3")
 	(title_block
 		(title "DUT connectors and ESD")
-		(date "2026-10-19")
+		(date "2026-10-20")
 		(rev "A")
 		(company "OOTY")
 	)
@@ -1804,6 +1804,17 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "DUT rails and VIO are probed on J_PWR / J_DBG pins (no separate test points)."
+		(exclude_from_sim no)
+		(at 20 260.35 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0b79f389-0091-50ee-894a-5f47065eccb5")
+	)
 	(text "ESD (cont.)"
 		(exclude_from_sim no)
 		(at 184.15 30.48 0)
@@ -1904,31 +1915,23 @@
 		(uuid "01e34111-fcb9-51eb-bb16-e1866a5d4b32")
 	)
 	(no_connect
-		(at 220.98 107.95)
+		(at 195.58 123.19)
 		(uuid "0454c34a-c411-57ff-89e0-6992033bf95e")
-	)
-	(no_connect
-		(at 195.58 73.66)
-		(uuid "1035e856-5547-50b4-b9db-dce01ae11181")
 	)
 	(no_connect
 		(at 198.12 157.48)
 		(uuid "200d0459-2d5f-5853-ba68-abbd19634a28")
 	)
 	(no_connect
-		(at 220.98 88.9)
+		(at 222.25 73.66)
 		(uuid "22c64830-ecbf-5447-8468-79459b27a45b")
 	)
 	(no_connect
-		(at 195.58 118.11)
-		(uuid "29e0ae34-2338-5c73-ad00-2c6280ca0f9c")
-	)
-	(no_connect
-		(at 129.54 107.95)
+		(at 134.62 107.95)
 		(uuid "2a57ba89-cef0-55f8-a3e3-639a4f25d464")
 	)
 	(no_connect
-		(at 196.85 54.61)
+		(at 195.58 54.61)
 		(uuid "31d8fd82-5aeb-5bdf-a373-816fb0694376")
 	)
 	(no_connect
@@ -1944,10 +1947,6 @@
 		(uuid "45162fdd-e71b-5239-b883-eb6e3b3de210")
 	)
 	(no_connect
-		(at 195.58 107.95)
-		(uuid "5088a5d6-1c8c-56d5-a515-aab58c44f3a5")
-	)
-	(no_connect
 		(at 220.98 118.11)
 		(uuid "51eb5360-3337-5eb8-90ab-61ea81ca16ef")
 	)
@@ -1956,23 +1955,23 @@
 		(uuid "5d5e1155-b4d1-5877-84c2-9d3a8e89e70f")
 	)
 	(no_connect
-		(at 195.58 88.9)
+		(at 196.85 73.66)
 		(uuid "6522af25-ffd2-5740-8e27-e888b0254f5e")
 	)
 	(no_connect
-		(at 220.98 73.66)
+		(at 196.85 88.9)
 		(uuid "687dbbf6-964b-5da5-a620-2426e5f8e75f")
 	)
 	(no_connect
-		(at 222.25 39.37)
+		(at 220.98 39.37)
 		(uuid "6a51edab-e5d6-5333-a369-4d4e17db0a20")
 	)
 	(no_connect
-		(at 196.85 39.37)
+		(at 195.58 39.37)
 		(uuid "6c935f0a-e1c9-5dde-bb9b-6347122a3514")
 	)
 	(no_connect
-		(at 195.58 123.19)
+		(at 195.58 107.95)
 		(uuid "7a4652b1-f45c-5689-aabe-2ef1abb1358f")
 	)
 	(no_connect
@@ -1988,15 +1987,23 @@
 		(uuid "85459224-e824-519c-8593-2697097f0359")
 	)
 	(no_connect
-		(at 129.54 123.19)
+		(at 134.62 123.19)
 		(uuid "8add73fa-9049-52be-b7fc-78b5f366051d")
+	)
+	(no_connect
+		(at 220.98 49.53)
+		(uuid "8e94722d-fe0f-58e8-bd63-134b98fb6f1b")
+	)
+	(no_connect
+		(at 222.25 88.9)
+		(uuid "99f4155a-0755-5c4e-ac5c-95beca9424f6")
 	)
 	(no_connect
 		(at 220.98 113.03)
 		(uuid "9c9fc84a-57be-5adc-b954-ef5bcc32d315")
 	)
 	(no_connect
-		(at 154.94 123.19)
+		(at 160.02 123.19)
 		(uuid "b04643c9-2c33-5864-aca3-29b79c09af8c")
 	)
 	(no_connect
@@ -2004,7 +2011,7 @@
 		(uuid "b5b0195c-4890-59e6-80b0-aadb2ed01758")
 	)
 	(no_connect
-		(at 154.94 107.95)
+		(at 160.02 107.95)
 		(uuid "b6ec48fe-5cb8-5d16-be98-bc5f32454f11")
 	)
 	(no_connect
@@ -2016,7 +2023,7 @@
 		(uuid "cd7d1a9f-5584-56a2-987f-41b5c62132d3")
 	)
 	(no_connect
-		(at 222.25 54.61)
+		(at 220.98 54.61)
 		(uuid "d09c5d4f-1e20-5ea3-b086-ab598d77cbfa")
 	)
 	(no_connect
@@ -2036,8 +2043,12 @@
 		(uuid "e64579b7-7c9e-5bba-9261-579649126398")
 	)
 	(no_connect
-		(at 220.98 123.19)
+		(at 220.98 107.95)
 		(uuid "f588b472-0f33-5f3c-bf48-670071d63701")
+	)
+	(no_connect
+		(at 220.98 123.19)
+		(uuid "f91e0142-7ad5-5fef-a029-7724bd4532ae")
 	)
 	(wire
 		(pts
@@ -2061,7 +2072,7 @@
 	)
 	(wire
 		(pts
-			(xy 129.54 118.11) (xy 127 118.11)
+			(xy 134.62 118.11) (xy 132.08 118.11)
 		)
 		(stroke
 			(width 0)
@@ -2071,7 +2082,7 @@
 	)
 	(wire
 		(pts
-			(xy 196.85 49.53) (xy 194.31 49.53)
+			(xy 195.58 49.53) (xy 193.04 49.53)
 		)
 		(stroke
 			(width 0)
@@ -2121,6 +2132,16 @@
 	)
 	(wire
 		(pts
+			(xy 208.28 63.5) (xy 208.28 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ab97108-275f-5114-8a6c-08517dbbf915")
+	)
+	(wire
+		(pts
 			(xy 260.35 71.12) (xy 257.81 71.12)
 		)
 		(stroke
@@ -2128,6 +2149,16 @@
 			(type default)
 		)
 		(uuid "0d4dac93-9046-58e4-938d-b98c18733c41")
+	)
+	(wire
+		(pts
+			(xy 196.85 83.82) (xy 194.31 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ecbd9f0-7dcf-5d53-b8ba-24461cdbac9b")
 	)
 	(wire
 		(pts
@@ -2141,7 +2172,17 @@
 	)
 	(wire
 		(pts
-			(xy 209.55 59.69) (xy 209.55 63.5)
+			(xy 196.85 78.74) (xy 194.31 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1035e856-5547-50b4-b9db-dce01ae11181")
+	)
+	(wire
+		(pts
+			(xy 208.28 59.69) (xy 208.28 63.5)
 		)
 		(stroke
 			(width 0)
@@ -2191,7 +2232,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 113.03) (xy 157.48 113.03)
+			(xy 160.02 113.03) (xy 162.56 113.03)
 		)
 		(stroke
 			(width 0)
@@ -2208,16 +2249,6 @@
 			(type default)
 		)
 		(uuid "236c7852-7e16-5c01-97a4-2ebbde4e51a3")
-	)
-	(wire
-		(pts
-			(xy 209.55 63.5) (xy 209.55 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "238e2f4c-7212-5980-bd6b-eb4a2d7cbce3")
 	)
 	(wire
 		(pts
@@ -2301,7 +2332,7 @@
 	)
 	(wire
 		(pts
-			(xy 196.85 44.45) (xy 194.31 44.45)
+			(xy 195.58 44.45) (xy 193.04 44.45)
 		)
 		(stroke
 			(width 0)
@@ -2358,16 +2389,6 @@
 			(type default)
 		)
 		(uuid "437a0559-d7dc-549c-a7c2-56338210bbad")
-	)
-	(wire
-		(pts
-			(xy 195.58 78.74) (xy 193.04 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "443f5502-5501-51be-bbb9-786b6eaf418a")
 	)
 	(wire
 		(pts
@@ -2431,6 +2452,16 @@
 	)
 	(wire
 		(pts
+			(xy 195.58 113.03) (xy 193.04 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5088a5d6-1c8c-56d5-a515-aab58c44f3a5")
+	)
+	(wire
+		(pts
 			(xy 91.44 118.11) (xy 93.98 118.11)
 		)
 		(stroke
@@ -2458,16 +2489,6 @@
 			(type default)
 		)
 		(uuid "55e4c754-77a5-5121-9f95-8fbf98329b75")
-	)
-	(wire
-		(pts
-			(xy 195.58 113.03) (xy 193.04 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5c198cc5-4bfa-5785-b758-86098ea2502a")
 	)
 	(wire
 		(pts
@@ -2511,6 +2532,16 @@
 	)
 	(wire
 		(pts
+			(xy 209.55 97.79) (xy 209.55 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6304cae3-6909-5ca3-9a5d-60d70d39454f")
+	)
+	(wire
+		(pts
 			(xy 302.26 55.88) (xy 298.45 55.88)
 		)
 		(stroke
@@ -2521,7 +2552,7 @@
 	)
 	(wire
 		(pts
-			(xy 129.54 113.03) (xy 127 113.03)
+			(xy 134.62 113.03) (xy 132.08 113.03)
 		)
 		(stroke
 			(width 0)
@@ -2541,23 +2572,13 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 128.27) (xy 142.24 132.08)
+			(xy 147.32 128.27) (xy 147.32 132.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "6b0d4ef8-3b08-5d29-9a4d-86578ce5b0a4")
-	)
-	(wire
-		(pts
-			(xy 220.98 78.74) (xy 223.52 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6ce39db9-0a3c-5412-a0b5-0995ba055df6")
 	)
 	(wire
 		(pts
@@ -2571,16 +2592,6 @@
 	)
 	(wire
 		(pts
-			(xy 195.58 83.82) (xy 193.04 83.82)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6f76ec2f-123d-59f9-8fa4-d59d40917504")
-	)
-	(wire
-		(pts
 			(xy 41.91 59.69) (xy 44.45 59.69)
 		)
 		(stroke
@@ -2591,7 +2602,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 118.11) (xy 157.48 118.11)
+			(xy 160.02 118.11) (xy 162.56 118.11)
 		)
 		(stroke
 			(width 0)
@@ -2661,7 +2672,17 @@
 	)
 	(wire
 		(pts
-			(xy 222.25 44.45) (xy 224.79 44.45)
+			(xy 195.58 118.11) (xy 193.04 118.11)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80048ac9-145c-5b80-9120-cc1bfab8e8b3")
+	)
+	(wire
+		(pts
+			(xy 220.98 44.45) (xy 223.52 44.45)
 		)
 		(stroke
 			(width 0)
@@ -2711,6 +2732,16 @@
 	)
 	(wire
 		(pts
+			(xy 209.55 93.98) (xy 209.55 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "85b380fc-3237-54e1-9c07-6e542110ecfa")
+	)
+	(wire
+		(pts
 			(xy 148.59 162.56) (xy 148.59 166.37)
 		)
 		(stroke
@@ -2721,17 +2752,7 @@
 	)
 	(wire
 		(pts
-			(xy 220.98 83.82) (xy 223.52 83.82)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "888aeec3-da28-5805-be00-16192836f14e")
-	)
-	(wire
-		(pts
-			(xy 142.24 128.27) (xy 142.24 132.08)
+			(xy 147.32 128.27) (xy 147.32 132.08)
 		)
 		(stroke
 			(width 0)
@@ -2758,16 +2779,6 @@
 			(type default)
 		)
 		(uuid "8dc36135-5434-5951-95a8-eb01a0e0f6fa")
-	)
-	(wire
-		(pts
-			(xy 222.25 49.53) (xy 224.79 49.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8e94722d-fe0f-58e8-bd63-134b98fb6f1b")
 	)
 	(wire
 		(pts
@@ -2848,16 +2859,6 @@
 			(type default)
 		)
 		(uuid "9971bf19-f379-566d-8c6a-950db6fd140b")
-	)
-	(wire
-		(pts
-			(xy 208.28 93.98) (xy 208.28 97.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "99f4155a-0755-5c4e-ac5c-95beca9424f6")
 	)
 	(wire
 		(pts
@@ -3001,7 +3002,7 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 132.08) (xy 142.24 132.08)
+			(xy 147.32 132.08) (xy 147.32 132.08)
 		)
 		(stroke
 			(width 0)
@@ -3091,7 +3092,7 @@
 	)
 	(wire
 		(pts
-			(xy 209.55 59.69) (xy 209.55 63.5)
+			(xy 208.28 59.69) (xy 208.28 63.5)
 		)
 		(stroke
 			(width 0)
@@ -3108,6 +3109,16 @@
 			(type default)
 		)
 		(uuid "c4a8be6b-1f9e-567e-9500-e0cf72e976b7")
+	)
+	(wire
+		(pts
+			(xy 222.25 78.74) (xy 224.79 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c9dcd0e8-d346-534f-957b-b2bc2cebb5ba")
 	)
 	(wire
 		(pts
@@ -3191,7 +3202,7 @@
 	)
 	(wire
 		(pts
-			(xy 208.28 93.98) (xy 208.28 97.79)
+			(xy 209.55 93.98) (xy 209.55 97.79)
 		)
 		(stroke
 			(width 0)
@@ -3228,6 +3239,16 @@
 			(type default)
 		)
 		(uuid "e9c491f7-1ddf-5916-9999-87c9c5cc9bff")
+	)
+	(wire
+		(pts
+			(xy 222.25 83.82) (xy 224.79 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea6d297a-7f8e-55fd-ae52-ab85c2f1ce1f")
 	)
 	(wire
 		(pts
@@ -3278,26 +3299,6 @@
 			(type default)
 		)
 		(uuid "f73c53f6-983d-5f75-9785-53bedf3234ed")
-	)
-	(wire
-		(pts
-			(xy 208.28 97.79) (xy 208.28 97.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f87b75c9-38c7-54ec-98e4-bd9774cf27fb")
-	)
-	(wire
-		(pts
-			(xy 208.28 128.27) (xy 208.28 132.08)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f91e0142-7ad5-5fef-a029-7724bd4532ae")
 	)
 	(wire
 		(pts
@@ -3359,6 +3360,16 @@
 		)
 		(uuid "ff89519e-b9c8-511a-9cd8-325328f8824d")
 	)
+	(wire
+		(pts
+			(xy 208.28 128.27) (xy 208.28 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ff8f592b-7ac1-5808-b64c-051a1ecf250d")
+	)
 	(label "TX"
 		(at 46.99 80.01 0)
 		(effects
@@ -3378,26 +3389,6 @@
 			(justify left bottom)
 		)
 		(uuid "068a0932-1b8f-5798-9468-e59607498a54")
-	)
-	(label "RESET"
-		(at 224.79 49.53 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "0ab97108-275f-5114-8a6c-08517dbbf915")
-	)
-	(label "BOOT"
-		(at 193.04 78.74 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "0ecbd9f0-7dcf-5d53-b8ba-24461cdbac9b")
 	)
 	(label "OUT1"
 		(at 299.72 66.04 180)
@@ -3439,18 +3430,8 @@
 		)
 		(uuid "1a866274-2d0b-58a0-ad90-497685b95135")
 	)
-	(label "SWCLK"
-		(at 194.31 49.53 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "22099053-b707-5c41-b045-ad92b94a730c")
-	)
 	(label "SPI_MOSI"
-		(at 157.48 118.11 0)
+		(at 162.56 118.11 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3499,15 +3480,15 @@
 		)
 		(uuid "3866e827-39d4-5a9f-b6db-992145b5aef0")
 	)
-	(label "RX"
-		(at 127 118.11 180)
+	(label "SWDIO"
+		(at 194.31 78.74 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "4489ca54-bf68-5df1-8930-cc3ba7a9ebef")
+		(uuid "443f5502-5501-51be-bbb9-786b6eaf418a")
 	)
 	(label "RESET"
 		(at 96.52 107.95 0)
@@ -3559,6 +3540,16 @@
 		)
 		(uuid "57a941eb-afc5-5aae-badb-029762b7c569")
 	)
+	(label "BOOT"
+		(at 193.04 113.03 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5c198cc5-4bfa-5785-b758-86098ea2502a")
+	)
 	(label "SPI_CS"
 		(at 133.35 152.4 180)
 		(effects
@@ -3588,6 +3579,26 @@
 			(justify right bottom)
 		)
 		(uuid "6b9cd378-8bf4-5df7-8fc6-793dba94614d")
+	)
+	(label "SWO"
+		(at 224.79 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6ce39db9-0a3c-5412-a0b5-0995ba055df6")
+	)
+	(label "SWCLK"
+		(at 194.31 83.82 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "6f76ec2f-123d-59f9-8fa4-d59d40917504")
 	)
 	(label "IN4"
 		(at 92.71 50.8 0)
@@ -3639,6 +3650,16 @@
 		)
 		(uuid "87bc587b-3539-5d70-8d60-af217db14287")
 	)
+	(label "RESET"
+		(at 224.79 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "888aeec3-da28-5805-be00-16192836f14e")
+	)
 	(label "OUT2"
 		(at 44.45 50.8 0)
 		(effects
@@ -3650,7 +3671,7 @@
 		(uuid "8c74697f-6fdb-5992-96a0-cf55708efda8")
 	)
 	(label "SPI_SCK"
-		(at 157.48 113.03 0)
+		(at 162.56 113.03 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3739,6 +3760,16 @@
 		)
 		(uuid "b6bb8c1f-60a4-59de-adf6-b6c8e42105ea")
 	)
+	(label "TX"
+		(at 163.83 147.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b9f47226-184a-5b72-b382-19704b70acb8")
+	)
 	(label "IN1"
 		(at 43.18 118.11 0)
 		(effects
@@ -3799,16 +3830,6 @@
 		)
 		(uuid "dbffbcf7-7a89-56ee-8c00-6b134da14e03")
 	)
-	(label "SWDIO"
-		(at 194.31 44.45 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "e50bd4a8-a662-5657-bbf4-d57bda72013b")
-	)
 	(label "IN3"
 		(at 158.75 78.74 0)
 		(effects
@@ -3849,16 +3870,6 @@
 		)
 		(uuid "ea9592af-835a-5062-8c69-6615ac0edb73")
 	)
-	(label "TX"
-		(at 127 113.03 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "eee7291b-e288-59b3-b49c-59a1fcae3c27")
-	)
 	(label "OUT4"
 		(at 299.72 73.66 180)
 		(effects
@@ -3868,16 +3879,6 @@
 			(justify right bottom)
 		)
 		(uuid "f0f7d24c-07d1-56ef-ae8f-ff567ddcbd02")
-	)
-	(label "SWO"
-		(at 224.79 44.45 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f309cc16-96f4-5fc8-b8a7-216553ea57d2")
 	)
 	(label "OUT2"
 		(at 299.72 68.58 180)
@@ -3928,6 +3929,16 @@
 			(justify right bottom)
 		)
 		(uuid "fbe7fcd2-c6b7-5460-aa26-9820f580703e")
+	)
+	(label "RX"
+		(at 163.83 152.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fd102edd-1ea1-51a0-896b-c752c0f9b2ef")
 	)
 	(global_label "I2C_SDA"
 		(shape bidirectional)
@@ -4097,6 +4108,54 @@
 			)
 		)
 	)
+	(global_label "AIN2"
+		(shape bidirectional)
+		(at 193.04 49.53 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "22099053-b707-5c41-b045-ad92b94a730c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 193.04 49.53 180)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "VIO"
+		(shape bidirectional)
+		(at 193.04 118.11 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "29e0ae34-2338-5c73-ad00-2c6280ca0f9c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 193.04 118.11 180)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
 	(global_label "3V3_SW"
 		(shape bidirectional)
 		(at 259.08 48.26 180)
@@ -4158,6 +4217,30 @@
 		(uuid "43a062a5-452a-57e7-b3b5-f3934db447e4")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 35.56 99.06 180)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "I2C_SCL"
+		(shape bidirectional)
+		(at 132.08 118.11 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4489ca54-bf68-5df1-8930-cc3ba7a9ebef")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 132.08 118.11 180)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4286,30 +4369,6 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
-			)
-		)
-	)
-	(global_label "AOUT"
-		(shape bidirectional)
-		(at 223.52 83.82 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "6304cae3-6909-5ca3-9a5d-60d70d39454f")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 223.52 83.82 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
 			)
 		)
 	)
@@ -4457,30 +4516,6 @@
 			)
 		)
 	)
-	(global_label "VIO"
-		(shape bidirectional)
-		(at 193.04 113.03 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "80048ac9-145c-5b80-9120-cc1bfab8e8b3")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 193.04 113.03 180)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
 	(global_label "IN4_B"
 		(shape bidirectional)
 		(at 80.01 50.8 180)
@@ -4553,30 +4588,6 @@
 			)
 		)
 	)
-	(global_label "I2C_SDA"
-		(shape bidirectional)
-		(at 163.83 147.32 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "b9f47226-184a-5b72-b382-19704b70acb8")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 163.83 147.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-	)
 	(global_label "OUT4_B"
 		(shape bidirectional)
 		(at 31.75 69.85 180)
@@ -4638,30 +4649,6 @@
 		(uuid "c7abcf7f-7afc-5480-a8d1-8c214c5cbd37")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 259.08 40.64 180)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
-	(global_label "AIN1"
-		(shape bidirectional)
-		(at 193.04 83.82 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "c9dcd0e8-d346-534f-957b-b2bc2cebb5ba")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 193.04 83.82 180)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4769,9 +4756,57 @@
 			)
 		)
 	)
-	(global_label "AIN2"
+	(global_label "AIN1"
 		(shape bidirectional)
-		(at 223.52 78.74 0)
+		(at 193.04 44.45 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "e50bd4a8-a662-5657-bbf4-d57bda72013b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 193.04 44.45 180)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "I2C_SDA"
+		(shape bidirectional)
+		(at 132.08 113.03 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "eee7291b-e288-59b3-b49c-59a1fcae3c27")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 132.08 113.03 180)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "AOUT"
+		(shape bidirectional)
+		(at 223.52 44.45 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4779,9 +4814,9 @@
 			)
 			(justify left)
 		)
-		(uuid "ea6d297a-7f8e-55fd-ae52-ab85c2f1ce1f")
+		(uuid "f309cc16-96f4-5fc8-b8a7-216553ea57d2")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 223.52 78.74 0)
+			(at 223.52 44.45 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4841,30 +4876,6 @@
 			)
 		)
 	)
-	(global_label "I2C_SCL"
-		(shape bidirectional)
-		(at 163.83 152.4 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "fd102edd-1ea1-51a0-896b-c752c0f9b2ef")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 163.83 152.4 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-	)
 	(global_label "AOUT"
 		(shape bidirectional)
 		(at 299.72 53.34 180)
@@ -4891,7 +4902,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 41.91 99.06 90)
+		(at 87.63 118.11 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4900,9 +4911,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "009993a2-06f9-5296-bbdd-785c6453019c")
-		(property "Reference" "R63"
-			(at 41.91 96.52 90)
+		(uuid "01ce11de-ccb9-5727-b920-62608dcb1a42")
+		(property "Reference" "R87"
+			(at 87.63 115.57 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4912,7 +4923,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 41.91 101.6 90)
+			(at 87.63 120.65 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4922,7 +4933,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 41.91 99.06 0)
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4932,8 +4943,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 41.91 99.06 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4944,7 +4955,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 41.91 99.06 0)
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4955,7 +4966,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 41.91 99.06 0)
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4966,7 +4977,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 41.91 99.06 0)
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4977,7 +4988,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 41.91 99.06 0)
+			(at 87.63 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4988,15 +4999,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "401b9b8d-841e-5e23-963b-856f6ad6e42a")
+			(uuid "bff63a2f-269f-5625-bb93-205074f621c0")
 		)
 		(pin "2"
-			(uuid "b96f94a0-f27e-5ae2-8217-108553d72001")
+			(uuid "a22b42ad-ab7a-5a0f-9ae2-f3cb04bc13e0")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R63")
+					(reference "R87")
 					(unit 1)
 				)
 			)
@@ -5004,7 +5015,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 90.17 59.69 90)
+		(at 38.1 40.64 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5015,7 +5026,7 @@
 		(fields_autoplaced yes)
 		(uuid "0242eaa4-d178-5ec7-879e-3d10a0e79f69")
 		(property "Reference" "R69"
-			(at 90.17 57.15 90)
+			(at 38.1 38.1 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5025,7 +5036,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 90.17 62.23 90)
+			(at 38.1 43.18 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5035,7 +5046,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 90.17 59.69 0)
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5045,8 +5056,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 90.17 59.69 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5057,7 +5068,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 90.17 59.69 0)
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5068,7 +5079,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 90.17 59.69 0)
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5079,7 +5090,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 90.17 59.69 0)
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5090,7 +5101,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 90.17 59.69 0)
+			(at 38.1 40.64 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5101,10 +5112,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "bcbe483a-0253-5539-bb5a-28abfd0f8842")
+			(uuid "ca541298-c591-5f3b-8a54-37a5575bc2aa")
 		)
 		(pin "2"
-			(uuid "3b0e4a96-ce71-5725-840a-747e44fd23f8")
+			(uuid "683c3d97-8c77-53fa-b99f-6944ed1fce31")
 		)
 		(instances
 			(project "OOTY"
@@ -5191,7 +5202,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 90.17 107.95 90)
+		(at 40.64 88.9 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5202,7 +5213,7 @@
 		(fields_autoplaced yes)
 		(uuid "0acfd675-cbe8-547e-a57e-2c56968dd3b6")
 		(property "Reference" "R74"
-			(at 90.17 105.41 90)
+			(at 40.64 86.36 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5212,7 +5223,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 90.17 110.49 90)
+			(at 40.64 91.44 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5222,7 +5233,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 90.17 107.95 0)
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5232,8 +5243,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 90.17 107.95 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5244,7 +5255,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 90.17 107.95 0)
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5255,7 +5266,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 90.17 107.95 0)
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5266,7 +5277,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 90.17 107.95 0)
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5277,7 +5288,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 90.17 107.95 0)
+			(at 40.64 88.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5288,10 +5299,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "df997d1e-71b6-53aa-972b-4074f771d192")
+			(uuid "d56f13cc-3330-54fc-809f-915942e57f7d")
 		)
 		(pin "2"
-			(uuid "fc853b0d-d009-5416-8ae0-f4fe149069cb")
+			(uuid "943d269b-a4f0-519d-82fc-12da9e934262")
 		)
 		(instances
 			(project "OOTY"
@@ -5304,7 +5315,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 298.45 45.72 270)
+		(at 208.28 63.5 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5313,9 +5324,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "0fa840c3-c876-58c2-9146-1941412a2944")
-		(property "Reference" "#PWR205"
-			(at 297.18 43.18 90)
+		(uuid "1687af5a-9098-5312-9520-4ad6daf4913f")
+		(property "Reference" "#PWR213"
+			(at 208.28 62.23 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5326,18 +5337,17 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 295.91 45.72 90)
+			(at 208.28 67.31 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" ""
-			(at 298.45 45.72 0)
+			(at 208.28 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5348,7 +5358,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 298.45 45.72 0)
+			(at 208.28 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5359,7 +5369,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 298.45 45.72 0)
+			(at 208.28 63.5 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5370,168 +5380,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "60786af5-28f4-5747-8b73-f07777b2eb93")
+			(uuid "238e2f4c-7212-5980-bd6b-eb4a2d7cbce3")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR205")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 210.82 166.37 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "118cdc6a-6fbe-5e93-ac3b-dc0413c5a37c")
-		(property "Reference" "#PWR201"
-			(at 210.82 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 210.82 170.18 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 210.82 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 210.82 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 210.82 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "268e9b24-fc70-50bb-b3e7-d8c1fb76cbe2")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR201")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 148.59 166.37 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "12a94e84-a09c-5c44-96d8-703506294187")
-		(property "Reference" "#PWR197"
-			(at 148.59 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 148.59 170.18 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 148.59 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 148.59 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 148.59 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "2043a69c-bb03-5f59-8241-56003c0fbb2d")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR197")
+					(reference "#PWR213")
 					(unit 1)
 				)
 			)
@@ -5539,7 +5393,7 @@
 	)
 	(symbol
 		(lib_id "Power_Protection:TPD4E05U06DQA")
-		(at 209.55 46.99 0)
+		(at 208.28 46.99 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5550,7 +5404,7 @@
 		(fields_autoplaced yes)
 		(uuid "182bffbb-8650-5e26-8735-e9e4241666ad")
 		(property "Reference" "U24"
-			(at 222.25 36.83 0)
+			(at 220.98 36.83 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5561,7 +5415,7 @@
 			)
 		)
 		(property "Value" "TPD4E05U06DQAR"
-			(at 209.55 60.96 0)
+			(at 208.28 60.96 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5571,7 +5425,7 @@
 			)
 		)
 		(property "Footprint" "Package_SON:USON-10_2.5x1.0mm_P0.5mm"
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5582,7 +5436,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf"
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5593,7 +5447,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5604,7 +5458,7 @@
 			)
 		)
 		(property "MPN" "TPD4E05U06DQAR"
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5615,7 +5469,7 @@
 			)
 		)
 		(property "Manufacturer" "Texas Instruments"
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5626,7 +5480,7 @@
 			)
 		)
 		(property "LCSC" "C138714"
-			(at 209.55 46.99 0)
+			(at 208.28 46.99 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5676,19 +5530,39 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 257.81 53.34 270)
+		(lib_id "Device:R")
+		(at 91.44 69.85 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "1ca8ea42-e0ce-59a1-9550-289f74a9ac39")
-		(property "Reference" "#PWR202"
-			(at 256.54 50.8 90)
+		(uuid "196d5c61-023e-509d-81bc-81d664ad1b24")
+		(property "Reference" "R82"
+			(at 91.44 67.31 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 91.44 72.39 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 91.44 69.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5698,30 +5572,8 @@
 				)
 			)
 		)
-		(property "Value" "GND"
-			(at 255.27 53.34 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 257.81 53.34 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 257.81 53.34 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 91.44 69.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5732,7 +5584,40 @@
 			)
 		)
 		(property "Description" ""
-			(at 257.81 53.34 0)
+			(at 91.44 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 91.44 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 91.44 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 91.44 69.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5743,12 +5628,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "5593d460-b740-522a-9a40-ebcba6d81df3")
+			(uuid "190c74c7-4af7-5ebd-8b7f-c45780a5d184")
+		)
+		(pin "2"
+			(uuid "a2cccfd1-0ddb-5312-937e-33a7dcd2f552")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR202")
+					(reference "R82")
 					(unit 1)
 				)
 			)
@@ -5756,7 +5644,7 @@
 	)
 	(symbol
 		(lib_id "Power_Protection:TPD4E05U06DQA")
-		(at 208.28 81.28 0)
+		(at 209.55 81.28 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5767,7 +5655,7 @@
 		(fields_autoplaced yes)
 		(uuid "1dd8b844-4a9a-5568-befe-59e3330c965e")
 		(property "Reference" "U25"
-			(at 220.98 71.12 0)
+			(at 222.25 71.12 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5778,7 +5666,7 @@
 			)
 		)
 		(property "Value" "TPD4E05U06DQAR"
-			(at 208.28 95.25 0)
+			(at 209.55 95.25 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5788,7 +5676,7 @@
 			)
 		)
 		(property "Footprint" "Package_SON:USON-10_2.5x1.0mm_P0.5mm"
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5799,7 +5687,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf"
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5810,7 +5698,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5821,7 +5709,7 @@
 			)
 		)
 		(property "MPN" "TPD4E05U06DQAR"
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5832,7 +5720,7 @@
 			)
 		)
 		(property "Manufacturer" "Texas Instruments"
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5843,7 +5731,7 @@
 			)
 		)
 		(property "LCSC" "C138714"
-			(at 208.28 81.28 0)
+			(at 209.55 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5854,39 +5742,117 @@
 			)
 		)
 		(pin "1"
-			(uuid "73c49c76-6457-5b6a-ba1b-20e49b185551")
+			(uuid "e1bae9ed-799f-5ce4-97fb-dbda884f2dea")
 		)
 		(pin "2"
-			(uuid "52a671e6-ef39-5e04-b2c9-cfd6abfc0704")
+			(uuid "73c49c76-6457-5b6a-ba1b-20e49b185551")
 		)
 		(pin "3"
-			(uuid "a9f499f7-8d6e-5928-a941-7c7da7df4aba")
+			(uuid "52a671e6-ef39-5e04-b2c9-cfd6abfc0704")
 		)
 		(pin "4"
-			(uuid "0654e988-9cbb-5acb-a860-2cb3da069a7b")
+			(uuid "a9f499f7-8d6e-5928-a941-7c7da7df4aba")
 		)
 		(pin "5"
-			(uuid "9a2fc4db-6d7d-52c9-9a90-80b1cb1d6d44")
+			(uuid "0654e988-9cbb-5acb-a860-2cb3da069a7b")
 		)
 		(pin "6"
-			(uuid "0fca416e-09f8-572e-aeda-fd51ac7d71d2")
+			(uuid "9a2fc4db-6d7d-52c9-9a90-80b1cb1d6d44")
 		)
 		(pin "7"
-			(uuid "4873311e-b0d9-51d3-9d24-2fe0d016d419")
+			(uuid "0fca416e-09f8-572e-aeda-fd51ac7d71d2")
 		)
 		(pin "8"
-			(uuid "4ff62a63-fc52-5bc8-8b4c-0ad6ceab927b")
+			(uuid "4873311e-b0d9-51d3-9d24-2fe0d016d419")
 		)
 		(pin "9"
-			(uuid "99c1c759-cfe2-5310-95ed-5a0ac8f2dc55")
+			(uuid "4ff62a63-fc52-5bc8-8b4c-0ad6ceab927b")
 		)
 		(pin "10"
-			(uuid "85b380fc-3237-54e1-9c07-6e542110ecfa")
+			(uuid "99c1c759-cfe2-5310-95ed-5a0ac8f2dc55")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
 					(reference "U25")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 209.55 97.79 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1f312dba-6be2-5587-b479-7348a1b394be")
+		(property "Reference" "#PWR214"
+			(at 209.55 96.52 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 209.55 101.6 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 209.55 97.79 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 209.55 97.79 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 209.55 97.79 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f87b75c9-38c7-54ec-98e4-bd9774cf27fb")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "#PWR214")
 					(unit 1)
 				)
 			)
@@ -5936,7 +5902,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C492409.html"
 			(at 307.34 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -6169,19 +6135,20 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 86.36 40.64 90)
+		(lib_id "power:GND")
+		(at 259.08 106.68 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "27368334-7ffc-5436-ba9a-9788ac51af38")
-		(property "Reference" "R67"
-			(at 86.36 38.1 90)
+		(uuid "2a5b97cd-9139-513a-b095-20c58812657a")
+		(property "Reference" "#PWR219"
+			(at 257.81 104.14 90)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6190,18 +6157,19 @@
 				)
 			)
 		)
-		(property "Value" "100R"
-			(at 86.36 43.18 90)
+		(property "Value" "GND"
+			(at 256.54 106.68 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 86.36 40.64 0)
+		(property "Footprint" ""
+			(at 259.08 106.68 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6212,7 +6180,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 86.36 40.64 0)
+			(at 259.08 106.68 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6223,40 +6191,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 86.36 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 86.36 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 86.36 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 86.36 40.64 0)
+			(at 259.08 106.68 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6267,15 +6202,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b88b32a0-b9d5-5341-bdbc-a84d007bb75a")
-		)
-		(pin "2"
-			(uuid "7f4948b5-a18b-5227-bfe6-e36b9f06d4ab")
+			(uuid "5a37da74-a9f7-5e89-ae00-a6fd2e806403")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R67")
+					(reference "#PWR219")
 					(unit 1)
 				)
 			)
@@ -6357,7 +6289,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 40.64 88.9 90)
+		(at 90.17 107.95 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6366,9 +6298,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "319c0250-c48a-5997-b14a-6cfbc06e7f59")
-		(property "Reference" "R62"
-			(at 40.64 86.36 90)
+		(uuid "3dc0deba-4e83-53be-af15-bc93da126e7e")
+		(property "Reference" "R86"
+			(at 90.17 105.41 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6378,7 +6310,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 40.64 91.44 90)
+			(at 90.17 110.49 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6388,7 +6320,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 40.64 88.9 0)
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6398,8 +6330,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 40.64 88.9 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6410,7 +6342,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 40.64 88.9 0)
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6421,7 +6353,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 40.64 88.9 0)
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6432,7 +6364,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 40.64 88.9 0)
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6443,7 +6375,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 40.64 88.9 0)
+			(at 90.17 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6454,15 +6386,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "d56f13cc-3330-54fc-809f-915942e57f7d")
+			(uuid "df997d1e-71b6-53aa-972b-4074f771d192")
 		)
 		(pin "2"
-			(uuid "943d269b-a4f0-519d-82fc-12da9e934262")
+			(uuid "fc853b0d-d009-5416-8ae0-f4fe149069cb")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R62")
+					(reference "R86")
 					(unit 1)
 				)
 			)
@@ -6512,7 +6444,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C492406.html"
 			(at 307.34 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -6592,6 +6524,119 @@
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
 					(reference "J7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 39.37 107.95 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4371ea6c-2066-5c65-b720-70a7117d3d49")
+		(property "Reference" "R76"
+			(at 39.37 105.41 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 39.37 110.49 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 39.37 107.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3ce7fdcf-9046-58d0-a9ea-8765eac98da8")
+		)
+		(pin "2"
+			(uuid "48d94396-bafb-5d71-9099-6b704e72bfce")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R76")
 					(unit 1)
 				)
 			)
@@ -6810,598 +6855,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 38.1 69.85 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "454a5055-433a-5abe-a7d8-909ab0391625")
-		(property "Reference" "R60"
-			(at 38.1 67.31 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 38.1 72.39 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 38.1 69.85 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d2f3209f-b9c6-563a-8d93-d2a05f08e992")
-		)
-		(pin "2"
-			(uuid "2c6a0012-99cf-5c4c-90e9-c31ab381cb21")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R60")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 86.36 50.8 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4b25c9b9-2707-5b38-8665-9a87b08c1edd")
-		(property "Reference" "R68"
-			(at 86.36 48.26 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 86.36 53.34 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 86.36 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3a3c1e88-3238-5763-9948-71b4dd6e2f75")
-		)
-		(pin "2"
-			(uuid "1c4448a4-aed9-5797-9221-39ef2237e3e3")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R68")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 90.17 80.01 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4ddbe8e2-4d92-59f9-8b0f-67ae161000cd")
-		(property "Reference" "R71"
-			(at 90.17 77.47 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 90.17 82.55 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 90.17 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "4b55db11-a76f-5229-80dc-bff84b9c84f7")
-		)
-		(pin "2"
-			(uuid "502c1360-f970-5c3d-8be2-4df810841268")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R71")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 88.9 88.9 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4ef99933-830d-50b8-89ed-a50b25644760")
-		(property "Reference" "R72"
-			(at 88.9 86.36 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 88.9 91.44 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 88.9 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "8e1beccd-6ba0-5ead-b86f-d8a3d82c3864")
-		)
-		(pin "2"
-			(uuid "310e5901-7b1c-585c-8110-a7775e4694f7")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R72")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Power_Protection:TPD4E05U06DQA")
-		(at 142.24 115.57 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "59905847-4e69-5b2a-ac9f-7c1f3a92b8e0")
-		(property "Reference" "U22"
-			(at 154.94 105.41 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "TPD4E05U06DQAR"
-			(at 142.24 129.54 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_SON:USON-10_2.5x1.0mm_P0.5mm"
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf"
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "TPD4E05U06DQAR"
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "Texas Instruments"
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C138714"
-			(at 142.24 115.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d0624a26-558a-5ac4-8840-764e68f347c0")
-		)
-		(pin "2"
-			(uuid "1b91cad1-b8c5-53f8-a5b5-a1ed82b480e7")
-		)
-		(pin "3"
-			(uuid "de8c8506-9adc-5e39-8dd4-08f04c11fae9")
-		)
-		(pin "4"
-			(uuid "d3d03cc9-dc6b-5843-bd9e-f71d65b12eab")
-		)
-		(pin "5"
-			(uuid "fe0e6894-13ba-5906-a95a-50db0d702d56")
-		)
-		(pin "6"
-			(uuid "00134955-7981-5447-ac23-4ff3d01f55f3")
-		)
-		(pin "7"
-			(uuid "01b8f2ae-5f32-592c-b2f6-adca05cff689")
-		)
-		(pin "8"
-			(uuid "0d3b1f59-07ab-5840-a46a-b68a107948cb")
-		)
-		(pin "9"
-			(uuid "7080e48e-e147-520a-b824-0404eb4a50b1")
-		)
-		(pin "10"
-			(uuid "58bb986f-85eb-59f9-a6dd-554668e9c73c")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "U22")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
-		(at 208.28 132.08 0)
+		(at 298.45 45.72 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7410,9 +6865,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "65b342c1-50cb-52a8-8fd0-79758e0e0b49")
-		(property "Reference" "#PWR200"
-			(at 208.28 130.81 0)
+		(uuid "4c099ce7-a3d1-52c9-82cb-60cf841294ba")
+		(property "Reference" "#PWR220"
+			(at 297.18 43.18 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7423,17 +6878,18 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 208.28 135.89 0)
+			(at 295.91 45.72 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify right)
 			)
 		)
 		(property "Footprint" ""
-			(at 208.28 132.08 0)
+			(at 298.45 45.72 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7444,7 +6900,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 208.28 132.08 0)
+			(at 298.45 45.72 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7455,7 +6911,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 208.28 132.08 0)
+			(at 298.45 45.72 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7466,238 +6922,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c5cf2545-2e34-56ed-9a48-8b1613739758")
+			(uuid "60786af5-28f4-5747-8b73-f07777b2eb93")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR200")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 40.64 80.01 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "694b7e2c-e562-518d-9771-874139200811")
-		(property "Reference" "R61"
-			(at 40.64 77.47 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 40.64 82.55 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 40.64 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e84481da-94a7-5692-8d49-cd9f95ed2dfb")
-		)
-		(pin "2"
-			(uuid "2b6e6dce-e5a3-5a5c-8b6c-7d4d00cceb7c")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R61")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 36.83 118.11 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6a61ba53-ceeb-5d6e-ae0e-075ba22304ee")
-		(property "Reference" "R65"
-			(at 36.83 115.57 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 36.83 120.65 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 36.83 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "60bbc323-fc3f-59ae-a9eb-3f4ec881d150")
-		)
-		(pin "2"
-			(uuid "30ef08c3-b921-5247-9168-f50fb2ee1c93")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R65")
+					(reference "#PWR220")
 					(unit 1)
 				)
 			)
@@ -7714,8 +6944,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "73909942-58b1-5d10-9bad-04817648cfe1")
-		(property "Reference" "R59"
+		(uuid "4ddbe8e2-4d92-59f9-8b0f-67ae161000cd")
+		(property "Reference" "R71"
 			(at 38.1 57.15 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7746,7 +6976,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
 			(at 38.1 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -7810,7 +7040,720 @@
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R59")
+					(reference "R71")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 257.81 53.34 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4e58a4e5-7aee-5720-a756-46b09ac360a6")
+		(property "Reference" "#PWR217"
+			(at 256.54 50.8 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 255.27 53.34 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 257.81 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 257.81 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 257.81 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5593d460-b740-522a-9a40-ebcba6d81df3")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "#PWR217")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 38.1 69.85 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4ef99933-830d-50b8-89ed-a50b25644760")
+		(property "Reference" "R72"
+			(at 38.1 67.31 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 38.1 72.39 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 38.1 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d2f3209f-b9c6-563a-8d93-d2a05f08e992")
+		)
+		(pin "2"
+			(uuid "2c6a0012-99cf-5c4c-90e9-c31ab381cb21")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R72")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 90.17 80.01 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4f4db2f1-2735-5b7c-9b09-8d4b9b1d353c")
+		(property "Reference" "R83"
+			(at 90.17 77.47 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 90.17 82.55 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 90.17 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "4b55db11-a76f-5229-80dc-bff84b9c84f7")
+		)
+		(pin "2"
+			(uuid "502c1360-f970-5c3d-8be2-4df810841268")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R83")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Power_Protection:TPD4E05U06DQA")
+		(at 147.32 115.57 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "59905847-4e69-5b2a-ac9f-7c1f3a92b8e0")
+		(property "Reference" "U22"
+			(at 160.02 105.41 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "TPD4E05U06DQAR"
+			(at 147.32 129.54 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_SON:USON-10_2.5x1.0mm_P0.5mm"
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf"
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "TPD4E05U06DQAR"
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "Texas Instruments"
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C138714"
+			(at 147.32 115.57 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d0624a26-558a-5ac4-8840-764e68f347c0")
+		)
+		(pin "2"
+			(uuid "1b91cad1-b8c5-53f8-a5b5-a1ed82b480e7")
+		)
+		(pin "3"
+			(uuid "de8c8506-9adc-5e39-8dd4-08f04c11fae9")
+		)
+		(pin "4"
+			(uuid "d3d03cc9-dc6b-5843-bd9e-f71d65b12eab")
+		)
+		(pin "5"
+			(uuid "fe0e6894-13ba-5906-a95a-50db0d702d56")
+		)
+		(pin "6"
+			(uuid "00134955-7981-5447-ac23-4ff3d01f55f3")
+		)
+		(pin "7"
+			(uuid "01b8f2ae-5f32-592c-b2f6-adca05cff689")
+		)
+		(pin "8"
+			(uuid "0d3b1f59-07ab-5840-a46a-b68a107948cb")
+		)
+		(pin "9"
+			(uuid "7080e48e-e147-520a-b824-0404eb4a50b1")
+		)
+		(pin "10"
+			(uuid "58bb986f-85eb-59f9-a6dd-554668e9c73c")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "U22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 147.32 132.08 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "59b0943b-20c4-5cb6-b74c-ec9a7b210c09")
+		(property "Reference" "#PWR211"
+			(at 147.32 130.81 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 147.32 135.89 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 147.32 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 147.32 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 147.32 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6bc383b1-cfa3-521b-b0a0-89c906efe714")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "#PWR211")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 36.83 128.27 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5cfe3084-e098-5e2f-b466-ec2425dd8762")
+		(property "Reference" "R78"
+			(at 36.83 125.73 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 36.83 130.81 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 36.83 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a2db93b8-8b7b-5b43-a962-1580e50de3cd")
+		)
+		(pin "2"
+			(uuid "b59dee1b-a883-56cc-acd0-df43d69f91b8")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R78")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 298.45 76.2 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "77d4a47b-3b87-5310-b1d1-2724683f7073")
+		(property "Reference" "#PWR221"
+			(at 297.18 73.66 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 295.91 76.2 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 298.45 76.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 298.45 76.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 298.45 76.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "430dfc7b-2779-520c-8aba-c5910cad1114")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "#PWR221")
 					(unit 1)
 				)
 			)
@@ -7955,234 +7898,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 38.1 50.8 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "80ddfecd-3f7d-5cc8-943a-3d944f17a284")
-		(property "Reference" "R58"
-			(at 38.1 48.26 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 38.1 53.34 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 38.1 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "acce3075-063b-5443-9df3-397e1d78bf6f")
-		)
-		(pin "2"
-			(uuid "1a4024c5-2509-5571-a151-ccd255dd4b3e")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R58")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 38.1 40.64 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8c0e1e95-9179-5146-bd4f-6da9f9cb361c")
-		(property "Reference" "R57"
-			(at 38.1 38.1 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 38.1 43.18 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 38.1 40.64 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "ca541298-c591-5f3b-8a54-37a5575bc2aa")
-		)
-		(pin "2"
-			(uuid "683c3d97-8c77-53fa-b99f-6944ed1fce31")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R57")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
-		(at 209.55 63.5 0)
+		(at 210.82 166.37 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -8191,9 +7908,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "972c4eb4-d0a9-5564-bf7c-296e97479e68")
-		(property "Reference" "#PWR198"
-			(at 209.55 62.23 0)
+		(uuid "7eca0026-098e-5bfb-a9a4-cbbb153e1f4d")
+		(property "Reference" "#PWR216"
+			(at 210.82 165.1 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8204,7 +7921,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 209.55 67.31 0)
+			(at 210.82 170.18 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8214,7 +7931,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 209.55 63.5 0)
+			(at 210.82 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8225,7 +7942,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 209.55 63.5 0)
+			(at 210.82 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8236,7 +7953,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 209.55 63.5 0)
+			(at 210.82 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8247,31 +7964,51 @@
 			)
 		)
 		(pin "1"
-			(uuid "e1bae9ed-799f-5ce4-97fb-dbda884f2dea")
+			(uuid "268e9b24-fc70-50bb-b3e7-d8c1fb76cbe2")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR198")
+					(reference "#PWR216")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 208.28 97.79 0)
+		(lib_id "Device:R")
+		(at 86.36 50.8 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "9ce40659-e574-52ea-a9ce-f266ff85d300")
-		(property "Reference" "#PWR199"
-			(at 208.28 96.52 0)
+		(uuid "95a39fcb-760f-5bba-bf73-09a0ac141fcd")
+		(property "Reference" "R80"
+			(at 86.36 48.26 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 86.36 53.34 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 86.36 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8281,29 +8018,8 @@
 				)
 			)
 		)
-		(property "Value" "GND"
-			(at 208.28 101.6 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 208.28 97.79 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 208.28 97.79 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 86.36 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8314,7 +8030,40 @@
 			)
 		)
 		(property "Description" ""
-			(at 208.28 97.79 0)
+			(at 86.36 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 86.36 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 86.36 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 86.36 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8325,12 +8074,128 @@
 			)
 		)
 		(pin "1"
-			(uuid "b5d2e116-1637-5c2a-b6c6-4305a105ef90")
+			(uuid "3a3c1e88-3238-5763-9948-71b4dd6e2f75")
+		)
+		(pin "2"
+			(uuid "1c4448a4-aed9-5797-9221-39ef2237e3e3")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR199")
+					(reference "R80")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 36.83 118.11 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "96bece73-6de0-5980-826d-7538b249bc1d")
+		(property "Reference" "R77"
+			(at 36.83 115.57 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 36.83 120.65 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 36.83 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "60bbc323-fc3f-59ae-a9eb-3f4ec881d150")
+		)
+		(pin "2"
+			(uuid "30ef08c3-b921-5247-9168-f50fb2ee1c93")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R77")
 					(unit 1)
 				)
 			)
@@ -8380,7 +8245,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C492406.html"
 			(at 266.7 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -8467,7 +8332,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 87.63 118.11 90)
+		(at 41.91 99.06 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -8478,7 +8343,7 @@
 		(fields_autoplaced yes)
 		(uuid "a82af778-fccd-52cf-8cc4-ec2d6a8d147f")
 		(property "Reference" "R75"
-			(at 87.63 115.57 90)
+			(at 41.91 96.52 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8488,7 +8353,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 87.63 120.65 90)
+			(at 41.91 101.6 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8498,7 +8363,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 87.63 118.11 0)
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8508,8 +8373,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 87.63 118.11 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8520,7 +8385,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 87.63 118.11 0)
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8531,7 +8396,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 87.63 118.11 0)
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8542,7 +8407,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 87.63 118.11 0)
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8553,7 +8418,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 87.63 118.11 0)
+			(at 41.91 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8564,15 +8429,93 @@
 			)
 		)
 		(pin "1"
-			(uuid "bff63a2f-269f-5625-bb93-205074f621c0")
+			(uuid "401b9b8d-841e-5e23-963b-856f6ad6e42a")
 		)
 		(pin "2"
-			(uuid "a22b42ad-ab7a-5a0f-9ae2-f3cb04bc13e0")
+			(uuid "b96f94a0-f27e-5ae2-8217-108553d72001")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
 					(reference "R75")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 144.78 63.5 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a936ca20-ce33-5ac4-a42b-a6cca013d78f")
+		(property "Reference" "#PWR209"
+			(at 144.78 62.23 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 144.78 67.31 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 144.78 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 144.78 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b1c544ce-29cf-578c-a102-95e801575e95")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "#PWR209")
 					(unit 1)
 				)
 			)
@@ -8589,8 +8532,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "a8f30d0a-e0a3-557d-97de-21f0f463dd3f")
-		(property "Reference" "#PWR195"
+		(uuid "ba3c7509-2aa9-5cac-b728-6acc8149079f")
+		(property "Reference" "#PWR210"
 			(at 143.51 96.52 0)
 			(hide yes)
 			(show_name no)
@@ -8650,86 +8593,7 @@
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR195")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 298.45 76.2 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a9427584-f904-5ee8-a2a0-819bc7db27ca")
-		(property "Reference" "#PWR206"
-			(at 297.18 73.66 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 295.91 76.2 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 298.45 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 298.45 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 298.45 76.2 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "430dfc7b-2779-520c-8aba-c5910cad1114")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR206")
+					(reference "#PWR210")
 					(unit 1)
 				)
 			)
@@ -8779,7 +8643,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C492406.html"
 			(at 265.43 73.66 0)
 			(hide yes)
 			(show_name no)
@@ -8859,6 +8723,119 @@
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
 					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 86.36 40.64 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "cc17f532-5aba-558f-a9d9-083e59df7c81")
+		(property "Reference" "R79"
+			(at 86.36 38.1 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 86.36 43.18 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 86.36 40.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b88b32a0-b9d5-5341-bdbc-a84d007bb75a")
+		)
+		(pin "2"
+			(uuid "7f4948b5-a18b-5227-bfe6-e36b9f06d4ab")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R79")
 					(unit 1)
 				)
 			)
@@ -8964,34 +8941,34 @@
 			)
 		)
 		(pin "1"
-			(uuid "f484e678-764d-5321-8c9a-11e917480886")
+			(uuid "b5d2e116-1637-5c2a-b6c6-4305a105ef90")
 		)
 		(pin "2"
-			(uuid "1fd0b431-f2cf-5f1e-8754-efd78d2e49b5")
+			(uuid "f484e678-764d-5321-8c9a-11e917480886")
 		)
 		(pin "3"
-			(uuid "b41a17c3-4cce-5d19-a570-b9af34fd9a21")
+			(uuid "1fd0b431-f2cf-5f1e-8754-efd78d2e49b5")
 		)
 		(pin "4"
-			(uuid "ae71bf3d-642c-5a58-8967-844fd80a7157")
+			(uuid "b41a17c3-4cce-5d19-a570-b9af34fd9a21")
 		)
 		(pin "5"
-			(uuid "fad93dff-8e05-5b9a-a070-1f1323f7fa39")
+			(uuid "ae71bf3d-642c-5a58-8967-844fd80a7157")
 		)
 		(pin "6"
-			(uuid "427a8671-05bb-5f44-a8e3-4561713bb0e9")
+			(uuid "fad93dff-8e05-5b9a-a070-1f1323f7fa39")
 		)
 		(pin "7"
-			(uuid "4b97d684-a9b6-5c97-a680-c67530861b9a")
+			(uuid "427a8671-05bb-5f44-a8e3-4561713bb0e9")
 		)
 		(pin "8"
-			(uuid "673f113a-75e4-5ff3-8e63-4119a605563e")
+			(uuid "4b97d684-a9b6-5c97-a680-c67530861b9a")
 		)
 		(pin "9"
-			(uuid "164f82d6-1591-5a3b-b6d5-8e71c963be11")
+			(uuid "673f113a-75e4-5ff3-8e63-4119a605563e")
 		)
 		(pin "10"
-			(uuid "ff8f592b-7ac1-5808-b64c-051a1ecf250d")
+			(uuid "164f82d6-1591-5a3b-b6d5-8e71c963be11")
 		)
 		(instances
 			(project "OOTY"
@@ -9003,121 +8980,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 39.37 107.95 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d357a0f8-fb03-5081-8743-d2f411d9da38")
-		(property "Reference" "R64"
-			(at 39.37 105.41 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100R"
-			(at 39.37 110.49 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "0402WGF1000TCE"
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Manufacturer" "UNI-ROYAL"
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC" "C25076"
-			(at 39.37 107.95 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3ce7fdcf-9046-58d0-a9ea-8765eac98da8")
-		)
-		(pin "2"
-			(uuid "48d94396-bafb-5d71-9099-6b704e72bfce")
-		)
-		(instances
-			(project "OOTY"
-				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R64")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
-		(at 142.24 132.08 0)
+		(at 148.59 166.37 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -9126,9 +8990,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "d494327b-8ebc-5810-b8cf-16277a181a77")
-		(property "Reference" "#PWR196"
-			(at 142.24 130.81 0)
+		(uuid "d1ee19bf-4c68-575d-b711-7c36ca53a904")
+		(property "Reference" "#PWR212"
+			(at 148.59 165.1 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9139,7 +9003,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 142.24 135.89 0)
+			(at 148.59 170.18 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9149,7 +9013,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 142.24 132.08 0)
+			(at 148.59 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9160,7 +9024,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 142.24 132.08 0)
+			(at 148.59 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9171,7 +9035,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 142.24 132.08 0)
+			(at 148.59 166.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9182,12 +9046,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6bc383b1-cfa3-521b-b0a0-89c906efe714")
+			(uuid "2043a69c-bb03-5f59-8241-56003c0fbb2d")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR196")
+					(reference "#PWR212")
 					(unit 1)
 				)
 			)
@@ -9407,7 +9271,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 91.44 69.85 90)
+		(at 38.1 50.8 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -9418,7 +9282,7 @@
 		(fields_autoplaced yes)
 		(uuid "e2059c23-7dfe-5c06-b5e4-fd9a771f114e")
 		(property "Reference" "R70"
-			(at 91.44 67.31 90)
+			(at 38.1 48.26 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9428,7 +9292,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 91.44 72.39 90)
+			(at 38.1 53.34 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9438,7 +9302,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 91.44 69.85 0)
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9448,8 +9312,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 91.44 69.85 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9460,7 +9324,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 91.44 69.85 0)
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9471,7 +9335,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 91.44 69.85 0)
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9482,7 +9346,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 91.44 69.85 0)
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9493,7 +9357,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 91.44 69.85 0)
+			(at 38.1 50.8 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9504,10 +9368,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "190c74c7-4af7-5ebd-8b7f-c45780a5d184")
+			(uuid "acce3075-063b-5443-9df3-397e1d78bf6f")
 		)
 		(pin "2"
-			(uuid "a2cccfd1-0ddb-5312-937e-33a7dcd2f552")
+			(uuid "1a4024c5-2509-5571-a151-ccd255dd4b3e")
 		)
 		(instances
 			(project "OOTY"
@@ -9529,8 +9393,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "e38cf181-979f-5057-a48e-debbdc835f63")
-		(property "Reference" "#PWR203"
+		(uuid "e3d6f962-40a4-5c15-a22f-91e04d494b1b")
+		(property "Reference" "#PWR218"
 			(at 255.27 78.74 90)
 			(hide yes)
 			(show_name no)
@@ -9591,7 +9455,7 @@
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR203")
+					(reference "#PWR218")
 					(unit 1)
 				)
 			)
@@ -9641,7 +9505,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C492406.html"
 			(at 267.97 99.06 0)
 			(hide yes)
 			(show_name no)
@@ -9737,8 +9601,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "f056444e-f3c6-546a-95f7-e718516bf0fb")
-		(property "Reference" "R73"
+		(uuid "e6ce9fa1-7e7c-5143-99eb-1d1aa81f035c")
+		(property "Reference" "R85"
 			(at 88.9 96.52 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9769,7 +9633,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
 			(at 88.9 99.06 0)
 			(hide yes)
 			(show_name no)
@@ -9833,7 +9697,7 @@
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R73")
+					(reference "R85")
 					(unit 1)
 				)
 			)
@@ -9841,7 +9705,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 36.83 128.27 90)
+		(at 40.64 80.01 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -9850,9 +9714,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "f187ca9e-22df-5b48-8be7-cb02d6ced837")
-		(property "Reference" "R66"
-			(at 36.83 125.73 90)
+		(uuid "f056444e-f3c6-546a-95f7-e718516bf0fb")
+		(property "Reference" "R73"
+			(at 40.64 77.47 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9862,7 +9726,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 36.83 130.81 90)
+			(at 40.64 82.55 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9872,7 +9736,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 36.83 128.27 0)
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9882,8 +9746,8 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
-			(at 36.83 128.27 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9894,7 +9758,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 36.83 128.27 0)
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9905,7 +9769,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 36.83 128.27 0)
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9916,7 +9780,7 @@
 			)
 		)
 		(property "Manufacturer" "UNI-ROYAL"
-			(at 36.83 128.27 0)
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9927,7 +9791,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 36.83 128.27 0)
+			(at 40.64 80.01 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9938,15 +9802,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "a2db93b8-8b7b-5b43-a962-1580e50de3cd")
+			(uuid "e84481da-94a7-5692-8d49-cd9f95ed2dfb")
 		)
 		(pin "2"
-			(uuid "b59dee1b-a883-56cc-acd0-df43d69f91b8")
+			(uuid "2b6e6dce-e5a3-5a5c-8b6c-7d4d00cceb7c")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "R66")
+					(reference "R73")
 					(unit 1)
 				)
 			)
@@ -9954,7 +9818,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 144.78 63.5 0)
+		(at 208.28 132.08 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -9963,9 +9827,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "fd531479-4093-52ea-96cf-0ca52e52dd33")
-		(property "Reference" "#PWR194"
-			(at 144.78 62.23 0)
+		(uuid "f1c978a1-189f-5ba4-a38c-a884eb010b2c")
+		(property "Reference" "#PWR215"
+			(at 208.28 130.81 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9976,7 +9840,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 144.78 67.31 0)
+			(at 208.28 135.89 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9986,7 +9850,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 144.78 63.5 0)
+			(at 208.28 132.08 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9997,7 +9861,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 144.78 63.5 0)
+			(at 208.28 132.08 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10008,7 +9872,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 144.78 63.5 0)
+			(at 208.28 132.08 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10019,31 +9883,51 @@
 			)
 		)
 		(pin "1"
-			(uuid "b1c544ce-29cf-578c-a102-95e801575e95")
+			(uuid "c5cf2545-2e34-56ed-9a48-8b1613739758")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR194")
+					(reference "#PWR215")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 259.08 106.68 270)
+		(lib_id "Device:R")
+		(at 90.17 59.69 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
+		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "fe0f1d96-7e8b-5b36-8561-144312b7163f")
-		(property "Reference" "#PWR204"
-			(at 257.81 104.14 90)
+		(uuid "f2b08cc2-54a8-5b0c-9234-637ad445d629")
+		(property "Reference" "R81"
+			(at 90.17 57.15 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 90.17 62.23 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 90.17 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10053,30 +9937,8 @@
 				)
 			)
 		)
-		(property "Value" "GND"
-			(at 256.54 106.68 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 259.08 106.68 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 259.08 106.68 0)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 90.17 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10087,7 +9949,40 @@
 			)
 		)
 		(property "Description" ""
-			(at 259.08 106.68 0)
+			(at 90.17 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 90.17 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 90.17 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 90.17 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10098,12 +9993,128 @@
 			)
 		)
 		(pin "1"
-			(uuid "5a37da74-a9f7-5e89-ae00-a6fd2e806403")
+			(uuid "bcbe483a-0253-5539-bb5a-28abfd0f8842")
+		)
+		(pin "2"
+			(uuid "3b0e4a96-ce71-5725-840a-747e44fd23f8")
 		)
 		(instances
 			(project "OOTY"
 				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
-					(reference "#PWR204")
+					(reference "R81")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 88.9 88.9 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f506b8de-b4f2-58b5-8f6d-8f2323d1d9a7")
+		(property "Reference" "R84"
+			(at 88.9 86.36 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100R"
+			(at 88.9 91.44 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C25076.html"
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "0402WGF1000TCE"
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "UNI-ROYAL"
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "C25076"
+			(at 88.9 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8e1beccd-6ba0-5ead-b86f-d8a3d82c3864")
+		)
+		(pin "2"
+			(uuid "310e5901-7b1c-585c-8110-a7775e4694f7")
+		)
+		(instances
+			(project "OOTY"
+				(path "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7"
+					(reference "R84")
 					(unit 1)
 				)
 			)

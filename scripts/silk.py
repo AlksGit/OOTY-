@@ -1,8 +1,10 @@
 """Silkscreen: readable reference designators, DUT header pin labels, board marking.
 
 - References: 1.0 mm text (JLCPCB minimum readable height), horizontal, placed on the first free
-  side of the courtyard (top, bottom, left, right) without touching pads, courtyards or other
-  text. A reference that cannot be placed is moved to F.Fab (assembly drawing) only.
+  side of the courtyard (top, bottom, left, right) without touching pads, other courtyards or
+  other text, so that no reference can be read as belonging to a neighbour. ICs, connectors,
+  diodes, transistors, switches and test points are placed first; a passive reference that finds
+  no room is moved to F.Fab (assembly drawing) only. Test points show their net name instead.
 - Header pin labels: net name next to each pin of the DUT headers.
 Runs inside KiCad's Python (pcbnew).
 """
@@ -14,6 +16,10 @@ from autoplace import courtyard_box, overlaps, to_mm
 TEXT_H = 1.0
 TEXT_T = 0.15
 GAP = 0.25
+# A reference must be within OWN_MAX of its own courtyard and closer to it than to any other.
+OWN_MAX = 2.0
+# Reference prefixes that always get a silkscreen reference (placed before the passives).
+KEY_PARTS = ("U", "J", "D", "Q", "F", "L", "SW", "TP", "JP")
 
 # Short pin labels for the DUT headers (net name -> silkscreen text).
 PIN_LABELS = {
@@ -30,23 +36,36 @@ def mm(v):
     return pcbnew.FromMM(v)
 
 
+def box_distance(point, box):
+    """Distance from a point to a box (0 inside)."""
+    dx = max(box[0] - point[0], 0.0, point[0] - box[2])
+    dy = max(box[1] - point[1], 0.0, point[1] - box[3])
+    return (dx * dx + dy * dy) ** 0.5
+
+
 def text_box(item):
     bb = item.GetBoundingBox()
     return (to_mm(bb.GetX()), to_mm(bb.GetY()), to_mm(bb.GetRight()), to_mm(bb.GetBottom()))
 
 
 class Silk:
-    def __init__(self, board, area):
+    def __init__(self, board, area, refs=None):
+        """refs: footprints taken into account (default: all); see refresh()."""
         self.board = board
         self.area = area
+        self.texts = []
+        self.refresh(refs)
+
+    def refresh(self, refs=None):
+        """Recompute pad and courtyard obstacles, e.g. after more footprints were placed."""
+        fps = [fp for fp in self.board.GetFootprints() if refs is None or fp.GetReference() in refs]
         self.obstacles = []
-        for fp in board.GetFootprints():
+        for fp in fps:
             for pad in fp.Pads():
                 bb = pad.GetBoundingBox()
                 self.obstacles.append((to_mm(bb.GetX()), to_mm(bb.GetY()),
                                        to_mm(bb.GetRight()), to_mm(bb.GetBottom())))
-        self.courtyards = {fp.GetReference(): courtyard_box(fp) for fp in board.GetFootprints()}
-        self.texts = []
+        self.courtyards = {fp.GetReference(): courtyard_box(fp) for fp in fps}
 
     def _free(self, box, owner):
         x0, y0, x1, y1 = self.area
@@ -56,12 +75,20 @@ class Silk:
             return False
         if any(overlaps(box, t, GAP) for t in self.texts):
             return False
-        # Text may run over a neighbour's body, but never over an IC or connector courtyard.
-        return not any(overlaps(box, c, 0.0) for ref, c in self.courtyards.items()
-                       if ref != owner and ref[0] in "UJ")
+        if any(overlaps(box, c, 0.0) for ref, c in self.courtyards.items() if ref != owner):
+            return False
+        centre = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+        own = box_distance(centre, self.courtyards[owner])
+        return own <= OWN_MAX and all(own < box_distance(centre, c)
+                                      for ref, c in self.courtyards.items() if ref != owner)
 
     def place_reference(self, fp):
-        ref = fp.Reference()
+        """Place the reference (the net name for a test point) on the silkscreen."""
+        if fp.GetReference().startswith("TP"):
+            ref = fp.Value()
+            fp.Reference().SetLayer(pcbnew.F_Fab)
+        else:
+            ref = fp.Reference()
         ref.SetTextSize(pcbnew.VECTOR2I(mm(TEXT_H), mm(TEXT_H)))
         ref.SetTextThickness(mm(TEXT_T))
         ref.SetKeepUpright(True)
@@ -111,7 +138,23 @@ class Silk:
 
 
 def pin_labels(silk, fp, side):
-    """Label each pin of a DUT header. side: 'above' (bottom-row headers) or 'left' (right column)."""
+    """Label each pin of a DUT header and put its reference in the gap before pin 1.
+    side: 'above' (bottom-row headers) or 'left' (right column)."""
+    pin1 = fp.FindPadByNumber("1")
+    x1, y1 = to_mm(pin1.GetPosition().x), to_mm(pin1.GetPosition().y)
+    ref = fp.Reference()
+    ref.SetTextSize(pcbnew.VECTOR2I(mm(TEXT_H), mm(TEXT_H)))
+    ref.SetTextThickness(mm(TEXT_T))
+    ref.SetLayer(pcbnew.F_SilkS)
+    ref.SetVisible(True)
+    ref.SetKeepUpright(True)
+    if side == "above":
+        ref.SetTextAngleDegrees(90)
+        ref.SetPosition(pcbnew.VECTOR2I(mm(x1 - 1.9), mm(y1 - 3.4)))
+    else:
+        ref.SetTextAngleDegrees(0)
+        ref.SetPosition(pcbnew.VECTOR2I(mm(x1 - 3.7), mm(y1 - 1.9)))
+    silk.texts.append(text_box(ref))
     for pad in fp.Pads():
         label = PIN_LABELS.get(pad.GetNetname().split("/")[-1])
         if not label:
@@ -124,8 +167,12 @@ def pin_labels(silk, fp, side):
         t.SetHorizJustify(pcbnew.GR_TEXT_H_ALIGN_CENTER)
 
 
-def run(board, area, headers_bottom, headers_right, marking):
-    silk = Silk(board, area)
+def reserve(board, area, headers_bottom, headers_right, marking):
+    """Before auto-placement: header pin labels, board marking and the references of the
+    already placed (locked) key parts. Returns the Silk object; its texts are keepouts for the
+    auto-placer."""
+    locked = {fp.GetReference() for fp in board.GetFootprints() if fp.IsLocked()}
+    silk = Silk(board, area, locked)
     for fp in board.GetFootprints():
         if fp.GetReference() in headers_bottom:
             pin_labels(silk, fp, "above")
@@ -133,13 +180,29 @@ def run(board, area, headers_bottom, headers_right, marking):
             pin_labels(silk, fp, "left")
     for text, x, y, size in marking:
         silk.add_text(text, x, y, size=size)
-    hidden = []
+    silk.done = set(headers_bottom) | set(headers_right)
     for fp in sorted(board.GetFootprints(), key=lambda f: -len(f.Pads())):
+        ref = fp.GetReference()
+        if (ref in locked and ref not in silk.done and ref.startswith(KEY_PARTS)
+                and silk.place_reference(fp)):
+            silk.done.add(ref)
+    return silk
+
+
+def finish(silk):
+    """After auto-placement: references of every other part. Returns the refs moved to F.Fab."""
+    board = silk.board
+    silk.refresh()
+    hidden = []
+    remaining = [fp for fp in board.GetFootprints() if fp.GetReference() not in silk.done]
+    for fp in sorted(remaining, key=lambda f: (not f.GetReference().startswith(KEY_PARTS),
+                                                -len(f.Pads()))):
         if fp.GetReference().startswith("H"):
             fp.Reference().SetVisible(False)
             continue
         if not silk.place_reference(fp):
             hidden.append(fp.GetReference())
     for fp in board.GetFootprints():
-        fp.Value().SetLayer(pcbnew.F_Fab)
+        if not fp.GetReference().startswith("TP"):
+            fp.Value().SetLayer(pcbnew.F_Fab)
     return hidden
