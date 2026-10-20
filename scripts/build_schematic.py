@@ -42,6 +42,8 @@ C10U25 = "C15850"
 C22U = "C45783"
 
 TP_FOOTPRINT = "TestPoint:TestPoint_Pad_D1.5mm"
+JUMPER_FOOTPRINT = "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm"
+LCSC_PAGE = "https://www.lcsc.com/product-detail/{}.html"
 HOLE_FOOTPRINT = "MountingHole:MountingHole_3.2mm_M3"
 
 
@@ -50,7 +52,8 @@ def bom_fields(part):
     if not lcsc:
         return {}
     p = BOM[lcsc]
-    return {"Footprint": p.footprint, "Datasheet": p.datasheet, "MPN": p.mpn,
+    return {"Footprint": p.footprint, "Datasheet": p.datasheet or LCSC_PAGE.format(lcsc),
+            "MPN": p.mpn,
             "Manufacturer": p.manufacturer}
 
 
@@ -69,9 +72,13 @@ def res(sh, lcsc, a, b, value=None):
                   fields={"LCSC": lcsc})
 
 
-def cap(sh, lcsc, a, b="GND"):
-    return sh.add("C", "Device:C", value_of(lcsc), {"1": a, "2": b}, rot=90,
-                  fields={"LCSC": lcsc})
+def cap(sh, lcsc, a, b="GND", near=None):
+    """Capacitor between nets a and b. `near` = (part, pin name or number) it decouples: used by
+    the placer and by scripts/check_placement.py."""
+    c = sh.add("C", "Device:C", value_of(lcsc), {"1": a, "2": b}, rot=90,
+               fields={"LCSC": lcsc})
+    c.near = near
+    return c
 
 
 def pwr_flag(sh, net):
@@ -101,59 +108,64 @@ def power_sheet():
     res(sh, R5K1, "CC2", "GND")
     part(sh, "U", "Power_Protection:TPD4E05U06DQA", "C138714", {
         "D1+": "CC1", "D1-": "CC2", "D2+": None, "D2-": None, "GND": "GND", "NC": None})
-    part(sh, "U", "Power_Protection:USBLC6-2SC6", "C7519", {
+    esd_usb = part(sh, "U", "Power_Protection:USBLC6-2SC6", "C7519", {
         "I/O1": "USB_DP", "I/O2": "USB_DM", "VBUS": "VBUS", "GND": "GND"})
-    cap(sh, C100N, "VBUS")
+    cap(sh, C100N, "VBUS", near=(esd_usb, "VBUS"))
 
     sh.group("VBUS protection")
-    part(sh, "D", "Device:D_Zener", "C83329", {"1": "VBUS", "2": "GND"})
-    part(sh, "F", "Device:Polyfuse", "C21003", {"1": "VBUS", "2": "+5V"}, value="PTC 2.6A",
-         rot=90)
-    cap(sh, C100N, "+5V")
+    ptc = part(sh, "F", "Device:Polyfuse", "C21003", {"1": "VBUS", "2": "+5V"},
+               value="PTC 2.6A", rot=90)
+    # TVS after the PTC: a sustained overvoltage trips the PTC instead of cooking the TVS.
+    part(sh, "D", "Device:D_Zener", "C83329", {"1": "+5V", "2": "GND"})
+    cap(sh, C100N, "+5V", near=(ptc, "2"))
     pwr_flag(sh, "VBUS")
     pwr_flag(sh, "+5V")
     pwr_flag(sh, "GND")
 
+    sh.group("Rail test points")
+    for net in ("VBUS", "+5V", "+3V3", "GND"):
+        test_point(sh, net)
+
     sh.group("3V3 buck (TLV62569)", column_break=True)
-    part(sh, "U", "Regulator_Switching:TLV62569DBV", "C141836", {
+    buck = part(sh, "U", "Regulator_Switching:TLV62569DBV", "C141836", {
         "VIN": "+5V", "EN": "+5V", "GND": "GND", "SW": "SW_3V3", "FB": "FB_3V3"})
-    cap(sh, C10U, "+5V")
-    cap(sh, C100N, "+5V")
-    part(sh, "L", "Device:L", "C167206", {"1": "SW_3V3", "2": "+3V3"}, value="2.2uH", rot=90)
+    cap(sh, C10U25, "+5V", near=(buck, "VIN"))
+    cap(sh, C100N, "+5V", near=(buck, "VIN"))
+    ind = part(sh, "L", "Device:L", "C167206", {"1": "SW_3V3", "2": "+3V3"}, value="2.2uH",
+               rot=90)
     res(sh, R100K, "+3V3", "FB_3V3")
     sh.add("C", "Device:C", "6.8pF DNP", {"1": "+3V3", "2": "FB_3V3"}, rot=90, in_bom=False,
            dnp=True, fields={"Footprint": "Capacitor_SMD:C_0402_1005Metric"})
     res(sh, R22K, "FB_3V3", "GND")
-    cap(sh, C22U, "+3V3")
-    cap(sh, C22U, "+3V3")
+    cap(sh, C22U, "+3V3", near=(ind, "2"))
+    cap(sh, C22U, "+3V3", near=(ind, "2"))
     pwr_flag(sh, "+3V3")
 
     sh.group("Power OK LED")
     res(sh, R1K, "+3V3", "LED_PWR_A")
     part(sh, "D", "Device:LED", "C965805", {"A": "LED_PWR_A", "K": "GND"}, value="PWR", rot=180)
 
+    # Switched rails start off (EN pulled down). Fixed rails start on (EN pulled up to IN), but the
+    # firmware can still cut them (USB power budget, persistent fault).
     switches = [
-        ("5V_SW (switched, 1 A)", "+5V", "EN_5VSW", "5V_SW_PRE", "FAULT_5VSW", R22K, C10U25),
-        ("5V fixed (0.5 A)", "+5V", "+5V", "5V_DUT", "FAULT_5V", R39K, C10U25),
-        ("3V3_SW (switched, 0.5 A)", "+3V3", "EN_3V3SW", "3V3_SW_PRE", "FAULT_3V3SW", R39K, C10U),
-        ("3V3 fixed (0.3 A)", "+3V3", "+3V3", "3V3_DUT", "FAULT_3V3", R68K, C10U),
+        ("5V_SW (switched, 1 A)", "+5V", "EN_5VSW", "5V_SW_PRE", "FAULT_5VSW", R22K, C10U25, "GND"),
+        ("5V fixed (0.5 A)", "+5V", "EN_5V", "5V_DUT", "FAULT_5V", R39K, C10U25, "+5V"),
+        ("3V3_SW (switched, 0.5 A)", "+3V3", "EN_3V3SW", "3V3_SW_PRE", "FAULT_3V3SW", R39K, C10U,
+         "GND"),
+        ("3V3 fixed (0.3 A)", "+3V3", "EN_3V3", "3V3_DUT", "FAULT_3V3", R68K, C10U, "+3V3"),
     ]
-    for i, (title, vin, en, vout, fault, rlim, cbulk) in enumerate(switches):
+    for i, (title, vin, en, vout, fault, rlim, cbulk, en_bias) in enumerate(switches):
         sh.group(f"Switch {title}", column_break=(i % 2 == 0))
         ilim = f"ILIM_{fault[6:]}"
-        part(sh, "U", "OOTY:AP22653W6", "C2158037", {
+        sw = part(sh, "U", "OOTY:AP22653W6", "C2158037", {
             "IN": vin, "EN": en, "OUT": vout, "~{FAULT}": fault, "GND": "GND", "ILIM": ilim})
         res(sh, rlim, ilim, "GND")
-        cap(sh, C100N, vin)
-        cap(sh, C100N, vout)
-        cap(sh, cbulk, vout)
+        cap(sh, C100N, vin, near=(sw, "IN"))
+        cap(sh, C100N, vout, near=(sw, "OUT"))
+        cap(sh, cbulk, vout, near=(sw, "OUT"))
         res(sh, R10K, fault, "+3V3")
-        if en != vin:
-            res(sh, R100K, en, "GND")
+        res(sh, R100K, en, en_bias)
 
-    sh.group("Rail test points", column_break=True)
-    for net in ("VBUS", "+5V", "+3V3", "5V_SW", "5V_DUT", "3V3_SW", "3V3_DUT", "GND"):
-        test_point(sh, net)
     sh.note("AP22653 ILIM (DS41186 p.10, VIN = 5 V): 22k -> 1.16 A typ, 39k -> 0.64 A typ, "
             "68k -> 0.35 A typ. See NOTES.md.")
     sh.note("Buck: Vout = 0.6 V x (1 + 100k/22k) = 3.327 V.")
@@ -191,30 +203,43 @@ MCU_PINS = {
     # DUT RESET / BOOT open-drain drivers
     "PC6": "RESET_DUT_CTL", "PC7": "BOOT_DUT_CTL",
     "PA10": "LED_HB",
-    "PB4": "BOOT_DIR",
+    # BOOT_DIR is not on PB4: PB4 is NJTRST with a 25-55k pull-up after reset (DS12589 Table 12,
+    # note 4), which beat the 100k pull-down and drove the DUT BOOT pin during HIL resets.
+    "PE9": "BOOT_DIR", "PB4": None,
+    # Fixed DUT rails enable (pulled up: on by default)
+    "PE7": "EN_5V", "PE8": "EN_3V3",
+    # User buttons (active low)
+    "PD0": "BTN1", "PD1": "BTN2",
+    # Spare LQFP-80 GPIO
+    "PE10": None, "PE11": None, "PE12": None, "PE13": None, "PE14": None, "PE15": None,
+    "PD8": None, "PD9": None, "PD10": None,
 }
+
+# VDD pins of the LQFP-80 (DS12589 Figure 11): one 100 nF each.
+MCU_VDD_PINS = ("16", "41", "51", "62", "80")
 
 
 def mcu_sheet():
-    sh = Sheet("mcu", "MCU STM32G431RBT6")
+    sh = Sheet("mcu", "MCU STM32G431MBT6")
 
-    sh.group("STM32G431RBT6")
-    part(sh, "U", "MCU_ST_STM32G4:STM32G431RBTx", "C431633", MCU_PINS)
+    sh.group("STM32G431MBT6")
+    mcu = part(sh, "U", "MCU_ST_STM32G4:STM32G431MBTx", "C730099", MCU_PINS)
 
     sh.group("Decoupling (DS12589 5.1.6)", column_break=True)
-    for _ in range(4):
-        cap(sh, C100N, "+3V3")          # VDD pins 16, 32, 48, 64
-    cap(sh, C4U7, "+3V3")
-    cap(sh, C100N, "+3V3")              # VBAT
-    cap(sh, C10N, "+3V3")               # VDDA
-    cap(sh, C1U, "+3V3")                # VDDA
-    cap(sh, C100N, "+3V3")              # VREF+
-    cap(sh, C1U, "+3V3")                # VREF+
-    cap(sh, C100N, "NRST")
+    for pin in MCU_VDD_PINS:
+        cap(sh, C100N, "+3V3", near=(mcu, pin))
+    cap(sh, C4U7, "+3V3", near=(mcu, "51"))
+    cap(sh, C100N, "+3V3", near=(mcu, "VBAT"))
+    cap(sh, C10N, "+3V3", near=(mcu, "VDDA"))
+    cap(sh, C1U, "+3V3", near=(mcu, "VDDA"))
+    cap(sh, C100N, "+3V3", near=(mcu, "VREF+"))
+    cap(sh, C1U, "+3V3", near=(mcu, "VREF+"))
+    cap(sh, C100N, "NRST", near=(mcu, "PG10"))
 
     sh.group("Boot / HIL debug (SWD)")
     res(sh, R10K, "BOOT0", "GND")
-    test_point(sh, "BOOT0")
+    sh.add("JP", "Jumper:SolderJumper_2_Open", "BOOT0", {"1": "BOOT0", "2": "+3V3"},
+           in_bom=False, fields={"Footprint": JUMPER_FOOTPRINT})
     sh.add("J", "Connector:Conn_ARM_JTAG_SWD_10", "SWD_HIL", {
         "VTref": "+3V3", "SWDIO/TMS": "SWDIO_HIL", "SWCLK/TCK": "SWCLK_HIL",
         "SWO/TDO": "SWO_HIL", "~{RESET}": "NRST", "GND": "GND", "GNDDetect": "GND",
@@ -224,10 +249,17 @@ def mcu_sheet():
     res(sh, R1K, "LED_HB", "LED_HB_A")
     part(sh, "D", "Device:LED", "C2286", {"A": "LED_HB_A", "K": "GND"}, value="HB", rot=180)
 
-    sh.note("USB FS runs crystal-less (HSI48 + CRS). BOOT0 test pad: short to 3V3 for the "
+    sh.group("User buttons")
+    for n in ("1", "2"):
+        sh.add("SW", "Switch:SW_Push", f"BTN{n}", {"1": f"BTN{n}", "2": "GND"},
+               fields={"LCSC": "C318884"})
+        res(sh, R10K, f"BTN{n}", "+3V3")
+        cap(sh, C100N, f"BTN{n}")
+
+    sh.note("USB FS runs crystal-less (HSI48 + CRS). BOOT0 solder jumper: bridge it to force the "
             "system bootloader.")
-    sh.note("PB4/PB6 may carry UCPD dead-battery pull-downs at reset; BOOT_DIR and I2C_DUT_EN "
-            "also have external pull-downs. Firmware sets PWR_CR3.UCPD1_DBDIS first.")
+    sh.note("PB6 may carry a UCPD dead-battery pull-down at reset (PA9 = DBCC1 is pulled high); "
+            "I2C_DUT_EN has an external pull-down anyway. Firmware sets PWR_CR3.UCPD1_DBDIS first.")
     return sh
 
 
@@ -238,12 +270,12 @@ def sensing_sheet():
     for rail, pre, a0, shunt in monitors:
         sh.group(f"Current monitor {rail}")
         part(sh, "R", "Device:R", shunt, {"1": pre, "2": rail}, value=BOM[shunt].value, rot=90)
-        part(sh, "U", "Sensor_Energy:INA226", "C49851", {
+        ina = part(sh, "U", "Sensor_Energy:INA226", "C49851", {
             # Vbus upstream of the shunt: its ~1 MOhm input would otherwise add ~5 uA through it.
             "Vin+": pre, "Vin-": rail, "Vbus": pre, "VS": "+3V3", "GND": "GND",
             "A1": "GND", "A0": a0, "SDA": "I2C_INT_SDA", "SCL": "I2C_INT_SCL",
             "~{Alert}": "INA_ALERT"})
-        cap(sh, C100N, "+3V3")
+        cap(sh, C100N, "+3V3", near=(ina, "VS"))
 
     sh.group("Internal I2C + OLED", column_break=True)
     res(sh, R2K2, "I2C_INT_SDA", "+3V3")
@@ -265,9 +297,9 @@ def sensing_sheet():
     cap(sh, C10N, "VIO_MON")
 
     sh.group("DAC output buffer", column_break=True)
-    part(sh, "U", "OOTY:TLV9001IDBV", "C398363", {
+    buf = part(sh, "U", "OOTY:TLV9001IDBV", "C398363", {
         "+": "DAC_OUT", "-": "AOUT_BUF", "1": "AOUT_BUF", "V+": "+3V3", "V-": "GND"})
-    cap(sh, C100N, "+3V3")
+    cap(sh, C100N, "+3V3", near=(buf, "V+"))
     res(sh, R100, "AOUT_BUF", "AOUT")
 
     sh.note("INA226 addresses: 5V_SW 0x40 (A1=A0=GND), 3V3_SW 0x41 (A0=VS). OLED 0x3C. "
@@ -280,12 +312,14 @@ def vio_sheet():
     sh = Sheet("vio", "VIO: 1.8 / 3.3 / 5 V or external")
 
     sh.group("VIO selection (TPS2116 mux)")
-    part(sh, "U", "Power_Management:TPS2116DRL", "C3235557", {
-        "VIN1": "+5V", "VIN2": "VIO_LDO", "VOUT": "VIO", "PR1": "VIO_PR1", "MODE": "VIO_MODE",
+    # VIN1 from the current-limited fixed 5 V rail: a short on VIO in 5 V mode trips that limiter
+    # instead of collapsing +5V (and the HIL 3V3 behind it).
+    mux = part(sh, "U", "Power_Management:TPS2116DRL", "C3235557", {
+        "VIN1": "5V_DUT", "VIN2": "VIO_LDO", "VOUT": "VIO", "PR1": "VIO_PR1", "MODE": "VIO_MODE",
         "ST": None, "GND": "GND"})
-    cap(sh, C1U, "+5V")
-    cap(sh, C1U, "VIO_LDO")
-    cap(sh, C1U, "VIO")
+    cap(sh, C1U, "5V_DUT", near=(mux, "VIN1"))
+    cap(sh, C1U, "VIO_LDO", near=(mux, "VIN2"))
+    cap(sh, C1U, "VIO", near=(mux, "2"))
     # PR1 pulled up from +5V (not +3V3): MODE=0/PR1=0 would select 5 V while 3V3 ramps up.
     res(sh, R10K, "+5V", "VIO_PR1")
     res(sh, R22K, "VIO_PR1", "GND")
@@ -293,10 +327,10 @@ def vio_sheet():
     test_point(sh, "VIO")
 
     sh.group("VIO LDO 1.8 / 3.3 V (AP2127K-ADJ)")
-    part(sh, "U", "Regulator_Linear:AP2127K-ADJ", "C96343", {
+    ldo = part(sh, "U", "Regulator_Linear:AP2127K-ADJ", "C96343", {
         "VIN": "+5V", "EN": "+5V", "GND": "GND", "ADJ": "VIO_ADJ", "VOUT": "VIO_LDO"})
-    cap(sh, C1U, "+5V")
-    cap(sh, C1U, "VIO_LDO")
+    cap(sh, C1U, "+5V", near=(ldo, "VIN"))
+    cap(sh, C1U, "VIO_LDO", near=(ldo, "VOUT"))
     res(sh, R30K, "VIO_LDO", "VIO_ADJ")
     sh.add("C", "Device:C", value_of(C1N), {"1": "VIO_LDO", "2": "VIO_ADJ"}, rot=90,
            fields={"LCSC": C1N})
@@ -305,7 +339,7 @@ def vio_sheet():
     part(sh, "Q", "Transistor_FET:2N7002", "C8545", {"G": "VIO_VSEL", "S": "GND", "D": "VSEL_D"})
     res(sh, R100K, "VIO_VSEL", "GND")
 
-    sh.note("TPS2116: MODE=1 PR1=1 -> 5V_SYS ; MODE=1 PR1=0 -> LDO ; MODE=0 PR1=1 -> off "
+    sh.note("TPS2116: MODE=1 PR1=1 -> 5V_DUT ; MODE=1 PR1=0 -> LDO ; MODE=0 PR1=1 -> off "
             "(external VIO from J_PWR/J_DBG). MODE=0 PR1=0 is forbidden (selects 5 V).")
     sh.note("LDO: Vout = 0.8 x (1 + 30k/24k) = 1.80 V ; VIO_VSEL high adds 16k in parallel -> 3.30 V.")
     return sh
@@ -320,37 +354,39 @@ def translators_sheet():
     for i, name in enumerate(outs, 1):
         nets[f"A{i}"] = f"{name}_MCU"
         nets[f"B{i}"] = f"{name}_B"
-    part(sh, "U", "Logic_LevelTranslator:SN74LVC8T245", "C27643", nets)
-    cap(sh, C100N, "+3V3")
-    cap(sh, C100N, "VIO")
+    ls = part(sh, "U", "Logic_LevelTranslator:SN74LVC8T245", "C27643", nets)
+    cap(sh, C100N, "+3V3", near=(ls, "1"))
+    cap(sh, C100N, "VIO", near=(ls, "23"))
     res(sh, R10K, "LS_OE_N", "+3V3")
 
     sh.group("Inputs VIO -> 3V3 (DIR = B to A)", column_break=True)
     ins = ["IN1", "IN2", "IN3", "IN4", "UART_RX", "SPI_MISO", "SWO_DUT"]
+    # Unused channel 8: B8 and A8 tied low (no floating CMOS input while /OE is high, and no
+    # conflict once enabled: A8 then drives the B8 level, i.e. low).
     nets = {"V_{CCA}": "+3V3", "V_{CCB}": "VIO", "GND": "GND", "DIR": "GND", "~{OE}": "LS_OE_N",
-            "A8": None, "B8": "GND"}
+            "A8": "GND", "B8": "GND"}
     for i, name in enumerate(ins, 1):
         nets[f"A{i}"] = f"{name}_MCU"
         nets[f"B{i}"] = f"{name}_B"
-    part(sh, "U", "Logic_LevelTranslator:SN74LVC8T245", "C27643", nets)
-    cap(sh, C100N, "+3V3")
-    cap(sh, C100N, "VIO")
+    ls = part(sh, "U", "Logic_LevelTranslator:SN74LVC8T245", "C27643", nets)
+    cap(sh, C100N, "+3V3", near=(ls, "1"))
+    cap(sh, C100N, "VIO", near=(ls, "23"))
 
     sh.group("SWD probe")
     for sig in ("SWCLK", "SWDIO"):
-        part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
+        ls = part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
             "VCCA": "+3V3", "VCCB": "VIO", "GND": "GND", "A": f"{sig}_MCU", "B": f"{sig}_B",
             "DIR": f"{sig}_DIR"})
-        cap(sh, C100N, "+3V3")
-        cap(sh, C100N, "VIO")
+        cap(sh, C100N, "+3V3", near=(ls, "VCCA"))
+        cap(sh, C100N, "VIO", near=(ls, "VCCB"))
         res(sh, R100K, f"{sig}_DIR", "GND")
 
     sh.group("DUT I2C (A = DUT)")
-    part(sh, "U", "Logic_LevelTranslator:TCA9517ADGK", "C201698", {
+    tca = part(sh, "U", "Logic_LevelTranslator:TCA9517ADGK", "C201698", {
         "VCCA": "VIO", "SCLA": "I2C_SCL", "SDAA": "I2C_SDA", "GND": "GND", "EN": "I2C_DUT_EN",
         "SDAB": "I2C_DUT_SDA_MCU", "SCLB": "I2C_DUT_SCL_MCU", "VCCB": "+3V3"})
-    cap(sh, C100N, "VIO")
-    cap(sh, C100N, "+3V3")
+    cap(sh, C100N, "VIO", near=(tca, "VCCA"))
+    cap(sh, C100N, "+3V3", near=(tca, "VCCB"))
     res(sh, R4K7, "I2C_SCL", "VIO")
     res(sh, R4K7, "I2C_SDA", "VIO")
     res(sh, R4K7, "I2C_DUT_SCL_MCU", "+3V3")
@@ -361,17 +397,22 @@ def translators_sheet():
     part(sh, "Q", "Transistor_FET:2N7002", "C8545", {
         "G": "RESET_DUT_CTL", "S": "GND", "D": "RESET_OD"})
     res(sh, R100K, "RESET_DUT_CTL", "GND")
-    part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
+    ls = part(sh, "U", "Logic_LevelTranslator:SN74LVC1T45DBV", "C7843", {
         "VCCA": "+3V3", "VCCB": "VIO", "GND": "GND", "A": "BOOT_DUT_CTL", "B": "BOOT_B",
         "DIR": "BOOT_DIR"})
-    cap(sh, C100N, "+3V3")
-    cap(sh, C100N, "VIO")
+    cap(sh, C100N, "+3V3", near=(ls, "VCCA"))
+    cap(sh, C100N, "VIO", near=(ls, "VCCB"))
     res(sh, R100K, "BOOT_DIR", "GND")
 
     sh.group("Input bias 1M")
     for net in ("IN1_B", "IN2_B", "IN3_B", "IN4_B", "SPI_MISO_B", "SWCLK_B", "BOOT_B"):
         res(sh, R1M, net, "GND")
     for net in ("UART_RX_B", "SWO_DUT_B", "SWDIO_B"):
+        res(sh, R1M, net, "VIO")
+    # The output translator B side floats while /OE is high: bias it to each signal's idle level.
+    for net in ("OUT1_B", "OUT2_B", "OUT3_B", "OUT4_B", "SPI_SCK_B", "SPI_MOSI_B"):
+        res(sh, R1M, net, "GND")
+    for net in ("UART_TX_B", "SPI_CS_B"):
         res(sh, R1M, net, "VIO")
 
     sh.note("All translators are Hi-Z until firmware drives LS_OE_N low / DIR high / I2C_DUT_EN high.")
@@ -395,10 +436,15 @@ def connectors_sheet():
             sh.group("Series resistors (cont.)", column_break=True)
         res(sh, R100, inner, outer)
 
-    esd = ["OUT1", "OUT2", "OUT3", "OUT4", "IN1", "IN2", "IN3", "IN4", "TX", "RX", "SPI_SCK",
-           "SPI_MOSI", "SPI_MISO", "SPI_CS", "I2C_SDA", "I2C_SCL", "SWDIO", "SWCLK", "SWO",
-           "RESET", "BOOT", "AIN1", "AIN2", "AOUT", "VIO", None, None, None,
-           "5V_DUT", "5V_SW", "3V3_DUT", "3V3_SW"]
+    # Channels grouped per header so that each TVS sits next to its connector.
+    esd = ["OUT1", "OUT2", "OUT3", "OUT4",              # J_IO
+           "IN1", "IN2", "IN3", "IN4",                  # J_IO
+           "I2C_SDA", "I2C_SCL", "SPI_SCK", "SPI_MOSI",  # J_BUS
+           "SPI_MISO", "SPI_CS", "TX", "RX",            # J_BUS / J_UART_ANA
+           "AIN1", "AIN2", "AOUT", None,                # J_UART_ANA
+           "SWDIO", "SWCLK", "SWO", "RESET",            # J_DBG
+           "BOOT", "VIO", None, None,                   # J_DBG / J_PWR
+           "5V_DUT", "5V_SW", "3V3_DUT", "3V3_SW"]      # J_PWR
     channels = ["D1+", "D1-", "D2+", "D2-"]
     sh.group("ESD (TPD4E05U06)", column_break=True)
     for i in range(0, len(esd), 4):
@@ -427,6 +473,10 @@ def connectors_sheet():
         sh.add("J", lib_id, name, {str(i): n for i, n in enumerate(pins, 1)},
                fields={"LCSC": lcsc})
 
+    sh.group("DUT rail test points")
+    for net in ("5V_SW", "5V_DUT", "3V3_SW", "3V3_DUT"):
+        test_point(sh, net)
+
     sh.group("Mounting holes")
     for _ in range(4):
         sh.add("H", "Mechanical:MountingHole", "M3", {}, in_bom=False,
@@ -434,6 +484,29 @@ def connectors_sheet():
 
     sh.note("Signal path: header -> TVS -> 100R series -> translator / circuit.")
     return sh
+
+
+def decoupling(sheets):
+    """Map capacitor ref -> (part ref, pad number) for each capacitor declared with `near`.
+
+    Fails if the capacitor does not share a net with that pin.
+    """
+    result = {}
+    for sheet in sheets:
+        for c in sheet.parts:
+            near = getattr(c, "near", None)
+            if not near:
+                continue
+            target, key = near
+            pins = [(pin, net) for pin, net in schgen.resolve_pins(target)
+                    if key in (pin.number, pin.name)]
+            if not pins:
+                raise KeyError(f"{c.ref}: pin {key} not found on {target.ref}")
+            pin, net = pins[0]
+            if net not in c.nets.values():
+                raise ValueError(f"{c.ref} does not decouple {target.ref} pin {pin.number} ({net})")
+            result[c.ref] = (target.ref, pin.number)
+    return result
 
 
 def annotate(sheets):

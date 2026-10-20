@@ -6,7 +6,7 @@
 	(paper "A4")
 	(title_block
 		(title "OOTY - USB Hardware-in-the-Loop board")
-		(date "2026-10-19")
+		(date "2026-10-20")
 		(rev "A")
 		(company "OOTY")
 	)
