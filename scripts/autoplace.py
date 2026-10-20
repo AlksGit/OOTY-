@@ -1,10 +1,10 @@
 """Greedy placer for satellite parts (passives, small ICs) around hand-placed anchors.
 
 For each unplaced footprint, a target point is chosen:
-1. the pad of an already placed footprint sharing the most specific signal net, or
-2. for parts on power nets only (decoupling), the matching power pad of the first IC of the same
-   schematic group, or
-3. the board centre.
+1. for decoupling capacitors, the pad they decouple (build_schematic.decoupling), or
+2. the pad of an already placed footprint sharing the most specific signal net, or
+3. the power pad of the first IC of the same schematic group, or
+4. the board centre.
 The part is then put at the nearest free spot (courtyard + margin) found on a spiral grid.
 Runs inside KiCad's Python (pcbnew).
 """
@@ -17,7 +17,7 @@ POWER_NETS = {"GND", "+3V3", "+5V", "VBUS", "VIO"}
 GRID = 0.25
 MARGIN = 0.25          # between ICs
 PASSIVE_MARGIN = 0.8   # around resistors: leaves some room for references
-DECOUPLING_MARGIN = 0.3
+DECOUPLING_MARGIN = 0.1
 MAX_RADIUS = 30.0
 
 
@@ -43,13 +43,16 @@ def overlaps(a, b, margin=MARGIN):
 
 
 class Placer:
-    def __init__(self, board, area, keepouts, groups):
-        """area: (x0, y0, x1, y1) allowed region; keepouts: list of boxes; groups: ref -> group id."""
+    def __init__(self, board, area, keepouts, groups, near):
+        """area: (x0, y0, x1, y1) allowed region; keepouts: list of boxes; groups: ref -> group id;
+        near: capacitor ref -> (part ref, pad number) it decouples."""
         self.board = board
         self.area = area
         self.boxes = list(keepouts)
         self.groups = groups
+        self.near = near
         self.placed = set()
+        self.fps = {fp.GetReference(): fp for fp in board.GetFootprints()}
 
     def mark_placed(self, fp):
         self.placed.add(fp.GetReference())
@@ -66,22 +69,12 @@ class Placer:
                     index.setdefault(name, []).append((fp, pad))
         return index
 
-    def _group_ic_pad(self, fp, nets):
-        group = self.groups.get(fp.GetReference())
-        for other in self.board.GetFootprints():
-            ref = other.GetReference()
-            if ref in self.placed and ref.startswith("U") and self.groups.get(ref) == group:
-                for pad in other.Pads():
-                    if pad.GetNetname() in nets and pad.GetNetname() != "GND":
-                        return to_mm(pad.GetPosition().x), to_mm(pad.GetPosition().y)
-        return None
-
     def target(self, fp, index):
         nets = [p.GetNetname() for p in fp.Pads() if p.GetNetname()]
-        if fp.GetReference().startswith("C"):
-            pad = self._group_ic_pad(fp, nets)
-            if pad:
-                return pad
+        near = self.near.get(fp.GetReference())
+        if near and near[0] in self.placed:
+            pad = self.fps[near[0]].FindPadByNumber(near[1])
+            return to_mm(pad.GetPosition().x), to_mm(pad.GetPosition().y)
         signal = [n for n in nets if n not in POWER_NETS and not n.startswith("unconnected")]
         best = None
         for n in signal:
@@ -154,29 +147,32 @@ def priority(fp):
     return order.get(key, 5), num
 
 
-def run(board, area, keepouts, groups):
-    placer = Placer(board, area, keepouts, groups)
+def run(board, area, keepouts, groups, near, only=None):
+    """Place every unlocked footprint (or only the refs in `only`) and lock it. Returns the refs
+    that found no spot."""
+    placer = Placer(board, area, keepouts, groups, near)
     pending = []
     for fp in board.GetFootprints():
         if fp.IsLocked():
             placer.mark_placed(fp)
-        else:
+        elif only is None or fp.GetReference() in only:
             pending.append(fp)
-    # Each IC is followed by the capacitors of its schematic group, so decoupling gets the
-    # spots closest to the IC pins before anything else competes for them.
+    # Each part is followed by the capacitors that decouple it, so decoupling gets the spots
+    # closest to the pins before anything else competes for them.
     ordered = []
-    ics = [fp for fp in board.GetFootprints() if fp.GetReference().startswith("U")]
-    for ic in sorted(ics, key=lambda f: (not f.IsLocked(), priority(f))):
-        if not ic.IsLocked():
-            ordered.append(ic)
-        grp = groups.get(ic.GetReference())
+    owners = [fp for fp in board.GetFootprints() if not fp.GetReference().startswith("C")]
+    for owner in sorted(owners, key=lambda f: (not f.IsLocked(), priority(f))):
+        if not owner.IsLocked() and owner in pending:
+            ordered.append(owner)
         for fp in sorted(pending, key=priority):
-            if (fp.GetReference().startswith("C") and groups.get(fp.GetReference()) == grp
-                    and fp not in ordered):
+            target = near.get(fp.GetReference())
+            if target and target[0] == owner.GetReference() and fp not in ordered:
                 ordered.append(fp)
     ordered += [fp for fp in sorted(pending, key=priority) if fp not in ordered]
     failed = []
     for fp in ordered:
-        if not placer.place(fp):
+        if placer.place(fp):
+            fp.SetLocked(True)
+        else:
             failed.append(fp.GetReference())
     return failed

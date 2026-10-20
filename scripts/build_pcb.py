@@ -1,13 +1,14 @@
 """Build OOTY.kicad_pcb from the schematic netlist (run with KiCad's Python).
 
 - 4-layer JLCPCB stack-up (JLC04161H-7628), design rules and net classes (saved in OOTY.kicad_pro)
-- board outline 85 x 55 mm with rounded corners, 4 x M3 holes
+- board outline 85 x 55 mm with rounded corners, 4 x M3 holes with copper keepouts
 - every schematic footprint imported with its nets and schematic path (DRC parity)
 - placement from scripts/placement.py; parts without a position are parked beside the board
 
 Usage: "C:\\Program Files\\KiCad\\10.0\\bin\\python.exe" scripts/build_pcb.py
 """
 
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -48,21 +49,31 @@ STACKUP = """(stackup
   (copper_finish "HAL lead-free")
   (dielectric_constraints no))"""
 
-# Rules (SPEC.md section 7): conservative values above JLCPCB minimums.
+# Rules (SPEC.md section 7): conservative values at or above JLCPCB minimums (annular ring
+# 0.15 mm, smallest via 0.5 / 0.2 mm, silkscreen text 1.0 mm high, 0.15 mm stroke).
 RULES = {
     "clearance": 0.15,
     "track": 0.15,
     "via_diameter": 0.6,
     "via_drill": 0.3,
+    "via_min_diameter": 0.5,
+    "via_min_drill": 0.2,
     "copper_edge": 0.3,
     "hole_to_hole": 0.5,
-    "annular": 0.13,
+    "annular": 0.15,
+    "silk_text_height": 1.0,
+    "silk_text_thickness": 0.15,
 }
 
 NETCLASSES = {
     # name: (track width, clearance, via diameter, via drill, patterns)
-    "Power": (0.5, 0.15, 0.8, 0.4, ["+3V3", "5V_SW*", "5V_DUT", "3V3_SW*", "3V3_DUT", "VIO*", "GND"]),
-    "HighCurrent": (1.0, 0.2, 0.8, 0.4, ["VBUS", "+5V", "*SW_3V3"]),
+    # Power: up to ~1.45 A on outer layers (IPC-2221, 10 degC rise). The buck switch node stays
+    # here: its pads are 0.6 mm wide and the inductor sits next to the IC.
+    "Power": (0.5, 0.15, 0.8, 0.4, ["+3V3", "5V_SW*", "5V_DUT", "3V3_SW*", "3V3_DUT", "VIO",
+                                    "VIO_LDO", "GND", "*SW_3V3"]),
+    # HighCurrent: VBUS and +5V carry the whole board (3 A max from a USB-C 3 A source):
+    # 1.5 mm outer, 1 oz -> ~3.2 A at 10 degC rise.
+    "HighCurrent": (1.5, 0.2, 0.8, 0.4, ["VBUS", "+5V"]),
     "USB": (0.25, 0.15, 0.6, 0.3, ["USB_DP", "USB_DM"]),
 }
 
@@ -110,8 +121,10 @@ def setup_board(board):
 
     ds.m_MinClearance = mm(RULES["clearance"])
     ds.m_TrackMinWidth = mm(RULES["track"])
-    ds.m_ViasMinSize = mm(0.45)
-    ds.m_MinThroughDrill = mm(0.2)
+    ds.m_ViasMinSize = mm(RULES["via_min_diameter"])
+    ds.m_MinThroughDrill = mm(RULES["via_min_drill"])
+    ds.m_MinSilkTextHeight = mm(RULES["silk_text_height"])
+    ds.m_MinSilkTextThickness = mm(RULES["silk_text_thickness"])
     ds.m_CopperEdgeClearance = mm(RULES["copper_edge"])
     ds.m_HoleToHoleMin = mm(RULES["hole_to_hole"])
     ds.m_ViasMinAnnularWidth = mm(RULES["annular"])
@@ -162,6 +175,30 @@ def draw_outline(board):
         s.SetLayer(pcbnew.Edge_Cuts)
         s.SetWidth(mm(0.05))
         board.Add(s)
+
+
+def add_mounting_keepouts(board):
+    """Rule area (no tracks, vias or copper fill) under each M3 screw head, on all copper layers."""
+    r = placement.MOUNTING_KEEPOUT_D / 2
+    for ref, (_, x, y, _, _) in placement.PLACEMENT.items():
+        if not ref.startswith("H"):
+            continue
+        cx, cy = placement.ORIGIN[0] + x, placement.ORIGIN[1] + y
+        zone = pcbnew.ZONE(board)
+        zone.SetIsRuleArea(True)
+        zone.SetDoNotAllowTracks(True)
+        zone.SetDoNotAllowVias(True)
+        zone.SetDoNotAllowZoneFills(True)
+        zone.SetDoNotAllowPads(False)
+        zone.SetDoNotAllowFootprints(False)
+        zone.SetLayerSet(pcbnew.LSET.AllCuMask())
+        zone.SetZoneName(f"keepout_{ref}")
+        outline = zone.Outline()
+        outline.NewOutline()
+        for i in range(32):
+            a = 2 * math.pi * i / 32
+            outline.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
+        board.Add(zone)
 
 
 def load_footprint(fpid):
@@ -254,25 +291,35 @@ def main():
     board = pcbnew.NewBoard(str(pcb_path))
     setup_board(board)
     draw_outline(board)
+    add_mounting_keepouts(board)
     parked = add_footprints(board, comps, pads)
     if "--no-autoplace" not in sys.argv:
+        sheets = build_schematic.build()
         groups = {}
-        for sheet in build_schematic.build():
+        for sheet in sheets:
             for i, grp in enumerate(sheet.groups):
                 for p in grp.parts:
                     groups[p.ref] = f"{sheet.name}:{i}"
         area = placement.absolute(placement.AREA)
+        ox, oy = placement.ORIGIN
+        marking = [(t, ox + x, oy + y, h) for t, x, y, h in placement.MARKING]
         keepouts = [placement.absolute(k) for k in placement.KEEPOUTS]
-        failed = autoplace.run(board, area, keepouts, groups)
+        near = build_schematic.decoupling(sheets)
+        # Order: decoupling capacitors next to their pins, then the silkscreen of every part
+        # placed so far (so the auto-placer leaves room for it), then everything else.
+        failed = autoplace.run(board, area, keepouts, groups, near, only=set(near))
+        silk_layer = silk.reserve(board, placement.absolute((0.6, 0.6, 84.4, 54.4)),
+                                  placement.refs_with_value(placement.HEADERS_BOTTOM),
+                                  placement.refs_with_value(placement.HEADERS_RIGHT), marking)
+        failed += autoplace.run(board, area, keepouts + silk_layer.texts, groups, near)
         parked = len(failed)
         if failed:
             print("not placed:", " ".join(failed))
-        ox, oy = placement.ORIGIN
-        marking = [(t, ox + x, oy + y, h) for t, x, y, h in placement.MARKING]
-        hidden = silk.run(board, placement.absolute((0.6, 0.6, 84.4, 54.4)),
-                          placement.refs_with_value(placement.HEADERS_BOTTOM),
-                          placement.refs_with_value(placement.HEADERS_RIGHT), marking)
+        hidden = silk.finish(silk_layer)
         print(f"{len(hidden)} references moved to F.Fab (no room on silkscreen)")
+        key_hidden = [r for r in hidden if r.startswith(silk.KEY_PARTS)]
+        if key_hidden:
+            print("key parts without silkscreen reference:", " ".join(key_hidden))
     board.BuildConnectivity()
     pcbnew.SaveBoard(str(pcb_path), board)
     write_stackup(pcb_path)
