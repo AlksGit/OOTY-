@@ -15,6 +15,7 @@
 - [ ] TASK-012 | Placement — intégration des nouveaux blocs + finition de la sérigraphie
   > Blocs de mesure au plus près des shunts (Kelvin, boucle de bascule courte). Toutes les pièces clés ont leur référence en sérigraphie, sans ambiguïté. DRC + parité 0 erreur, découplage dans les limites, rendus 3D. Relecture indépendante « prêt pour le routage ». Clôt aussi TASK-005/006/007 (merge de toute la pile après accord utilisateur).
   > Branch: feat/task-010-dual-range
+  > Statut : placement fait et relu (revue + contre-revue indépendantes : prêt pour le routage ; DRC 0 erreur, parité 0, découplage 59/59, toutes les pièces clés référencées). ⏸ En attente : réponses utilisateur (face arrière non assemblée, paires Kelvin en B.Cu) puis go pour merger la pile dans devape.
   > Blocked by: TASK-011 — levé
 
 - [ ] TASK-011 | Schéma — mesure double calibre ×2 + retours de tension des rails fixes

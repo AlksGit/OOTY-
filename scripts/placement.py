@@ -120,6 +120,17 @@ PLACEMENT = {
     "C71": ("1nF/50V", 53.2, 23.6, 0, "F"),
     # INA190 reference buffer (shared by the four amplifiers), next to them
     "U36": ("TLV9001IDBVR", 53.0, 41.0, 0, "F"),
+    "C72": ("100nF/50V", 51.6, 43.4, 0, "F"),
+    "R107": ("1k", 53.6, 43.4, 0, "F"),
+    "R106": ("30k", 55.6, 43.4, 0, "F"),
+    # Series resistors of OUT1-4 and SPI (the auto-placer had pushed them above U14 once the
+    # dual-range parts took their spots): back between U14/U15 and J8 / near U14
+    "R69": ("100R", 59.5, 45.12, 0, "F"),
+    "R70": ("100R", 62.22, 41.49, 90, "F"),
+    "R72": ("100R", 61.6, 45.12, 0, "F"),
+    "R71": ("100R", 64.44, 43.36, 0, "F"),
+    "R75": ("100R", 62.6, 26.12, 0, "F"),
+    "R76": ("100R", 58.82, 25.11, 0, "F"),
     # Shunt amplifiers under the MCU, next to the ADC pins, 4 mm pitch (routing channels for
     # the Kelvin pairs)
     # (rotated 180: VS pin up, decoupled by the capacitor row above)
