@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/erc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-10-19T14:59:59",
+    "date": "2026-10-19T16:47:15",
     "ignored_checks": [
         {
             "description": "Global label only appears once in the schematic",
@@ -29,7 +29,61 @@
     "sheets": [
         {
             "path": "/",
-            "uuid_path": "/009637b9-b6d9-4dee-872a-04bc9682b4dd",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86",
+            "violations": []
+        },
+        {
+            "path": "/power/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/40f9a084-92e8-50aa-bec2-cafc98cf2e20",
+            "violations": []
+        },
+        {
+            "path": "/mcu/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/359c2063-0e9c-5d97-829f-b413712fead4",
+            "violations": []
+        },
+        {
+            "path": "/sensing/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/e5736e45-0750-57df-a3a0-79a91db13f91",
+            "violations": []
+        },
+        {
+            "path": "/vio/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/c64e4008-9b8c-515d-afc9-c9649df6a342",
+            "violations": []
+        },
+        {
+            "path": "/translators/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/a6413182-5be5-52e1-b6fc-210ccfac5a07",
+            "violations": [
+                {
+                    "description": "Pins of type Bidirectional and Power output are connected",
+                    "items": [
+                        {
+                            "description": "Symbol U15 Pin 14 [B8, Bidirectional, Line]",
+                            "pos": {
+                                "x": 127.0,
+                                "y": 93.98
+                            },
+                            "uuid": "af63230f-ec36-5048-9971-697c8ba3a4c2"
+                        },
+                        {
+                            "description": "Symbol #FLG03 Pin 1 [Power output, Line]",
+                            "pos": {
+                                "x": 73.66,
+                                "y": 106.68
+                            },
+                            "uuid": "c8f66231-61c2-5076-9a11-5fad2d3cacc8"
+                        }
+                    ],
+                    "severity": "warning",
+                    "type": "pin_to_pin"
+                }
+            ]
+        },
+        {
+            "path": "/connectors/",
+            "uuid_path": "/896c938c-ef54-5782-bb20-81d92df4de86/9b136eae-4e84-5bd3-bf20-6d73091df9e7",
             "violations": []
         }
     ],

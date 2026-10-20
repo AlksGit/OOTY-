@@ -157,7 +157,7 @@ Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils
 ### Entrées analogiques
 - Diviseur 100 kΩ / 100 kΩ (Basic, évite une référence Extended) : impédance 200 kΩ, gain 0.5 → 5.0 V → 2.50 V, 5.5 V → 2.75 V (550 mV de marge). Résolution 12 bits : 1.61 mV à l'entrée.
 - Filtre 10 nF : fc = 1/(2π × 50 kΩ × 10 nF) = 318 Hz. Erreur de partage de charge avec le condensateur d'échantillonnage ≈ 0.05 %.
-- Protection : R1 limite l'injection à (24 − 3.6)/100 k = 0.2 mA pour 24 V en entrée. Pas de BAT54S (fuite 2 µA → erreur de plusieurs dizaines de mV).
+- Protection : la TVS TPD4E05U06 est sur la broche du header, **avant** le 100 kΩ (VRWM 5.5 V, VBR 6.5–8.5 V) : la plage d'entrée est donc **0–5.5 V**, une tension plus élevée détruirait la TVS. (Correction de la revue du schéma : la tenue « 24 V » annoncée en Phase 1 était fausse.) Pas de BAT54S (fuite 2 µA → erreur de plusieurs dizaines de mV).
 
 ### Sortie DAC
 - TLV9001IDBVR en suiveur, RRIO, 1.8–5.5 V, ±40 mA en court-circuit ; 100 Ω en série en sortie. Brochage DBV : 1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+ (attention : la version TLV9001**U** a un brochage différent).
@@ -209,6 +209,113 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 3. **TCA9517A au lieu du PCA9306** pour l'I2C DUT (le PCA9306 ne couvre pas VIO 1.8 → 5 V).
 4. **Frais Extended** (≈ 92 $ par commande) : accepter, ou regrouper les headers J_UART et J_ANA en un seul 1×7.
 5. **Écran** : module enfiché à la main sur un support (non posé par JLCPCB).
+
+## Phase 2 — Schéma (TASK-005)
+
+### Méthode de génération
+- `kiutils` ne gère pas le format KiCad 10 : le schéma est produit par un générateur maison.
+  - `scripts/sexpr.py` : lecture/écriture S-expression.
+  - `scripts/symlib.py` : lecture des symboles des librairies KiCad 10 (aplatissement des `extends`, géométrie des broches, fonctions alternatives des broches STM32).
+  - `scripts/schgen.py` : placement automatique par blocs, fil court + label sur chaque broche, symboles power pour GND / +3V3 / +5V / VBUS, labels globaux pour les nets partagés entre feuilles. Écrit au format KiCad 8, puis `kicad-cli sch upgrade` convertit au format KiCad 10.
+  - `scripts/build_schematic.py` : **description du design** (broche → net), une fonction par feuille. Les champs Footprint / MPN / Manufacturer / Datasheet / LCSC viennent de `scripts/bom_draft.py` via le code LCSC (source unique).
+  - `scripts/build_symbols.py` : symboles absents des librairies officielles (`lib/OOTY.kicad_sym`).
+- **Vérifications automatiques** :
+  - `scripts/verify_netlist.py` : exporte la netlist KiCad et compare chaque net à la description → **159 nets, 0 écart**.
+  - `scripts/check_bom.py` : quantités par code LCSC schéma vs BOM → **156 composants, 0 écart** (le module OLED, enfiché à la main, est hors schéma).
+  - `scripts/run_checks.py --erc-only` → **0 erreur, 1 warning justifié** (ci-dessous).
+  - `scripts/render_schematic.py` : PDF `out/OOTY_schematic.pdf` + PNG par feuille dans `out/renders/`.
+
+### Feuilles
+| Feuille | Contenu |
+|---|---|
+| power | USB-C, ESD USB, TVS + PTC VBUS, buck 3V3, 4 × AP22653, LED alim, points de test |
+| mcu | STM32G431RBT6, découplage, BOOT0, connecteur SWD HIL, LED heartbeat |
+| sensing | 2 × INA226 + shunts, I2C interne, connecteur OLED, entrées ADC, moniteur VIO, buffer DAC |
+| vio | Mux TPS2116, LDO AP2127K-ADJ et sélection 1.8 / 3.3 V |
+| translators | 2 × SN74LVC8T245, 2 × SN74LVC1T45 (SWD), TCA9517A, RESET/BOOT open-drain |
+| connectors | Résistances série, 8 × TPD4E05U06, 5 headers DUT, trous M3 |
+
+### Symboles projet (`lib/OOTY.kicad_sym`)
+- `AP22653W6` : brochage SOT26 de la datasheet DS41186 Rev. 5-2 (« Pin Descriptions ») : 1 IN, 2 GND, 3 EN (actif haut), 4 FAULT, 5 ILIM, 6 OUT.
+- `TLV9001IDBV` : graphique du symbole officiel OPA333xxDBV, même brochage DBV (1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+), vérifié contre la datasheet TLV9001.
+
+### Affectation des broches du STM32G431RBT6
+Fonctions alternatives vérifiées dans le symbole KiCad (`MCU_ST_STM32G4:STM32G431RBTx`, champs `alternate`) :
+
+| Fonction | Broches |
+|---|---|
+| USB FS | PA11 DM, PA12 DP |
+| SWD carte HIL | PA13 SWDIO, PA14 SWCLK, PB3 SWO, PG10 NRST, PB8 BOOT0 |
+| I2C interne (I2C1) | PA15 SCL, PB7 SDA |
+| I2C DUT (I2C3) | PC8 SCL, PC9 SDA |
+| SPI DUT (SPI1) | PA5 SCK, PA6 MISO, PA7 MOSI, PA8 CS (GPIO) |
+| UART DUT (USART3) | PB10 TX, PB11 RX |
+| SWO DUT (USART2_RX) | PA3 |
+| Sonde SWD DUT | PB13 SWCLK (SPI2_SCK), PB15 SWDIO (SPI2_MOSI), PB2 SWCLK_DIR, PB12 SWDIO_DIR |
+| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PB0 |
+| IN1–4 | PC10, PC11, PC12, PD2 |
+| ADC | PC0 AIN1, PC1 AIN2, PC2 CC1, PC3 CC2, PB1 VIO_MON |
+| DAC | PA4 (DAC1_OUT1) |
+| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
+| VIO / translateurs | PC4 PR1, PC5 MODE, PB14 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
+| Divers | PA10 LED heartbeat, PC6 RESET DUT, PC7 BOOT DUT, PB4 libre |
+
+- PB4 et PB6 portent les pull-downs « dead battery » de l'UCPD au reset : PB4 n'est pas utilisée, PB6 commande I2C_DUT_EN (bas = buffer désactivé, état sûr). À confirmer dans le RM0440 avant le firmware.
+- PC13–PC15 ont une sortance limitée (3 mA, 2 MHz) : utilisées seulement pour EN et FAULT (signaux lents).
+
+### Warning ERC justifié
+- `pin_to_pin` (warning) sur la feuille translators : la broche B8 (bidirectionnelle) du SN74LVC8T245 d'entrée est reliée à GND. C'est voulu : avec DIR = B→A, B8 est une entrée inutilisée, à tirer à un niveau fixe pour ne pas la laisser flotter (recommandation habituelle pour les entrées CMOS).
+
+### Revue électrique indépendante du schéma (2026-10-19) et corrections
+Relecture par un agent séparé, contre les datasheets TI / Diodes (le site ST n'était pas accessible : points STM32 vérifiés via les fonctions alternatives du symbole KiCad).
+
+| # | Gravité | Constat | Correction |
+|---|---|---|---|
+| 1 | MAJEUR | TPS2116 : avec MODE bas et PR1 bas, le mux passe la tension la plus haute (5 V). PR1 tiré à +3V3 → pendant la montée du buck (soft-start 800 µs) ou si le 3V3 tombe, **5 V sur VIO** possible. | PR1 tiré depuis **+5V** par un diviseur 10k / 22k (3.44 V, > VREF dès que VIN1 > ≈ 1.6 V). PC4 tire PR1 au niveau bas. Règle firmware : jamais PR1 bas avec MODE bas. |
+| 2 | MAJEUR | BOOT en open-drain (2N7002) ne peut pas mettre un BOOT0 STM32 (actif haut) au niveau haut. | BOOT via un **SN74LVC1T45** : sortie push-pull à VIO (DIR haut) ou haute impédance (DIR bas, état au reset). RESET reste open-drain (NRST / EN). |
+| 3 | mineur | TCA9517A : EN a un pull-up interne vers VCCB → buffer actif au reset. | Pull-down 10 kΩ sur I2C_DUT_EN. |
+| 4 | mineur | Entrées CMOS flottantes côté DUT des translateurs (« unused data inputs must be held high or low »). | 10 × 1 MΩ : pull-down sur IN1–4, MISO, SWCLK, BOOT ; pull-up à VIO sur RX, SWO, SWDIO (pratique SWD/UART). 1 MΩ pour ne pas perturber le DUT (ex. pull-up interne ESP32 IO0 ≈ 45 kΩ). |
+| 5 | mineur | Tenue « 24 V » des AIN fausse (TVS avant la résistance). | Note corrigée : 0–5.5 V. |
+| 6 | mineur | Capacité sur VBUS/+5V > 10 µF (limite USB 2.0). | 10 µF/25 V sur +5V retiré : reste buck Cin 10 µF + 2 × 1 µF + 100 nF (≈ 7 µF après derating). |
+| 7 | mineur | CC1/CC2 sans ESD. | TPD4E05U06 dédié près de l'USB-C (2 voies utilisées). |
+| 8 | mineur | Cff du buck absent du schéma. | 6.8 pF 0402 **non monté** (DNP) en parallèle sur le 100 kΩ. |
+| 9 | mineur | SMAJ5.0A : Vc 9.2 V > 6 V abs. max de TLV62569 / AP22653 / TPS2116. | Accepté et documenté : protection partielle contre les surtensions lentes ; le PTC + TVS absorbent les transitoires ESD/hot-plug usuels. Une TVS à clamp plus bas (ex. 5 V, Vc ≈ 7 V) pourra être évaluée en rev B. |
+| 10 | question | DFU USB sans quartz (AN2606) non vérifié. | SWD reste le chemin de programmation principal. |
+| 11 | question | 10 µF sur VIO à charger par le VTref du DUT en mode externe. | Réduit à 1 µF (+ 100 nF par translateur ≈ 1.6 µF). |
+
+Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 composants schéma = BOM.
+
+### Réévaluation MCU et mesure de courant (2026-10-19, demande de l'utilisateur)
+
+**MCU : STM32G431RBT6 conservé.**
+| Candidat (LQFP64) | Stock / prix (JLC) | Verdict |
+|---|---|---|
+| STM32G431RBT6 | 2659 / 5.76 $ | Retenu : USB FS sans quartz, DAC, 170 MHz, 128K/32K, stock solide |
+| STM32H503RBT6 | 242 / 5.96 $ | Équivalent (250 MHz) mais stock faible, aucun gain réel |
+| STM32H562RGT6 | 709 / 8.40 $ | Seule évolution crédible si RAM/flash manquent (640K RAM) ; ré-affectation complète des broches |
+| STM32G474RET6, U535/U545 | 15 / 0–21 | Stock insuffisant |
+| STM32G0B1RET6, F072RBT6 | 0 | Rupture |
+| STM32C071RBT6 | 960 / 5.12 $ | Pas de DAC, 24K RAM |
+
+- **Vitesse de la sonde SWD** : limitée par la latence des transactions USB (trames 1 ms) et la qualité du firmware, pas par l'horloge MCU ni par le débit FS. Mesures publiées (cible STM32H743) : CMSIS-DAP v2 FS ≈ 54 kB/s, ST-Link V2 (FS) ≈ 160–180 kB/s, sondes HS ≈ 0.3–1.1 MB/s. Un firmware v2 qui regroupe les transferts peut viser la classe ST-Link V2 → quelques secondes pour 64–256 Ko. Aucun STM32 LQFP64 en stock n'a de PHY USB HS intégré ; le HS n'est pas justifié ici.
+- SWCLK/SWDIO du DUT sont sur SPI2 (PB13/PB15) : SWD cadencé par le SPI possible (plusieurs MHz), sinon bit-bang à 170 MHz.
+- Aucun firmware de sonde open-source n'existe pour G4 (ni H5) : le portage passe par les sources CMSIS-DAP d'Arm (`DAP.c`, `SW_DP.c`) + TinyUSB (driver `stm32_fsdev`, 1 Ko de PMA suffisant : ≈ 610–740 o pour EP0 + DAP v2 + 2 CDC).
+- Source benchmark : https://9names.github.io/embedded/rust/debug/2022/04/07/cmsisdap-probe-performance.html
+
+**Mesure de courant : INA226 monté, INA228 recommandé dès disponibilité (même empreinte).**
+- INA228 : 0 en stock chez LCSC/JLC et DigiKey (réassort annoncé janvier 2027), seulement chez des brokers (risque de contrefaçon). Le global sourcing JLC ne peut rien tant que DigiKey est à 0 ; reste la consignation (l'utilisateur envoie les pièces).
+- Performances attendues (shunt 100 mΩ sur 3V3_SW, 50 mΩ sur 5V_SW, après calibration du zéro rail coupé) :
+
+| Courant | INA226 (monté) | INA228 (évolution) |
+|---|---|---|
+| 10 µA | non mesurable (LSB 25–50 µA) | résolution 0.8–1.6 µA, ±2–3 µA |
+| 1 mA | ≈ ±5–10 % | ≈ ±1.2 % |
+| 100 mA – 1 A | ≈ ±1.1 % | ≈ ±1.05 % (≈ 0.2 % avec calibration de gain) |
+
+- Shunt 5V_SW gardé à **50 mΩ** (et pas 100 mΩ) : avec l'INA226 la pleine échelle serait sinon 819 mA, sous la limite de 1.1 A du rail.
+- **Correction** : la broche Vbus des INA est maintenant reliée **en amont** du shunt (`*_PRE`) ; son impédance d'entrée (≈ 0.8–1 MΩ) faisait passer ≈ 3–5 µA dans le shunt, invisibles à la calibration du zéro. Le firmware corrige V_charge = V_bus − I·R.
+- Firmware : auto-range ADCRANGE (INA228), calibration du zéro quand le rail est coupé.
+- Un vrai 10 µA ±1 % demanderait une architecture double gamme (shunt commuté type Nordic PPK2 / Joulescope) : commutation rapide de MOSFET, creux d'alimentation sur le DUT, layout critique → **hors rev A** (risque élevé), à étudier pour une rev B.
 
 ## Rapports ERC / DRC justifiés
 
