@@ -8,6 +8,8 @@
 - Header pin labels: net name next to each pin of the DUT headers.
 - Bottom-side parts (test points, solder jumpers, unfitted parts) get their text on B.SilkS,
   checked against bottom-side obstacles and through-hole parts only.
+- A key part whose reference finds no room on the top side gets it on B.SilkS, right under the
+  part (same position seen through the board), so it cannot be read as a neighbour's.
 Runs inside KiCad's Python (pcbnew).
 """
 
@@ -138,6 +140,33 @@ class Silk:
         ref.SetPosition(pcbnew.VECTOR2I(mm(cx), mm(cy)))
         return False
 
+    def place_under(self, fp):
+        """Bottom silkscreen only: put a top-side part's reference under its own centre (or as
+        close as possible inside its courtyard)."""
+        ref = fp.Reference()
+        ref.SetTextSize(pcbnew.VECTOR2I(mm(TEXT_H), mm(TEXT_H)))
+        ref.SetTextThickness(mm(TEXT_T))
+        ref.SetKeepUpright(True)
+        ref.SetLayer(pcbnew.B_SilkS)
+        ref.SetMirrored(True)
+        ref.SetVisible(True)
+        cx0, cy0, cx1, cy1 = courtyard_box(fp)
+        cx, cy = (cx0 + cx1) / 2, (cy0 + cy1) / 2
+        vertical_part = (cy1 - cy0) > (cx1 - cx0)
+        for angle in ((90, 0) if vertical_part else (0, 90)):
+            ref.SetTextAngleDegrees(angle)
+            for dx, dy in ((0, 0), (0, -0.5), (0, 0.5), (-0.5, 0), (0.5, 0)):
+                ref.SetPosition(pcbnew.VECTOR2I(mm(cx + dx), mm(cy + dy)))
+                box = text_box(ref)
+                inside = (box[0] >= cx0 - GAP and box[2] <= cx1 + GAP and
+                          box[1] >= cy0 - GAP and box[3] <= cy1 + GAP)
+                if (inside and not any(overlaps(box, o, GAP) for o in self.obstacles)
+                        and not any(overlaps(box, o, GAP) for o in self.texts)):
+                    self.texts.append(box)
+                    return True
+        ref.SetMirrored(False)
+        return False
+
     def add_text(self, text, x, y, angle=0, size=TEXT_H):
         t = pcbnew.PCB_TEXT(self.board)
         t.SetText(text)
@@ -204,11 +233,13 @@ def reserve(board, area, headers_bottom, headers_right, marking):
 
 
 def finish(silk):
-    """After auto-placement: references of every other part. Returns the refs moved to F.Fab."""
+    """After auto-placement: references of every other part, key parts first; a key part that
+    finds no room on top gets its reference under it on B.SilkS. Returns the refs moved to the
+    assembly drawing (F.Fab / B.Fab) only."""
     board = silk.board
     silk.refresh()
     bottom = Silk(board, silk.area, bottom=True)
-    hidden = []
+    hidden, under = [], []
     remaining = [fp for fp in board.GetFootprints() if fp.GetReference() not in silk.done]
     for fp in sorted(remaining, key=lambda f: (not f.GetReference().startswith(KEY_PARTS),
                                                 -len(f.Pads()))):
@@ -216,9 +247,16 @@ def finish(silk):
             fp.Reference().SetVisible(False)
             continue
         side = bottom if bottom_only(fp) else silk
-        if not side.place_reference(fp):
-            hidden.append(fp.GetReference())
+        if side.place_reference(fp):
+            continue
+        if (side is silk and fp.GetReference().startswith(KEY_PARTS)
+                and not fp.GetReference().startswith("TP") and bottom.place_under(fp)):
+            under.append(fp.GetReference())
+            continue
+        hidden.append(fp.GetReference())
     for fp in board.GetFootprints():
         if not fp.GetReference().startswith("TP"):
             fp.Value().SetLayer(pcbnew.B_Fab if fp.IsFlipped() else pcbnew.F_Fab)
+    if under:
+        print("references under their part (B.SilkS):", " ".join(under))
     return hidden

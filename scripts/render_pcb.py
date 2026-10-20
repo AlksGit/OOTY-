@@ -33,6 +33,14 @@ def main():
     run("pcb", "export", "pdf", "--layers", "F.Fab,Edge.Cuts", "--mode-single",
         "--sketch-pads-on-fab-layers", "--crossout-DNP-footprints-on-fab-layers",
         "--include-border-title", "-o", str(RENDERS / f"{prefix}_assembly_top.pdf"), pcb)
+    # Bottom side: test points, bypass bridges, unfitted parts and the references printed under
+    # top-side parts that had no room on the top silkscreen.
+    run("pcb", "export", "svg", "--layers", "B.Cu,B.Silkscreen,B.Courtyard,Edge.Cuts", "--mirror",
+        "--mode-single", "--page-size-mode", "2", "--exclude-drawing-sheet",
+        "-o", str(RENDERS / f"{prefix}_bottom.svg"), pcb)
+    run("pcb", "export", "pdf", "--layers", "B.Fab,Edge.Cuts", "--mode-single", "--mirror",
+        "--sketch-pads-on-fab-layers", "--crossout-DNP-footprints-on-fab-layers",
+        "--include-border-title", "-o", str(RENDERS / f"{prefix}_assembly_bottom.pdf"), pcb)
     print(f"renders written to {RENDERS.relative_to(PROJECT_DIR)} ({prefix}_*)")
 
 
