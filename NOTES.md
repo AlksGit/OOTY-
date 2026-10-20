@@ -77,7 +77,8 @@ Pire cas ≈ 2.2 A @5V (détail dans `SPEC.md` §3) : il faut une source USB-C 3
 
 Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils bougent vite, à revérifier avant commande). Détail ligne par ligne dans `bom/bom_draft.csv`.
 
-### MCU : STM32G431RBT6 (LQFP-64)
+### MCU : STM32G431RBT6 (LQFP-64) — remplacé par le STM32G431MBT6 (LQFP-80) le 2026-10-20
+> Même puce en boîtier 80 broches : les 64 broches étaient toutes utilisées. Voir « Revue des checkpoints Phases 2–4 ».
 - **Seul candidat réellement en stock** chez JLCPCB/LCSC (≈ 2 600 pcs). STM32G0B1RET6 et STM32F072RBT6 : stock 0 le 2026-10-19.
 - DS12589 : USB FS sans quartz (HSI48 + CRS, §3.34/§3.36), 128 KiB flash, 32 KiB SRAM, 3× I2C, 3× SPI, 4 U(S)ART, DAC (2 voies sur broches), 2 ADC, 52 GPIO en LQFP-64 (besoin ≈ 46).
 - USB : 8 endpoints, 1 KiB de PMA → EP0 + 2 × CDC + CMSIS-DAP v2 ≈ 6 endpoints, ≈ 600 octets (estimation).
@@ -104,10 +105,11 @@ Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils
 | 3V3 fixe | 0.3 A | 68 kΩ | 307 / 354 / 405 mA |
 
 - Équations caractérisées à VIN = 5 V : la limite réelle sur les rails 3V3 est à **mesurer au banc**.
-- Rails fixes : EN relié à IN. Rails commutés : EN piloté par le MCU avec pull-down 100 kΩ (OFF pendant le boot ; VIH min 1.5 V).
+- Rails commutés : EN piloté par le MCU avec pull-down 100 kΩ (OFF pendant le boot ; VIH min 1.5 V).
+- Rails fixes (depuis le 2026-10-20) : EN piloté par le MCU avec **pull-up 100 kΩ vers IN** → allumés au démarrage comme avant, mais le firmware peut les couper (budget USB insuffisant, FAULT persistant).
 
 ### Protection d'entrée VBUS
-- PTC 1812 SMD1812P260TF (8 V, Ihold 2.6 A, Itrip 5 A) : dernier recours pour un défaut sur 5V_SYS lui-même ; la limitation fine est faite par les 4 AP22653. Chute ≈ 30 mV à 2.2 A.
+- PTC 1812 SMD1812P260TF (8 V, Ihold 2.6 A, Itrip 5 A) : dernier recours pour un défaut sur 5V_SYS lui-même ; la limitation fine est faite par les 4 AP22653. Chute : 10 mΩ typ. (≈ 22 mV à 2.2 A) mais **R1max 50 mΩ après déclenchement → jusqu'à 110 mV** (correction de la revue du 2026-10-20).
 - Somme des limites typiques des 4 rails ≈ 2.6 A (≈ 2.95 A aux limites max) : ne dépasse Ihold que si tous les rails sont en limitation en même temps (double défaut). La charge nominale max (2.2 A) reste sous Ihold.
 - TVS SMAJ5.0A sur VBUS (VBR 6.4 V, Vc 9.2 V) ; USBLC6-2SC6 sur D+/D-.
 - CC1/CC2 : Rd 5.1 kΩ vers GND, tension lue par l'ADC. Seuils de la spec USB Type-C (vRd) : < 0.66 V = USB par défaut, 0.66–1.23 V = 1.5 A, > 1.23 V = 3 A (à confirmer en Phase 2).
@@ -135,7 +137,7 @@ Recherche du 2026-10-19 : prix et stocks LCSC / JLCPCB relevés ce jour-là (ils
 - Monté sur un support femelle 1×4 2.54 mm (remplaçable). Alimenté en 3.3 V (VCC max illisible dans la datasheet).
 
 ### VIO
-- **Mux TPS2116** : VIN1 = 5V_SYS (choix 5 V), VIN2 = sortie du LDO AP2127K-ADJ (1.8 ou 3.3 V), VOUT = VIO.
+- **Mux TPS2116** : VIN1 = **5V_DUT** depuis le 2026-10-20 (sortie limitée du rail 5 V fixe ; avant : 5V_SYS non limité), VIN2 = sortie du LDO AP2127K-ADJ (1.8 ou 3.3 V), VOUT = VIO.
   - Table de vérité (§7.3.1) : MODE haut + PR1 haut → VIN1 ; MODE haut + PR1 bas → VIN2 ; **MODE bas + PR1 haut → arrêt, VOUT haute impédance = mode VIO externe**. MODE bas + PR1 bas = priorité à la tension la plus haute (5 V), **à éviter** : PR1 pull-up 10 kΩ, MODE pull-down 100 kΩ → VIO coupé au reset.
   - Blocage du courant inverse si VOUT − VIN > 42 mV typ : en mode externe, le DUT ne réalimente ni 5V_SYS ni le LDO.
   - Commutation sans chevauchement : passer par l'arrêt avant de descendre de 5 V à 1.8 V (firmware).
@@ -228,8 +230,8 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 ### Feuilles
 | Feuille | Contenu |
 |---|---|
-| power | USB-C, ESD USB, TVS + PTC VBUS, buck 3V3, 4 × AP22653, LED alim, points de test |
-| mcu | STM32G431RBT6, découplage, BOOT0, connecteur SWD HIL, LED heartbeat |
+| power | USB-C, ESD USB, PTC puis TVS, buck 3V3, 4 × AP22653, LED alim, points de test VBUS / +5V / +3V3 / GND |
+| mcu | STM32G431MBT6, découplage, BOOT0 (pont de soudure), connecteur SWD HIL, LED heartbeat, 2 boutons |
 | sensing | 2 × INA226 + shunts, I2C interne, connecteur OLED, entrées ADC, moniteur VIO, buffer DAC |
 | vio | Mux TPS2116, LDO AP2127K-ADJ et sélection 1.8 / 3.3 V |
 | translators | 2 × SN74LVC8T245, 2 × SN74LVC1T45 (SWD), TCA9517A, RESET/BOOT open-drain |
@@ -239,8 +241,8 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 - `AP22653W6` : brochage SOT26 de la datasheet DS41186 Rev. 5-2 (« Pin Descriptions ») : 1 IN, 2 GND, 3 EN (actif haut), 4 FAULT, 5 ILIM, 6 OUT.
 - `TLV9001IDBV` : graphique du symbole officiel OPA333xxDBV, même brochage DBV (1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+), vérifié contre la datasheet TLV9001.
 
-### Affectation des broches du STM32G431RBT6
-Fonctions alternatives vérifiées dans le symbole KiCad (`MCU_ST_STM32G4:STM32G431RBTx`, champs `alternate`) :
+### Affectation des broches du STM32G431MBT6 (LQFP-80, mise à jour du 2026-10-20)
+Brochage du symbole KiCad `MCU_ST_STM32G4:STM32G431MBTx` vérifié broche par broche contre DS12589 Rev 1 Figure 11 (LQFP80). Fonctions alternatives vérifiées dans le symbole (champs `alternate`) :
 
 | Fonction | Broches |
 |---|---|
@@ -256,15 +258,19 @@ Fonctions alternatives vérifiées dans le symbole KiCad (`MCU_ST_STM32G4:STM32G
 | IN1–4 | PC10, PC11, PC12, PD2 |
 | ADC | PC0 AIN1, PC1 AIN2, PC2 CC1, PC3 CC2, PB1 VIO_MON |
 | DAC | PA4 (DAC1_OUT1) |
-| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
+| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PD8 EN_5V, PD9 EN_3V3, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
 | VIO / translateurs | PC4 PR1, PC5 MODE, PB14 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
-| Divers | PA10 LED heartbeat, PC6 RESET DUT, PC7 BOOT DUT, PB4 libre |
+| RESET / BOOT DUT | PC6 RESET, PC7 BOOT (donnée), PD10 BOOT_DIR |
+| Interface locale | PE12 LED heartbeat, PE11 BTN1, PE10 BTN2 |
+| Libres | PA10, PB4, PD0, PD1, PE7, PE8, PE9, PE13, PE14, PE15 |
 
-- PB4 et PB6 portent les pull-downs « dead battery » de l'UCPD au reset : PB4 n'est pas utilisée, PB6 commande I2C_DUT_EN (bas = buffer désactivé, état sûr). À confirmer dans le RM0440 avant le firmware.
+- **BOOT_DIR n'est plus sur PB4** : après reset, PB4 = NJTRST avec pull-up interne 25–55 kΩ (DS12589 Table 12, note 4), plus fort que le pull-down 100 kΩ → DIR haut et broche BOOT du DUT pilotée pendant chaque reset de la carte HIL. PD10 n'a pas de pull au reset.
+- Le choix des broches suit le plan de placement (MCU tourné de 180°) : EN / BOOT_DIR sur le côté tourné vers l'alimentation et le debug, boutons et LED sur le côté tourné vers le coin haut-droit.
+- PB6 (I2C_DUT_EN) peut porter le pull-down « dead battery » de l'UCPD1 au reset (PA9 = DBCC1 tiré haut par le pull-up de LS_OE_N) : sans danger (bas = buffer désactivé). Le firmware écrit `PWR_CR3.UCPD1_DBDIS = 1` en tout premier. À confirmer dans le RM0440.
 - PC13–PC15 ont une sortance limitée (3 mA, 2 MHz) : utilisées seulement pour EN et FAULT (signaux lents).
 
-### Warning ERC justifié
-- `pin_to_pin` (warning) sur la feuille translators : la broche B8 (bidirectionnelle) du SN74LVC8T245 d'entrée est reliée à GND. C'est voulu : avec DIR = B→A, B8 est une entrée inutilisée, à tirer à un niveau fixe pour ne pas la laisser flotter (recommandation habituelle pour les entrées CMOS).
+### Warnings ERC justifiés
+- 2 × `pin_to_pin` (warning) sur la feuille translators : les broches A8 et B8 (bidirectionnelles) du SN74LVC8T245 d'entrée sont reliées à GND. C'est voulu : le canal 8 n'est pas utilisé et la datasheet impose un niveau fixe sur toutes les entrées (« must have a logic HIGH or LOW level applied »). A8 à GND ne crée pas de conflit une fois le buffer activé : avec DIR = B→A, A8 recopie B8, c'est-à-dire un niveau bas.
 
 ### Revue électrique indépendante du schéma (2026-10-19) et corrections
 Relecture par un agent séparé, contre les datasheets TI / Diodes (le site ST n'était pas accessible : points STM32 vérifiés via les fonctions alternatives du symbole KiCad).
@@ -317,6 +323,48 @@ Après corrections : ERC 0 erreur (1 warning justifié), 165 nets 0 écart, 170 
 - Firmware : auto-range ADCRANGE (INA228), calibration du zéro quand le rail est coupé.
 - Un vrai 10 µA ±1 % demanderait une architecture double gamme (shunt commuté type Nordic PPK2 / Joulescope) : commutation rapide de MOSFET, creux d'alimentation sur le DUT, layout critique → **hors rev A** (risque élevé), à étudier pour une rev B.
 
+## Revue des checkpoints Phases 2–4 (2026-10-20)
+
+L'utilisateur ne relit pas le hardware : les trois checkpoints (schéma, setup PCB, placement) ont été relus par trois agents indépendants, contre les datasheets (rapports complets conservés hors dépôt). Bilan : aucun bloquant sur le schéma, setup PCB sain à quelques règles près, **placement à refaire avant routage** (cellule buck, découplage du MCU, organisation des blocs).
+
+### Décisions de l'utilisateur
+| # | Sujet | Décision |
+|---|---|---|
+| D1 | Rails fixes 5 V / 3V3 toujours actifs (le firmware ne pouvait pas respecter le budget USB ni couper un court-circuit franc qui fait cycler l'AP22653 à ≈ 3.2 W) | EN sur GPIO + pull-up 100 kΩ vers IN : **allumés par défaut, coupables par le firmware** |
+| D2 | VIO 5 V pris sur +5V sans limitation (un court sur VIO faisait tomber la carte HIL) | TPS2116 VIN1 sur **5V_DUT** (limité ≈ 0.64 A, FAULT relu) |
+| D3 | INA226 / INA228 | **INA226 monté**, INA228 en évolution (même empreinte) |
+| D4 | Références des 0402 sur le plan de montage seulement | Accepté, à condition que tous les CI / connecteurs / LED / TP / Q / D soient en sérigraphie, TP marqués par leur net, aucune référence ambiguë |
+| D5 | Nouveau besoin | **2 boutons poussoirs** sur la carte, lus par le STM32 |
+| D6 | Plus aucune broche libre sur le LQFP-64 (il en fallait 4) | **STM32G431MBT6 (LQFP-80)**, même puce, 14 GPIO de plus |
+
+### MCU LQFP-80 : approvisionnement
+- STM32G431MBT6, LCSC C730099 : **0 en stock chez JLC** le 2026-10-20 (API JLC), ≈ 6.13 $. En stock chez Mouser et Farnell (vérifié par l'utilisateur sur Octopart) → **global sourcing JLC** (ou consignation). Délai et frais à prévoir en Phase 6.
+- Empreinte `Package_QFP:LQFP-80_12x12mm_P0.5mm`. 5 broches VDD (16, 41, 51, 62, 80) → 5 × 100 nF + 4.7 µF.
+
+### Corrections du schéma
+| Gravité | Constat | Correction |
+|---|---|---|
+| MAJEUR | BOOT_DIR sur PB4 : pull-up NJTRST au reset → BOOT du DUT piloté pendant les resets HIL | BOOT_DIR sur PD10 (pas de pull au reset) |
+| MAJEUR | D1, D2 (ci-dessus) | Appliqué |
+| mineur | TVS avant le PTC : une surtension durable chauffe la TVS sans faire déclencher le PTC | SMAJ5.0A **après** le PTC (sur +5V) |
+| mineur | Cin du buck 10 µF/10 V 0603 : ≈ 4–5 µF effectifs sous 5 V | 10 µF/25 V 0805 (C15850, déjà en BOM) |
+| mineur | Entrées CMOS flottantes : U15 A8, port B de U14 quand /OE est haut | A8 à GND ; 8 × 1 MΩ sur le port B de U14 (TX et CS vers VIO, les autres vers GND) |
+| mineur | TP BOOT0 « à court-circuiter » sans pastille 3V3 voisine | Pont de soudure BOOT0 ↔ 3V3 (JP1) |
+| mineur | Voies ESD mal réparties (TVS des entrées analogiques à 38 mm de J7) | Voies regroupées par header : chaque TPD4E05U06 dessert un seul connecteur (ou deux connecteurs voisins) |
+| mineur | Champ Datasheet vide sur les passifs | Lien vers la fiche LCSC par défaut |
+| mineur | Points de test des rails DUT et de VIO redondants avec J_PWR / J_DBG | Supprimés (VBUS, +5V, +3V3, GND conservés) |
+| ajout | D5 | SW1 / SW2 TS-1187A-B-A-B (LCSC C318884, Basic, 278 750 en stock), actifs bas, pull-up 10 kΩ + 100 nF ; empreinte officielle `SW_Push_1P1T_XKB_TS-1187A` vérifiée contre la datasheet (pastilles 1.0 × 0.75 mm à ±3.0 / ±1.875 mm) |
+
+Résultat : ERC 0 erreur (2 warnings justifiés), 178 nets 0 écart, 187 composants schéma = BOM.
+
+### Points documentés sans changement de schéma
+- **Rails 5 V non régulés** : au pire cas, VBUS 4.75 V − 110 mV (PTC) − 135 mV (AP22653, 1 A) − 50 mV (shunt) ≈ **4.45 V** sur 5V_SW, avant la chute du câble USB.
+- **Sortie DAC** : R33 (100 Ω) est hors de la boucle du suiveur → erreur = I × 100 Ω (0.5 V à 5 mA) ; 0–3.3 V à vide, la sortie n'atteint pas le rail en charge.
+- **TPS2116** : le blocage du courant inverse se déclenche si l'on passe d'une tension VIO à une plus basse sans arrêt. Règle firmware : passer par l'arrêt (MODE = 0, PR1 = 1), attendre la décharge (VIO_MON, ≈ 0.3 s via le diviseur 200 kΩ), puis changer VSEL / PR1.
+- **Capacité de sortie du buck** ≈ 52 µF nominaux (≈ 35–40 µF effectifs) pour une plage validée de 10–47 µF : à vérifier au banc par un échelon de charge.
+- **Court franc sur un rail 3V3** : creux estimé ≈ 0.5 V pendant les 5 µs de réaction de l'AP22653, au-dessus de l'UVLO et du BOR : à vérifier au banc (exigence n°8 de la SPEC).
+- **Module OLED** : brochage (1 GND, 2 VCC, 3 SCL, 4 SDA) à confirmer sur un échantillon avant commande (inversion GND/VCC destructrice).
+
 ## Phase 3 — Setup PCB (TASK-006)
 
 Généré par `scripts/build_pcb.py` (Python de KiCad) à partir de la netlist du schéma ; positions dans `scripts/placement.py`.
@@ -324,7 +372,8 @@ Généré par `scripts/build_pcb.py` (Python de KiCad) à partir de la netlist d
 ### Carte
 - **85 × 55 mm**, coins arrondis R2, 4 trous M3 (Ø 3.2 mm) à 3.5 mm des bords.
 - Les headers DUT imposent la taille : J_PWR + J_DBG + J_IO = 61 mm sur le grand côté (entre les trous : 85 − 2 × 7 = 71 mm), J_BUS + J_UART_ANA = 34 mm sur le petit côté droit (55 − 14 = 41 mm). Une carte plus petite ne laisse pas la place aux 5 headers 2.54 mm hors des trous.
-- Disposition : USB-C sur le bord gauche (bouche au ras du bord), J_PWR / J_DBG / J_IO en bas, J_BUS / J_UART_ANA à droite, SWD HIL et support OLED en haut à gauche (le module 38 × 12 mm couvre la bande haute, des CMS bas peuvent passer dessous), LED en haut à droite (visibles par webcam).
+- Disposition : USB-C sur le bord gauche (façade **au ras du bord** depuis le 2026-10-20 ; elle était 0.55 mm en retrait), J_PWR / J_DBG / J_IO en bas, J_BUS / J_UART_ANA à droite, support OLED en haut (le module 38 × 12 mm couvre la bande x ≈ 20–58 mm, des CMS bas passent dessous), LED et boutons en haut à droite (visibles par webcam, hors du module).
+- **Zone sans cuivre Ø 7 mm** (pistes, vias, remplissage) autour de chaque trou M3 : tête de vis M3 Ø 5.6 mm + marge.
 
 ### Empilement (JLC04161H-7628, 1.6 mm)
 | Couche | Rôle | Épaisseur |
@@ -340,7 +389,7 @@ Généré par `scripts/build_pcb.py` (Python de KiCad) à partir de la netlist d
 L'empilement est écrit dans le fichier par script (non exposé par l'API pcbnew).
 
 ### Règles et classes de nets
-- Défaut : piste 0.2 mm (min 0.15), isolement 0.15 mm, via 0.6 / 0.3 mm, cuivre–bord 0.3 mm, trou–trou 0.5 mm, anneau min 0.13 mm. Au-dessus des minima JLCPCB (0.09 / 0.09, via 0.45 / 0.2).
+- Défaut : piste 0.2 mm (min 0.15), isolement 0.15 mm, via 0.6 / 0.3 mm (plus petit via autorisé 0.5 / 0.2), cuivre–bord 0.3 mm, trou–trou 0.5 mm, **anneau min 0.15 mm**, **texte sérigraphie min 1.0 mm / trait 0.15 mm**. Au niveau ou au-dessus des minima JLCPCB (piste/isolement 0.09, anneau 0.15, texte 1.0 / 0.15). Les minima anneau (0.13) et texte (0.8 / 0.08) de la première version étaient sous les capacités JLC : corrigés le 2026-10-20.
 - Largeurs IPC-2221 (ΔT = 10 °C) :
 
 | Courant | Externe 1 oz | Interne 0.5 oz |
@@ -349,40 +398,55 @@ L'empilement est écrit dans le fichier par script (non exposé par l'API pcbnew
 | 1.2 A | 0.39 mm | 2.0 mm |
 | 2.5 A | 1.06 mm | 5.5 mm |
 
-- **Power** (0.5 mm, isolement 0.15, via 0.8 / 0.4) : +3V3, 5V_SW*, 5V_DUT, 3V3_SW*, 3V3_DUT, VIO*, GND — jusqu'à ≈ 1.5 A en externe.
-- **HighCurrent** (1.0 mm, isolement 0.2) : VBUS, +5V, SW_3V3 — 2.5 A en externe ; en interne, +5V et +3V3 passent par des zones larges sur In2.
-- **USB** (0.25 mm, paire différentielle écart 0.2 mm) : USB_DP / USB_DM. USB Full Speed (12 Mbit/s, fronts ≥ 4 ns) : impédance 90 Ω non critique sur < 30 mm ; paire courte, symétrique, au-dessus du plan GND In1.
+- **Power** (0.5 mm, isolement 0.15, via 0.8 / 0.4) : +3V3, 5V_SW*, 5V_DUT, 3V3_SW*, 3V3_DUT, VIO, VIO_LDO, GND, nœud SW du buck — jusqu'à ≈ 1.45 A en externe. Le motif `VIO*` captait des signaux logiques (VIO_PR1, VIO_MODE, VIO_VSEL, VIO_MON) : remplacé par les deux nets de puissance.
+- **HighCurrent** (**1.5 mm**, isolement 0.2) : VBUS, +5V — ≈ 3.2 A en externe 1 oz à ΔT 10 °C (source USB-C 3 A) ; au moins 3 vias 0.4 mm par changement de couche ; en interne, +5V et +3V3 passent par des zones larges sur In2.
+- **USB** (0.25 mm, paire différentielle écart 0.2 mm) : USB_DP / USB_DM. Sur ce prépreg (0.2104 mm, εr 4.4) cette géométrie donne **≈ 105 Ω différentiel** (microstrip), pas 90 Ω : sans conséquence en Full Speed (12 Mbit/s, fronts ≥ 4 ns) sur ≈ 25 mm ; paire symétrique au-dessus du plan GND In1.
 - L'isolement de la classe Power a été ramené de 0.2 à 0.15 mm : 0.2 mm était incompatible avec les boîtiers au pas de 0.5 mm (INA226, TCA9517A).
 
 ### Vérification
 - DRC `--schematic-parity` : **0 erreur, 0 écart de parité** ; nets non routés attendus à ce stade ; 5 warnings de sérigraphie (références de headers) traités au placement.
 
-## Phase 4 — Placement (TASK-007)
+## Phase 4 — Placement (TASK-007) — refait le 2026-10-20 après la revue
 
 ### Méthode
-- `scripts/placement.py` : connecteurs, trous et **ancres** placés à la main (MCU, USB, protections, buck, 4 limiteurs, INA226, mux VIO, 2 × 8T245, LED).
-- `scripts/autoplace.py` : placement glouton des autres composants. Chaque CI est suivi immédiatement des condensateurs de son groupe schéma, visés sur la broche d'alimentation correspondante. Les autres composants visent le pad du net le plus spécifique (ESD → broche du header, résistance série → ESD/translateur, etc.). Recherche en spirale sur une grille de 0.25 mm sans chevauchement de courtyards.
-- `scripts/silk.py` : références en 1.0 mm (hauteur minimale lisible JLCPCB), horizontales (verticales pour les composants verticaux), hors pads ; **nom de chaque broche** gravé à côté des headers DUT ; marquage « OOTY HIL rev A / 2026-10 », LED « PWR » / « HB ».
-- `scripts/check_placement.py` : distance de chaque condensateur de découplage à la broche qu'il découple.
+- `scripts/placement.py` : connecteurs, trous et **ancres** placés à la main : tous les CI, les pièces de puissance, la cellule buck complète, les ESD, les points de test, LED et boutons.
+- `scripts/autoplace.py` : placement glouton du reste, en trois passes :
+  1. les condensateurs de découplage, chacun visé sur **la broche qu'il découple** (déclarée dans le schéma, `near=` dans `build_schematic.py`, et vérifiée contre les nets) ;
+  2. la sérigraphie des pièces déjà placées est réservée (`silk.reserve`) ;
+  3. les autres pièces visent le pad du net le plus spécifique (résistance série → translateur / ESD, pull-up → broche, etc.).
+
+  Recherche en spirale sur une grille de 0.25 mm, sans chevauchement de courtyards.
+- `scripts/silk.py` : références en 1.0 mm / 0.15 mm. Une référence ne peut chevaucher ni un pad, ni le courtyard d'une autre pièce, ni un autre texte : aucune référence ne peut être lue comme celle d'un voisin. Les références des headers sont placées entre les rangées d'étiquettes de broches, celles des points de test sont remplacées par le nom du net.
+- `scripts/check_placement.py` : distance de chaque condensateur déclaré à **sa** broche (limite 3 mm, 6 mm pour le bulk ≥ 1 µF), et longueur du ratsnest des signaux (arbre couvrant minimal, plans exclus).
+- `scripts/plot_placement.py` : vue courtyards + références + ratsnest (`out/renders/pcb_placement_ratsnest.png`), pour comparer les itérations.
 - `scripts/render_pcb.py` : rendus 3D dessus / dessous / isométrique, SVG du placement, plan de montage PDF (F.Fab).
 
-### Zones
+### Problèmes du premier placement (revue)
+- **Buck** : nœud SW du côté opposé à l'inductance, Cin loin de VIN, 100 nF sur EN au lieu de VIN, Cout à 9–11 mm.
+- **Découplage du MCU** : condensateurs visant le centre de la carte (groupe schéma sans CI), VDD pin 48 à 9.9 mm ; le contrôle ne couvrait que 37 condensateurs sur 54 et rattachait certains au mauvais CI.
+- **Blocs dispersés** : USB à 46 mm à travers les limiteurs, chaîne de debug à 44–48 mm de J_DBG, TVS analogique à 38 mm de J_UART_ANA, rails DUT à 45–55 mm de J_PWR.
+
+### Plan de placement
 | Zone | Contenu |
 |---|---|
-| Bord gauche | USB-C, USBLC6, ESD CC, TVS, PTC |
-| Gauche-centre | 4 × AP22653 en carré avec leurs condensateurs et résistances ILIM |
-| Bas-gauche | Buck TLV62569 + inductance |
-| Haut (sous le module OLED) | 2 × INA226 + shunts, I2C interne |
-| Centre | STM32G431 + découplage |
-| Centre-droit / haut-droit | Mux VIO + LDO, SN74LVC1T45, TCA9517A |
-| Bas-droit | 2 × SN74LVC8T245, résistances série |
-| Le long des headers | ESD TPD4E05U06 |
+| Bord gauche | USB-C au ras du bord, USBLC6 dans l'axe de D+/D−, ESD CC + Rd 5.1 kΩ, PTC puis TVS sous le connecteur |
+| Haut-gauche | Buck TLV62569 : Cin (10 µF + 100 nF) contre VIN, inductance directement sur SW, 2 × 22 µF à la sortie de l'inductance, diviseur FB du côté FB ; points de test +3V3 / GND |
+| Gauche, sous le buck | 2 × INA226 (lignes de mesure Kelvin vers les shunts) |
+| Bas-gauche, au-dessus de J_PWR | 4 × AP22653 dans l'ordre des broches de J_PWR, shunts dans l'axe de leurs broches, ESD des rails entre les shunts |
+| Centre | STM32G431MBT6 **tourné de 180°** : USB face à l'USB-C, sonde SWD / RESET / BOOT face à J_DBG, SPI / DAC / ADC face à J_BUS et J_UART_ANA ; découplage sur chaque broche d'alimentation |
+| À gauche du MCU | Connecteur SWD de la carte HIL |
+| Haut, sous le module OLED | Mux VIO TPS2116 + LDO AP2127 + sélection 1.8 / 3.3 V (CMS bas) |
+| Au-dessus de J_DBG | 2 × SN74LVC1T45 (SWCLK, SWDIO), 2N7002 (RESET), SN74LVC1T45 (BOOT), ESD |
+| Au-dessus de J_IO | 2 × SN74LVC8T245 (côté A vers le MCU, côté B vers le header), résistances série et de polarisation, ESD |
+| Bord droit | ESD contre J_BUS / J_UART_ANA, TCA9517A, buffer DAC |
+| Coin haut-droit | LED PWR / HB, boutons SW1 / SW2, marquage « OOTY HIL rev A / 2026-10 » |
 
 ### Résultats
-- DRC `--schematic-parity` : **0 erreur, 0 écart de parité**, 2 warnings de sérigraphie (références touchant le contour sérigraphié de L1, sans impact).
-- Découplage : **35 condensateurs sur 37 à moins de 3 mm** de leur broche ; C49 à 3.5 mm (U16 VCCA), C5 à 3.4 mm (Cff non monté du buck).
-- Références : ≈ 88 sur la sérigraphie, **97 reportées sur le plan de montage** (`out/renders/pcb_placement_assembly_top.pdf`) faute de place autour des 0402 sans descendre sous 1 mm de hauteur de texte. Tous les CI, connecteurs, LED et points de test ont leur référence en sérigraphie.
-- À reprendre au routage si nécessaire : rapprocher C49 de U16, vérifier la boucle d'entrée / sortie du buck (Cin – VIN – GND – L – Cout) une fois routée.
+- DRC `--schematic-parity` : **0 erreur, 0 écart de parité**. 2 warnings `silk_edge_clearance` : le contour sérigraphié de l'empreinte USB-C est coupé par le bord de carte, conséquence directe de la façade au ras du bord ; JLC rogne la sérigraphie hors carte, sans impact.
+- Découplage : **50 condensateurs sur 50 dans leur limite** (le plus loin : 2.8 mm pour le 100 nF découplant le PTC, 4.1 mm pour le 4.7 µF de bulk du MCU).
+- Ratsnest des signaux : 2583 mm sur 117 nets (2481 mm sur 108 nets avant la revue). La longueur totale baisse peu, mais les liaisons critiques sont courtes : USB ≈ 25 mm en ligne droite, chaque ESD à côté de son header, résistances série groupées. Les plus longues restent des signaux lents (5V_DUT vers le mux VIO, I2C interne, CC1/CC2 vers l'ADC, FAULT/EN).
+- Sérigraphie : toutes les pièces clés (CI, connecteurs, LED, Q, D, boutons, TP, pont de soudure) ont leur référence ; 91 références de passifs sont sur le plan de montage seulement (`out/renders/pcb_placement_assembly_top.pdf`). La BOM interactive (iBOM HTML) sera générée avec les fichiers de fabrication (Phase 6).
+- Modèles 3D absents dans la librairie KiCad pour le TPD4E05U06 (USON-10) : sans incidence sur la fabrication.
 
 ## Rapports ERC / DRC justifiés
 
