@@ -242,7 +242,7 @@ L'utilisateur a demandé d'avancer ; les recommandations de la revue sont retenu
 - `TLV9001IDBV` : graphique du symbole officiel OPA333xxDBV, même brochage DBV (1 OUT, 2 V−, 3 IN+, 4 IN−, 5 V+), vérifié contre la datasheet TLV9001.
 
 ### Affectation des broches du STM32G431MBT6 (LQFP-80, mise à jour du 2026-10-20)
-> TASK-010 modifie cette affectation (ADC de la double gamme) : voir « Nouvelle affectation des broches du MCU ».
+> Table mise à jour en TASK-011 avec l'affectation de TASK-010 (double calibre, relecture des rails fixes).
 
 Brochage du symbole KiCad `MCU_ST_STM32G4:STM32G431MBTx` vérifié broche par broche contre DS12589 Rev 1 Figure 11 (LQFP80). Fonctions alternatives vérifiées dans le symbole (champs `alternate`) :
 
@@ -256,15 +256,18 @@ Brochage du symbole KiCad `MCU_ST_STM32G4:STM32G431MBTx` vérifié broche par br
 | UART DUT (USART3) | PB10 TX, PB11 RX |
 | SWO DUT (USART2_RX) | PA3 |
 | Sonde SWD DUT | PB13 SWCLK (SPI2_SCK), PB15 SWDIO (SPI2_MOSI), PB2 SWCLK_DIR, PB12 SWDIO_DIR |
-| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PB0 |
+| OUT1–4 | PA0, PA1, PA2 (TIM2_CH1–3, PWM possible), PE9 |
 | IN1–4 | PC10, PC11, PC12, PD2 |
 | ADC | PC0 AIN1, PC1 AIN2, PC2 CC1, PC3 CC2, PB1 VIO_MON |
+| Double calibre (ADC1 / ADC2) | PB14 I_5VSW_LO, PC4 I_5VSW_HI (IN5) ; PF0 I_3V3SW_LO, PF1 I_3V3SW_HI (IN10) |
+| Relecture rails fixes | PB0 V_5V_DUT (ADC1_IN15), PC5 V_3V3_DUT (ADC2_IN11) |
+| Bascules de calibre | PA10 RANGE_CLK_5VSW, PB4 RANGE_CLK_3V3SW, PD0 RANGE_5VSW, PD1 RANGE_3V3SW |
 | DAC | PA4 (DAC1_OUT1) |
-| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PD8 EN_5V, PD9 EN_3V3, PC15 / PF0 / PF1 / PB5 FAULT, PB9 INA_ALERT |
-| VIO / translateurs | PC4 PR1, PC5 MODE, PB14 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
+| Rails | PC13 EN_5VSW, PC14 EN_3V3SW, PD8 EN_5V, PD9 EN_3V3, FAULT : PC15 5V_SW, PE8 3V3_SW, PE7 5V, PB5 3V3 ; PB9 INA_ALERT |
+| VIO / translateurs | PE14 PR1, PE15 MODE, PE13 VSEL, PA9 LS_OE_N, PB6 I2C_DUT_EN |
 | RESET / BOOT DUT | PC6 RESET, PC7 BOOT (donnée), PD10 BOOT_DIR |
 | Interface locale | PE12 LED heartbeat, PE11 BTN1, PE10 BTN2 |
-| Libres | PA10, PB4, PD0, PD1, PE7, PE8, PE9, PE13, PE14, PE15 |
+| Libres | aucune |
 
 - **BOOT_DIR n'est plus sur PB4** : après reset, PB4 = NJTRST avec pull-up interne 25–55 kΩ (DS12589 Table 12, note 4), plus fort que le pull-down 100 kΩ → DIR haut et broche BOOT du DUT pilotée pendant chaque reset de la carte HIL. PD10 n'a pas de pull au reset.
 - Le choix des broches suit le plan de placement (MCU tourné de 180°) : EN / BOOT_DIR sur le côté tourné vers l'alimentation et le debug, boutons et LED sur le côté tourné vers le coin haut-droit.
@@ -573,6 +576,16 @@ TLV7021 : t_PHL 260 ns à 100 mV d'overdrive (plus lent près du seuil, ~0.5–1
 - CLK tirés à GND par 100 kΩ. Sur PB4, le pull-up NJTRST l'emporte au reset (≈ 2.2–2.6 V) : un front CLK possible au reset, inoffensif (rail coupé, le firmware relit Q avant d'activer le rail).
 - PA10 est DBCC2 de l'UCPD1 : maintenu bas par le 100 kΩ, il n'active pas le Rd « dead battery » sur PB4 (CC2) ; le firmware désactive de toute façon ce mode en premier.
 - Après ce changement, **plus aucune broche libre** sur le LQFP-80.
+
+### Décisions de l'utilisateur (checkpoint TASK-010, 2026-10-20)
+Recommandations de la revue acceptées : calibre fin garanti jusqu'à ≥ 0.22 mA ; chute en calibre fort (pire cas ≈ 145 mV) et creux de ≈ 1 µs à chaque bascule acceptés ; plus aucune broche MCU libre ; diode M7 en SMA et solutions de repli (pont, condensateur non monté, points de test).
+
+### Schéma (TASK-011)
+- Trois feuilles ajoutées **en fin de hiérarchie** (pour ne pas renuméroter les composants déjà placés) : `range_5v_sw`, `range_3v3_sw` (shunt 100 Ω, pont de repli, M7, AO3401A + 2N7002, comparateur, bascule, 2 INA190, filtres ADC, points de test) et `readback` (référence 0.1 V des INA190, diviseurs des rails fixes).
+- Feuille `sensing` : shunts R22 / R23 entre `*_PRE` et `*_MID` ; Vin− des INA226 sur `*_MID`.
+- Symboles projet ajoutés (`scripts/build_symbols.py`) : `INA190A2xDCK`, `TLV7021DBV`, `74LVC1G74DCU`, copies des symboles officiels INA199xxDCK, TLV7041DBV et 74AUP1G74 au brochage identique (vérifié contre SBOS863D, SLVSDM5F, SCES794G).
+- ERC : 0 erreur, les 2 warnings justifiés habituels (U15 A8/B8). Netlist : 196 nets, 0 écart. BOM : 242 = 242.
+- **Placement à reprendre (TASK-012)** : les nets `5V_SW_MID` / `3V3_SW_MID` doivent rejoindre la classe HighCurrent / Power (courant DUT complet).
 
 ### Contraintes de layout (pour TASK-012)
 1. **Boucle de bypass compacte** : R_low → MID → (R_high ∥ AO3401A ∥ M7) → sortie, pièces accolées, nœud MID réduit à un point.

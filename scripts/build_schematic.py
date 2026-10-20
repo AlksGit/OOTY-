@@ -31,6 +31,8 @@ R16K = "C25759"
 R39K = "C25783"
 R68K = "C36871"
 R100K = "C25741"
+R150K = "C25755"
+R100_PREC = "C122970"
 R1M = "C26083"
 C1N = "C1523"
 C10N = "C15195"
@@ -181,18 +183,24 @@ MCU_PINS = {
     "PA13": "SWDIO_HIL", "PA14": "SWCLK_HIL", "PB3": "SWO_HIL",
     # Rail control and status
     "PC13": "EN_5VSW", "PC14": "EN_3V3SW",
-    "PC15": "FAULT_5VSW", "PF0": "FAULT_3V3SW", "PF1": "FAULT_5V", "PB5": "FAULT_3V3",
+    "PC15": "FAULT_5VSW", "PE8": "FAULT_3V3SW", "PE7": "FAULT_5V", "PB5": "FAULT_3V3",
     "PB9": "INA_ALERT",
     # Internal I2C1 (current monitors + OLED)
     "PA15": "I2C_INT_SCL", "PB7": "I2C_INT_SDA",
     # Analog
     "PA4": "DAC_OUT", "PC0": "AIN1_ADC", "PC1": "AIN2_ADC", "PC2": "CC1", "PC3": "CC2",
     "PB1": "VIO_MON",
+    # Dual-range current sensing: LO and HI of a rail on the same channel of ADC1 / ADC2
+    # (simultaneous dual mode); fixed-rail voltage readback
+    "PB14": "I_5VSW_LO", "PC4": "I_5VSW_HI", "PF0": "I_3V3SW_LO", "PF1": "I_3V3SW_HI",
+    "PB0": "V_5V_DUT", "PC5": "V_3V3_DUT",
+    # Range flip-flops: CLK toggles the range, Q (RANGE_*) read on one port (GPIOD)
+    "PA10": "RANGE_CLK_5VSW", "PB4": "RANGE_CLK_3V3SW", "PD0": "RANGE_5VSW", "PD1": "RANGE_3V3SW",
     # VIO selection and translators
-    "PC4": "VIO_PR1", "PC5": "VIO_MODE", "PB14": "VIO_VSEL", "PA9": "LS_OE_N",
+    "PE14": "VIO_PR1", "PE15": "VIO_MODE", "PE13": "VIO_VSEL", "PA9": "LS_OE_N",
     "PB6": "I2C_DUT_EN",
     # DUT digital I/O
-    "PA0": "OUT1_MCU", "PA1": "OUT2_MCU", "PA2": "OUT3_MCU", "PB0": "OUT4_MCU",
+    "PA0": "OUT1_MCU", "PA1": "OUT2_MCU", "PA2": "OUT3_MCU", "PE9": "OUT4_MCU",
     "PC10": "IN1_MCU", "PC11": "IN2_MCU", "PC12": "IN3_MCU", "PD2": "IN4_MCU",
     # DUT UART (USART3), SPI (SPI1), I2C (I2C3)
     "PB10": "UART_TX_MCU", "PB11": "UART_RX_MCU",
@@ -203,17 +211,13 @@ MCU_PINS = {
     "PA3": "SWO_DUT_MCU",
     # DUT RESET / BOOT open-drain drivers
     "PC6": "RESET_DUT_CTL", "PC7": "BOOT_DUT_CTL",
-    "PA10": None,
     # BOOT_DIR is not on PB4: PB4 is NJTRST with a 25-55k pull-up after reset (DS12589 Table 12,
     # note 4), which beat the 100k pull-down and drove the DUT BOOT pin during HIL resets.
-    "PD10": "BOOT_DIR", "PB4": None,
+    "PD10": "BOOT_DIR",
     # Fixed DUT rails enable (pulled up: on by default)
     "PD8": "EN_5V", "PD9": "EN_3V3",
     # User buttons (active low) and heartbeat LED: pins on the side facing the top-right corner
     "PE11": "BTN1", "PE10": "BTN2", "PE12": "LED_HB",
-    # Spare LQFP-80 GPIO
-    "PE7": None, "PE8": None, "PE9": None, "PE13": None, "PE14": None, "PE15": None,
-    "PD0": None, "PD1": None,
 }
 
 # VDD pins of the LQFP-80 (DS12589 Figure 11): one 100 nF each.
@@ -271,10 +275,13 @@ def sensing_sheet():
     monitors = [("5V_SW", "5V_SW_PRE", "GND", "C845298"), ("3V3_SW", "3V3_SW_PRE", "+3V3", "C201308")]
     for rail, pre, a0, shunt in monitors:
         sh.group(f"Current monitor {rail}")
-        part(sh, "R", "Device:R", shunt, {"1": pre, "2": rail}, value=BOM[shunt].value, rot=90)
+        mid = f"{rail}_MID"
+        part(sh, "R", "Device:R", shunt, {"1": pre, "2": mid}, value=BOM[shunt].value, rot=90)
         ina = part(sh, "U", "Sensor_Energy:INA226", "C49851", {
             # Vbus upstream of the shunt: its ~1 MOhm input would otherwise add ~5 uA through it.
-            "Vin+": pre, "Vin-": rail, "Vbus": pre, "VS": "+3V3", "GND": "GND",
+            # Vin- on MID, not on the rail output: its bias current must not flow through the
+            # 100R low-range shunt (dual-range sheet).
+            "Vin+": pre, "Vin-": mid, "Vbus": pre, "VS": "+3V3", "GND": "GND",
             "A1": "GND", "A0": a0, "SDA": "I2C_INT_SDA", "SCL": "I2C_INT_SCL",
             "~{Alert}": "INA_ALERT"})
         cap(sh, C100N, "+3V3", near=(ina, "VS"))
@@ -306,7 +313,8 @@ def sensing_sheet():
 
     sh.note("INA226 addresses: 5V_SW 0x40 (A1=A0=GND), 3V3_SW 0x41 (A0=VS). OLED 0x3C. "
             "INA228 is a drop-in replacement (same pinout).")
-    sh.note("Shunts: Kelvin connection to IN+/IN- required at layout.")
+    sh.note("Shunts: Kelvin connection to IN+/IN- required at layout. The low-range 100R shunt "
+            "between *_MID and the rail output is on the dual-range sheet.")
     return sh
 
 
@@ -484,6 +492,89 @@ def connectors_sheet():
     return sh
 
 
+# Dual-range rails: (rail, upstream net, threshold divider bottom). Threshold = V_PRE x 1k / (1k + R):
+# 1k/150k -> 0.66 % (5V_SW), 1k/100k -> 0.99 % (3V3_SW); trip 22-52 mV across 100R (NOTES.md).
+DUAL_RANGE = [("5V_SW", "5V_SW_PRE", R150K), ("3V3_SW", "3V3_SW_PRE", R100K)]
+
+
+def dual_range_sheet(rail, pre, r_thr):
+    sh = Sheet(f"range_{rail.lower()}", f"Dual-range current sensing {rail}")
+    if True:
+        tag = rail.replace("_", "")
+        mid, gate = f"{rail}_MID", f"{rail}_BYP_G"
+        q, qn, set_n, clk = f"RANGE_{tag}", f"RANGE_{tag}_N", f"RANGE_SET_{tag}_N", f"RANGE_CLK_{tag}"
+        lo, hi = f"I_{tag}_LO", f"I_{tag}_HI"
+
+        sh.group(f"{rail} low-range shunt and bypass")
+        part(sh, "R", "Device:R", R100_PREC, {"1": mid, "2": rail}, value="100R 0.1%", rot=90)
+        # Fallback: bridge to go back to the single-shunt behaviour.
+        sh.add("JP", "Jumper:SolderJumper_2_Open", "BYPASS", {"1": mid, "2": rail},
+               in_bom=False, fields={"Footprint": JUMPER_FOOTPRINT})
+        part(sh, "D", "Device:D", "C95872", {"A": mid, "K": rail}, value="M7", rot=180)
+        part(sh, "Q", "Transistor_FET:AO3401A", "C15127", {"S": mid, "D": rail, "G": gate})
+        res(sh, R100K, gate, pre)
+        part(sh, "Q", "Transistor_FET:2N7002", "C8545", {"G": q, "S": "GND", "D": gate})
+        sh.add("C", "Device:C", "1uF DNP", {"1": rail, "2": "GND"}, rot=90, in_bom=False,
+               dnp=True, fields={"Footprint": "Capacitor_SMD:C_0603_1608Metric"})
+
+        sh.group(f"{rail} range comparator and flip-flop", column_break=True)
+        cmp_in, thr = f"{rail}_CMP", f"{rail}_THR"
+        res(sh, R1K, rail, cmp_in)
+        res(sh, R1K, pre, thr)
+        res(sh, r_thr, thr, "GND")
+        cmp = part(sh, "U", "OOTY:TLV7021DBV", "C2860939", {
+            "3": cmp_in, "4": thr, "5": "+5V", "2": "GND", "1": set_n})
+        cap(sh, C100N, "+5V", near=(cmp, "5"))
+        res(sh, R10K, set_n, "+3V3")
+        # D tied to /Q: each CLK rising edge toggles the range; /PRE (comparator) forces HI.
+        ff = part(sh, "U", "OOTY:74LVC1G74DCU", "C70285", {
+            "1": clk, "2": qn, "3": qn, "4": "GND", "5": q, "6": "+3V3", "7": set_n, "8": "+3V3"})
+        cap(sh, C100N, "+3V3", near=(ff, "8"))
+        res(sh, R100K, clk, "GND")
+
+        sh.group(f"{rail} amplifiers (x50)", column_break=True)
+        for name, inp, inn in (("LO", mid, rail), ("HI", pre, mid)):
+            out = f"I_{tag}_{name}"
+            amp = part(sh, "U", "OOTY:INA190A2xDCK", "C2870223", {
+                "4": inp, "5": inn, "3": "+3V3", "2": "GND", "1": "ISENSE_REF", "6": f"{out}_AMP"})
+            cap(sh, C100N, "+3V3", near=(amp, "3"))
+            res(sh, R100, f"{out}_AMP", out)
+            cap(sh, C1N, out)
+
+        sh.group(f"{rail} test points", column_break=True)
+        for net in (mid, q, f"{lo}_AMP", f"{hi}_AMP"):
+            test_point(sh, net)
+
+    sh.note("LO range: 100R x 50 = 5 mV/uA. HI range: existing shunt (also read by the INA226).")
+    sh.note("Comparator trips when the drop across 100R exceeds the threshold -> /PRE low -> Q high "
+            "-> 2N7002 on -> AO3401A bypasses 100R. Firmware toggles the range with CLK and reads Q.")
+    sh.note("M7: clamps the drop while the range switches. JP open: bridge it to bypass the 100R.")
+    return sh
+
+
+def readback_sheet():
+    sh = Sheet("readback", "INA190 reference, fixed-rail voltage readback")
+
+    sh.group("INA190 reference (~0.1 V)")
+    res(sh, R30K, "+3V3", "ISENSE_REF_DIV")
+    res(sh, R1K, "ISENSE_REF_DIV", "GND")
+    cap(sh, C100N, "ISENSE_REF_DIV")
+    buf = part(sh, "U", "OOTY:TLV9001IDBV", "C398363", {
+        "+": "ISENSE_REF_DIV", "-": "ISENSE_REF", "1": "ISENSE_REF", "V+": "+3V3", "V-": "GND"})
+    cap(sh, C100N, "+3V3", near=(buf, "V+"))
+
+    sh.group("Fixed-rail voltage readback (x0.5)")
+    for rail, adc in (("5V_DUT", "V_5V_DUT"), ("3V3_DUT", "V_3V3_DUT")):
+        res(sh, R100K, rail, adc)
+        res(sh, R100K, adc, "GND")
+        cap(sh, C100N, adc)
+
+    sh.note("ISENSE_REF = 3.3 V x 1k / 31k = 106 mV, buffered: zero-current output of the INA190 "
+            "stays in its linear range (SBOS863D 7.4).")
+    sh.note("V_5V_DUT / V_3V3_DUT: rail / 2, slow monitoring (5 ms), sample at <= 1 kS/s.")
+    return sh
+
+
 def decoupling(sheets):
     """Map capacitor ref -> (part ref, pad number) for each capacitor declared with `near`.
 
@@ -521,6 +612,7 @@ def annotate(sheets):
 def build():
     sheets = [power_sheet(), mcu_sheet(), sensing_sheet(), vio_sheet(), translators_sheet(),
               connectors_sheet()]
+    sheets += [dual_range_sheet(*rail) for rail in DUAL_RANGE] + [readback_sheet()]
     annotate(sheets)
     return sheets
 
