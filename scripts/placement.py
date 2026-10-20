@@ -42,8 +42,8 @@ PLACEMENT = {
     "R2": ("5.1k", 12.6, 33.2, 0, "F"),
     "F1": ("PTC 2.6A", 4.6, 37.5, 270, "F"),
     "D1": ("SMAJ5.0A", 4.8, 43.0, 0, "F"),
-    "TP1": ("VBUS", 16.8, 30.8, 0, "F"),
-    "TP2": ("+5V", 9.7, 41.8, 0, "F"),
+    "TP1": ("VBUS", 16.8, 30.8, 0, "B"),
+    "TP2": ("+5V", 9.7, 41.8, 0, "B"),
     "TP3": ("+3V3", 9.5, 8.6, 0, "F"),
     "TP4": ("GND", 13.5, 8.6, 0, "F"),
     # 3V3 buck (TLV62569, SLVSDG1C section 10): Cin on VIN with its ground via next to the GND pin,
@@ -75,10 +75,67 @@ PLACEMENT = {
     "R6": ("22k", 21.25, 37.5, 90, "F"),
     "R15": ("68k", 27.85, 37.5, 90, "F"),
     "R12": ("39k", 34.45, 37.5, 90, "F"),
-    # Shunts: switch side (pad 1, *_PRE) up, header side down
-    "R22": ("50mR 1% 1W", 14.54, 43.2, 270, "F"),
-    "R23": ("100mR 1% 1W", 19.62, 43.2, 270, "F"),
-    "U27": ("TPD4E05U06DQAR", 17.08, 44.6, 0, "F"),
+    # Dual-range current sensing (NOTES.md, TASK-010), between each switched rail's limiter and
+    # its J_PWR pin: shunt horizontal under the switch row (pad 1 *_PRE towards the limiter OUT,
+    # pad 2 *_MID), then the 100R low-range shunt, the M7 clamp and the AO3401A bypass in
+    # parallel from *_MID to the rail. Rail ESD moved left of pin 1.
+    "R22": ("50mR 1% 1W", 16.0, 40.6, 180, "F"),
+    "D4": ("M7", 11.9, 43.6, 0, "F"),
+    "Q3": ("AO3401A", 17.9, 43.8, 270, "F"),
+    "R88": ("100R 0.1%", 14.0, 46.2, 180, "F"),
+    "R23": ("100mR 1% 1W", 29.5, 40.6, 180, "F"),
+    "D5": ("M7", 23.45, 43.6, 0, "F"),
+    "Q5": ("AO3401A", 29.0, 43.8, 270, "F"),
+    "R97": ("100R 0.1%", 25.5, 46.2, 180, "F"),
+    "U27": ("TPD4E05U06DQAR", 6.7, 46.25, 90, "F"),
+    # Range comparators in the row between the USB corridor and the limiters, with room for
+    # their threshold dividers, close to the bypass MOSFETs (2N7002 Q4 next to them). Flip-flops
+    # and Q6 under the MCU, next to the RANGE / CLK pins (PA10, PB4, PD0, PD1).
+    "U28": ("TLV7021DBVR", 15.9, 30.85, 0, "F"),
+    "Q4": ("2N7002", 24.3, 30.85, 90, "F"),
+    "U32": ("TLV7021DBVR", 29.0, 30.85, 0, "F"),
+    "Q6": ("2N7002", 38.5, 32.7, 90, "F"),
+    # Comparator front ends on the free side of each comparator (VCC and IN- pins)
+    "C59": ("100nF/50V", 19.2, 29.45, 0, "F"),
+    "R91": ("1k", 19.2, 30.85, 0, "F"),
+    "R92": ("150k", 19.2, 32.25, 0, "F"),
+    "R93": ("10k", 21.3, 29.45, 0, "F"),
+    "R90": ("1k", 21.3, 32.25, 0, "F"),
+    "C66": ("100nF/50V", 32.3, 29.45, 0, "F"),
+    "R100": ("1k", 32.3, 30.85, 0, "F"),
+    "R101": ("100k", 32.3, 32.25, 0, "F"),
+    "R102": ("10k", 34.4, 29.45, 0, "F"),
+    "R99": ("1k", 34.4, 32.25, 0, "F"),
+    # Bypass gate pull-ups (gate -> *_PRE) next to the AO3401A
+    "R89": ("100k", 19.4, 40.6, 90, "F"),
+    "R98": ("100k", 31.6, 44.5, 90, "F"),
+    # INA190 reference buffer (DC, shared by the four amplifiers)
+    "U36": ("TLV9001IDBVR", 6.5, 19.5, 0, "F"),
+    "U29": ("SN74LVC1G74DCUR", 42.9, 33.0, 0, "F"),
+    "U33": ("SN74LVC1G74DCUR", 47.6, 33.0, 0, "F"),
+    # Shunt amplifiers under the MCU, next to the ADC pins
+    # (rotated 180: VS pin up, decoupled by the capacitor row above)
+    "U30": ("INA190A2IDCKR", 38.2, 36.9, 180, "F"),
+    "U31": ("INA190A2IDCKR", 41.7, 36.9, 180, "F"),
+    "U34": ("INA190A2IDCKR", 45.2, 36.9, 180, "F"),
+    "U35": ("INA190A2IDCKR", 48.7, 36.9, 180, "F"),
+    "C61": ("100nF/50V", 39.0, 35.2, 0, "F"),
+    "C63": ("100nF/50V", 42.5, 35.2, 0, "F"),
+    "C68": ("100nF/50V", 46.0, 35.2, 0, "F"),
+    "C70": ("100nF/50V", 49.5, 35.2, 0, "F"),
+    # Bottom side, not assembled: bypass bridges, unfitted output capacitors, test points
+    "JP2": ("BYPASS", 14.0, 46.2, 0, "B"),
+    "JP3": ("BYPASS", 25.5, 46.2, 0, "B"),
+    "C58": ("1uF/25V X7R", 11.0, 44.0, 0, "B"),
+    "C65": ("1uF/25V X7R", 21.5, 44.0, 0, "B"),
+    "TP5": ("5V_SW_MID", 16.2, 42.4, 0, "B"),
+    "TP9": ("3V3_SW_MID", 27.0, 42.4, 0, "B"),
+    "TP6": ("RANGE_5VSW", 20.0, 31.0, 0, "B"),
+    "TP7": ("I_5VSW_LO_AMP", 23.0, 31.0, 0, "B"),
+    "TP8": ("I_5VSW_HI_AMP", 26.0, 31.0, 0, "B"),
+    "TP10": ("RANGE_3V3SW", 29.0, 31.0, 0, "B"),
+    "TP11": ("I_3V3SW_LO_AMP", 32.0, 31.0, 0, "B"),
+    "TP12": ("I_3V3SW_HI_AMP", 35.0, 31.0, 0, "B"),
     # SWD probe, RESET and BOOT drivers above J_DBG
     "U17": ("SN74LVC1T45DBVR", 34.5, 41.8, 0, "F"),
     "U16": ("SN74LVC1T45DBVR", 39.2, 41.8, 0, "F"),

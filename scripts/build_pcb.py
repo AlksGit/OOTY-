@@ -69,7 +69,10 @@ NETCLASSES = {
     # name: (track width, clearance, via diameter, via drill, patterns)
     # Power: up to ~1.45 A on outer layers (IPC-2221, 10 degC rise). The buck switch node stays
     # here: its pads are 0.6 mm wide and the inductor sits next to the IC.
-    "Power": (0.5, 0.15, 0.8, 0.4, ["+3V3", "5V_SW*", "5V_DUT", "3V3_SW*", "3V3_DUT", "VIO",
+    # The dual-range rails list their power nets explicitly: their threshold, comparator and gate
+    # nets (5V_SW_THR, 5V_SW_CMP, 5V_SW_BYP_G...) are small signals and stay in Default.
+    "Power": (0.5, 0.15, 0.8, 0.4, ["+3V3", "5V_SW", "5V_SW_PRE", "5V_SW_MID", "5V_DUT",
+                                    "3V3_SW", "3V3_SW_PRE", "3V3_SW_MID", "3V3_DUT", "VIO",
                                     "VIO_LDO", "GND", "*SW_3V3"]),
     # HighCurrent: VBUS and +5V carry the whole board (3 A max from a USB-C 3 A source):
     # 1.5 mm outer, 1 oz -> ~3.2 A at 10 degC rise.
@@ -234,7 +237,7 @@ def add_footprints(board, comps, pads):
                 continue
             fp.SetField(key, val)
             fp.GetField(key).SetVisible(False)
-        if c["ref"].startswith(("TP", "H")) or "DNP" in c["value"]:
+        if c["ref"].startswith(("TP", "H")) or "DNP" in c["value"] or "dnp" in c["props"]:
             fp.SetExcludedFromBOM(True)
             fp.SetExcludedFromPosFiles(True)
         if "dnp" in c["props"] or "DNP" in c["value"]:
@@ -247,6 +250,8 @@ def add_footprints(board, comps, pads):
             key = (c["ref"], pad.GetNumber())
             if key in pads:
                 pad.SetNet(net(pads[key]))
+        # Added before positioning: Flip() needs the footprint to belong to the board.
+        board.Add(fp)
         pos = placement.position(c["ref"], c["value"])
         if pos is None:
             bb = fp.GetBoundingBox(False)
@@ -264,7 +269,6 @@ def add_footprints(board, comps, pads):
                 fp.Flip(fp.GetPosition(), pcbnew.FLIP_DIRECTION_LEFT_RIGHT)
             fp.SetOrientationDegrees(rot)
             fp.SetLocked(True)
-        board.Add(fp)
     return parked
 
 

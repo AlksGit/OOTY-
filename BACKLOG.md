@@ -1,10 +1,6 @@
 # Backlog
 
 ## TODO
-- [ ] TASK-012 | Placement — intégration des nouveaux blocs + finition de la sérigraphie
-  > Blocs de mesure au plus près des shunts (Kelvin, boucle de bascule courte). Toutes les pièces clés ont leur référence en sérigraphie, sans ambiguïté. DRC + parité 0 erreur, découplage dans les limites, rendus 3D. Relecture indépendante « prêt pour le routage ». Clôt aussi TASK-005/006/007 (merge de toute la pile après accord utilisateur).
-  > Blocked by: TASK-011 (on ne place que ce qui existe au schéma)
-
 - [ ] TASK-008 | Phase 5 — Routage
   > Routage complet, zones remplies, DRC --schematic-parity : 0 erreur, 0 net non connecté. SVG par couche + rendu 3D.
   > ⏸ Checkpoint : routage relu.
@@ -16,10 +12,15 @@
   > Blocked by: TASK-008 (DRC propre)
 
 ## IN PROGRESS
+- [ ] TASK-012 | Placement — intégration des nouveaux blocs + finition de la sérigraphie
+  > Blocs de mesure au plus près des shunts (Kelvin, boucle de bascule courte). Toutes les pièces clés ont leur référence en sérigraphie, sans ambiguïté. DRC + parité 0 erreur, découplage dans les limites, rendus 3D. Relecture indépendante « prêt pour le routage ». Clôt aussi TASK-005/006/007 (merge de toute la pile après accord utilisateur).
+  > Branch: feat/task-010-dual-range
+  > Blocked by: TASK-011 — levé
+
 - [ ] TASK-011 | Schéma — mesure double calibre ×2 + retours de tension des rails fixes
   > Blocs double calibre sur 3V3_SW et 5V_SW, diviseurs 5V_DUT / 3V3_DUT vers l'ADC, générés par script. ERC 0 erreur, netlist et BOM sans écart, PDF + rendus exportés. Relecture indépendante contre les datasheets.
   > Branch: feat/task-010-dual-range (même branche que TASK-010)
-  > Statut : schéma fait (ERC 0 erreur, netlist et BOM 0 écart), relecture indépendante en cours.
+  > Statut : ✅ terminé (ERC 0 erreur, netlist 196 nets et BOM 242 pièces sans écart, relecture indépendante sans bloquant ni majeur, mineurs appliqués) ; mergée avec la pile après TASK-012.
   > Blocked by: TASK-010 — levé
 
 - [ ] TASK-010 | Spec + composants — mesure double calibre (3V3_SW, 5V_SW) et retours de tension des rails fixes
