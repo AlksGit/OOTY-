@@ -597,6 +597,26 @@ Recommandations de la revue acceptées : calibre fin garanti jusqu'à ≥ 0.22 m
 7. **100 Ω + 1 nF** des sorties INA190 près des broches ADC du MCU.
 8. Le bloc ajoute ≈ 45 composants : nouveau checkpoint de placement.
 
+## Placement des blocs double calibre (TASK-012, 2026-10-20)
+
+### Méthode
+- **Chaîne de puissance placée à la main** entre chaque limiteur et sa broche de J_PWR : shunt fort horizontal sous la rangée des limiteurs (pastille `*_PRE` côté sortie du limiteur), puis 100 Ω, M7 et AO3401A en parallèle de `*_MID` vers la sortie, résistance de grille 100 kΩ contre le MOSFET. L'ESD des rails (U27) est déplacée à gauche de la broche 1.
+- **Comparateurs** (U28, U32) dans la rangée entre le couloir USB et les limiteurs, avec leur diviseur de seuil, la résistance d'entrée et le pull-up de PRE̅ sur le côté libre (broches VCC / IN−) ; 2N7002 Q4 à côté.
+- **Bascules** (U29, U33) et Q6 sous le MCU, près de PA10 / PB4 / PD0 / PD1 ; **amplis INA190** (U30, U31, U34, U35) en rangée sous le MCU près des entrées ADC, tournés de 180° pour que leur 100 nF de VS soit au-dessus ; tampon de REF (U36) à gauche (tension continue).
+- **Face arrière, sans assemblage** : tous les points de test (TP1–TP12, étiquetés par leur net), les ponts de repli JP2 / JP3 (sous les 100 Ω) et les condensateurs non montés C58 / C65. Rien n'est monté par JLC en face arrière : pas de surcoût d'assemblage double face.
+- `autoplace.py` ignore les pièces de la face arrière (sans trou métallisé) comme obstacles ; marge autour des résistances ramenée de 0.8 à 0.4 mm (leurs références sont sur le plan de montage).
+- Classe de nets Power : les nets de puissance des rails double calibre sont listés explicitement (`*_PRE`, `*_MID`, sortie) ; les nets locaux (seuil, entrée du comparateur, grille) restent en Default.
+- Correction de `build_pcb.py` : l'empreinte est ajoutée à la carte avant `Flip()` (plantage sinon) ; les pièces DNP sont exclues de la BOM et du fichier de position (parité avec le schéma).
+
+### Sérigraphie
+- Chaque pièce clé (CI, connecteur, D, Q, F, L, SW, TP, JP) a sa référence. Quand la face avant n'a plus de place, la référence est imprimée **en face arrière, à l'aplomb de la pièce** (même position vue à travers la carte, donc sans ambiguïté avec un voisin) : 24 pièces (J1, U1, U4, U6, U16, U17, U22, U25–U31, U33–U35, Q2, Q3, Q5, Q6, D1, D3–D5). Plans de montage : `out/renders/pcb_placement_assembly_top.pdf` et `out/renders/pcb_placement_assembly_bottom.pdf`.
+- 164 références de passifs sur le plan de montage seulement (décision D4).
+
+### Résultats
+- DRC `--schematic-parity` : **0 erreur, 0 écart de parité**, 2 warnings `silk_edge_clearance` sur J1 (justifiés plus haut). 499 connexions non routées : attendu avant le routage.
+- Découplage : **59 / 59** dans leur limite.
+- Ratsnest des signaux : 3121 mm sur 145 nets (2469 mm sur 117 nets avant TASK-010 : +45 composants, +28 nets). Les plus longs restent les rails (5V_DUT, 3V3_DUT vers le mux VIO et la relecture ADC) et les nets `*_MID` / `*_PRE` qui rejoignent les amplis sous le MCU (lignes Kelvin, à router en paires).
+
 ## Rapports ERC / DRC justifiés
 
 ### TASK-002 — projet vide

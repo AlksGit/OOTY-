@@ -1,10 +1,10 @@
 """Draw a placement review image: board outline, courtyards, references and signal ratsnest.
 
 Step 1 (KiCad's Python) dumps the board geometry to out/renders/placement.json; step 2 (system
-Python with matplotlib) draws out/renders/pcb_placement_ratsnest.png. Running the script with
-KiCad's Python does step 1 and then launches step 2 with the system Python.
+Python with matplotlib) draws out/renders/pcb_placement_ratsnest.png (both sides).
 
 Usage: "C:\\Program Files\\KiCad\\10.0\\bin\\python.exe" scripts/plot_placement.py
+       python scripts/plot_placement.py --draw
 """
 
 import json
