@@ -616,6 +616,11 @@ Recommandations de la revue acceptées : calibre fin garanti jusqu'à ≥ 0.22 m
 - Chaque pièce clé (CI, connecteur, D, Q, F, L, SW, TP, JP) a sa référence. Quand la face avant n'a plus de place, la référence est imprimée **en face arrière, à l'aplomb de la pièce** (même position vue à travers la carte, donc sans ambiguïté avec un voisin) : U1, U4, U6, U16, U17, U19, U20, U22, U25–U28, U30, U31, U33–U36, Q2–Q5, D3–D5 (25 pièces). Plans de montage : `out/renders/pcb_placement_assembly_top.pdf` et `out/renders/pcb_placement_assembly_bottom.pdf`.
 - 164 références de passifs sur le plan de montage seulement (décision D4).
 
+### Décisions de l'utilisateur (checkpoint TASK-012, 2026-10-20)
+- Face arrière non assemblée (points de test, ponts JP2 / JP3, C58 / C65 non montés, références sous les pièces) : **acceptée**.
+- Paires Kelvin et nœud µA des INA190 : routage d'abord en F.Cu, **B.Cu accepté** à défaut.
+- Go pour merger la pile (TASK-005 à 007, 010 à 012) dans `devape`.
+
 ### Revue indépendante du placement (2026-10-20)
 5 points majeurs (aucun bloquant) appliqués : chaîne rapide raccourcie (PRE̅), rangée d'amplis élargie, R60 réancré, ESD des rails rapprochée de J4, référence des INA190 à côté des amplis ; mineurs : condensateurs ADC, points de test hors du corps du MCU, C65 écarté de la référence de D5, R17 hors de la zone entre les chaînes. Contre-revue : prêt pour le routage ; corrections suivantes appliquées : diviseur de REF (R106 / R107 / C72) contre U36, résistances série de OUT1–4 et SPI (R69–R72, R75, R76) ramenées entre U14 / U15 et J8. Restent acceptés : tirages statiques R49 / R56 / R57 / R103 à 9–19 mm de leur CI (signaux lents, effet sur la longueur de ratsnest seulement) ; liaisons PRE̅ de 3V3_SW à router à y ≥ 30 (couloir USB à 1.3 mm).
 
