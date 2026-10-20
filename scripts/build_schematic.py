@@ -137,8 +137,8 @@ def power_sheet():
     sh.add("C", "Device:C", "6.8pF DNP", {"1": "+3V3", "2": "FB_3V3"}, rot=90, in_bom=False,
            dnp=True, fields={"Footprint": "Capacitor_SMD:C_0402_1005Metric"})
     res(sh, R22K, "FB_3V3", "GND")
-    cap(sh, C22U, "+3V3", near=(ind, "2"))
-    cap(sh, C22U, "+3V3", near=(ind, "2"))
+    cout = cap(sh, C22U, "+3V3", near=(ind, "2"))
+    cap(sh, C22U, "+3V3", near=(cout, "1"))
     pwr_flag(sh, "+3V3")
 
     sh.group("Power OK LED")
@@ -202,17 +202,17 @@ MCU_PINS = {
     "PA3": "SWO_DUT_MCU",
     # DUT RESET / BOOT open-drain drivers
     "PC6": "RESET_DUT_CTL", "PC7": "BOOT_DUT_CTL",
-    "PA10": "LED_HB",
+    "PA10": None,
     # BOOT_DIR is not on PB4: PB4 is NJTRST with a 25-55k pull-up after reset (DS12589 Table 12,
     # note 4), which beat the 100k pull-down and drove the DUT BOOT pin during HIL resets.
-    "PE9": "BOOT_DIR", "PB4": None,
+    "PD10": "BOOT_DIR", "PB4": None,
     # Fixed DUT rails enable (pulled up: on by default)
-    "PE7": "EN_5V", "PE8": "EN_3V3",
-    # User buttons (active low)
-    "PD0": "BTN1", "PD1": "BTN2",
+    "PD8": "EN_5V", "PD9": "EN_3V3",
+    # User buttons (active low) and heartbeat LED: pins on the side facing the top-right corner
+    "PE11": "BTN1", "PE10": "BTN2", "PE12": "LED_HB",
     # Spare LQFP-80 GPIO
-    "PE10": None, "PE11": None, "PE12": None, "PE13": None, "PE14": None, "PE15": None,
-    "PD8": None, "PD9": None, "PD10": None,
+    "PE7": None, "PE8": None, "PE9": None, "PE13": None, "PE14": None, "PE15": None,
+    "PD0": None, "PD1": None,
 }
 
 # VDD pins of the LQFP-80 (DS12589 Figure 11): one 100 nF each.
@@ -260,6 +260,7 @@ def mcu_sheet():
             "system bootloader.")
     sh.note("PB6 may carry a UCPD dead-battery pull-down at reset (PA9 = DBCC1 is pulled high); "
             "I2C_DUT_EN has an external pull-down anyway. Firmware sets PWR_CR3.UCPD1_DBDIS first.")
+    sh.note("Pin choice follows the PCB floor plan (MCU rotated 180 deg): see NOTES.md.")
     return sh
 
 
@@ -324,7 +325,6 @@ def vio_sheet():
     res(sh, R10K, "+5V", "VIO_PR1")
     res(sh, R22K, "VIO_PR1", "GND")
     res(sh, R100K, "VIO_MODE", "GND")
-    test_point(sh, "VIO")
 
     sh.group("VIO LDO 1.8 / 3.3 V (AP2127K-ADJ)")
     ldo = part(sh, "U", "Regulator_Linear:AP2127K-ADJ", "C96343", {
@@ -473,16 +473,13 @@ def connectors_sheet():
         sh.add("J", lib_id, name, {str(i): n for i, n in enumerate(pins, 1)},
                fields={"LCSC": lcsc})
 
-    sh.group("DUT rail test points")
-    for net in ("5V_SW", "5V_DUT", "3V3_SW", "3V3_DUT"):
-        test_point(sh, net)
-
     sh.group("Mounting holes")
     for _ in range(4):
         sh.add("H", "Mechanical:MountingHole", "M3", {}, in_bom=False,
                fields={"Footprint": HOLE_FOOTPRINT})
 
     sh.note("Signal path: header -> TVS -> 100R series -> translator / circuit.")
+    sh.note("DUT rails and VIO are probed on J_PWR / J_DBG pins (no separate test points).")
     return sh
 
 
