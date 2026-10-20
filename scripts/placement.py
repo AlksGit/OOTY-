@@ -24,20 +24,20 @@ PLACEMENT = {
     "J6": ("J_BUS", 82.0, 9.4, 0, "F"),
     "J7": ("J_UART_ANA", 82.0, 28.45, 0, "F"),
     # Anchors (Phase 4): the other parts are placed around them by scripts/autoplace.py.
-    "U8": ("STM32G431RBT6", 34.0, 23.0, 0, "F"),
+    "U8": ("STM32G431RBT6", 46.0, 24.0, 0, "F"),
     "U2": ("USBLC6-2SC6", 12.5, 24.0, 0, "F"),
     "U1": ("TPD4E05U06DQAR", 12.5, 31.0, 90, "F"),
     "D1": ("SMAJ5.0A", 9.5, 18.0, 0, "F"),
     "F1": ("PTC 2.6A", 12.5, 36.5, 0, "F"),
     "U3": ("TLV62569DBVR", 17.5, 39.0, 0, "F"),
     "L1": ("2.2uH", 23.5, 39.0, 0, "F"),
-    "U9": ("INA226AIDGSR", 6.0, 39.5, 0, "F"),
-    "U10": ("INA226AIDGSR", 27.5, 34.0, 0, "F"),
-    "U4": ("AP22653W6-7", 9.0, 44.5, 0, "F"),
-    "U5": ("AP22653W6-7", 15.0, 44.5, 0, "F"),
-    "U6": ("AP22653W6-7", 21.0, 44.5, 0, "F"),
-    "U7": ("AP22653W6-7", 27.0, 44.5, 0, "F"),
-    "U12": ("TPS2116DRLR", 49.0, 30.0, 0, "F"),
+    "U9": ("INA226AIDGSR", 29.0, 9.0, 0, "F"),
+    "U10": ("INA226AIDGSR", 36.0, 9.0, 0, "F"),
+    "U4": ("AP22653W6-7", 21.0, 19.0, 0, "F"),
+    "U5": ("AP22653W6-7", 30.0, 19.0, 0, "F"),
+    "U6": ("AP22653W6-7", 21.0, 28.0, 0, "F"),
+    "U7": ("AP22653W6-7", 30.0, 28.0, 0, "F"),
+    "U12": ("TPS2116DRLR", 60.0, 18.0, 0, "F"),
     "U14": ("SN74LVC8T245PWR", 58.0, 39.0, 0, "F"),
     "U15": ("SN74LVC8T245PWR", 68.0, 39.0, 0, "F"),
     "D2": ("PWR", 64.0, 3.5, 0, "F"),
@@ -46,6 +46,33 @@ PLACEMENT = {
 
 # Board area available to the auto-placer (board coordinates, 0.5 mm inside the outline).
 AREA = (1.2, 1.2, 83.8, 53.8)
+
+# Bands kept free for the header pin labels on the silkscreen (board coordinates).
+KEEPOUTS = [
+    (10.0, 47.0, 74.5, 50.6),   # labels above J_PWR / J_DBG / J_IO
+    (76.4, 7.5, 80.2, 45.5),    # labels left of J_BUS / J_UART_ANA
+    (58.5, 6.6, 73.5, 11.8),    # board marking
+    (61.5, 4.8, 70.5, 6.4),     # LED labels
+]
+
+HEADERS_BOTTOM = ("J_PWR", "J_DBG", "J_IO")
+HEADERS_RIGHT = ("J_BUS", "J_UART_ANA")
+
+# Board marking (text, x, y, height).
+MARKING = [
+    ("OOTY HIL rev A", 66.0, 8.5, 1.5),
+    ("2026-10", 66.0, 10.8, 1.0),
+    ("PWR", 64.0, 5.6, 1.0),
+    ("HB", 68.0, 5.6, 1.0),
+]
+
+
+def refs_with_value(values):
+    return {ref for ref, entry in PLACEMENT.items() if entry[0] in values}
+
+
+def absolute(box):
+    return (ORIGIN[0] + box[0], ORIGIN[1] + box[1], ORIGIN[0] + box[2], ORIGIN[1] + box[3])
 
 
 def position(ref, value=None):
