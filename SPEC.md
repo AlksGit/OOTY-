@@ -31,8 +31,8 @@ flowchart LR
     REG33 -- 3V3 --> SW33[Interrupteur 3V3_SW<br/>eFuse ~0.5 A]
     INPROT -- 5V_SYS --> VIOGEN[Sélection VIO<br/>1.8 / 3.3 / 5 V / externe]
     SW5F -- 5V limité --> VIOGEN
-    SW5 --> INA5[Mesure V/I 5V_SW]
-    SW33 --> INA33[Mesure V/I 3V3_SW]
+    SW5 --> INA5[Mesure V/I 5V_SW<br/>double calibre]
+    SW33 --> INA33[Mesure V/I 3V3_SW<br/>double calibre]
     USBC -- D+/D- --> MCU[STM32<br/>USB FS composite]
     USBC -- CC1/CC2 --> MCU
     MCU -- EN / FAULT --> SW5
@@ -41,6 +41,8 @@ flowchart LR
     MCU -- EN / FAULT --> SW33F
     MCU -- I2C interne --> INA5
     MCU -- I2C interne --> INA33
+    INA5 -- ADC + calibre --> MCU
+    INA33 -- ADC + calibre --> MCU
     MCU -- I2C interne --> OLED[Écran OLED 0.91 pouces<br/>128x32 SSD1306]
     MCU -- SEL --> VIOGEN
     VIOGEN -- VIO --> LS[Level shifters<br/>UART, IO, SWD, SPI, I2C, RESET/BOOT]
@@ -64,9 +66,9 @@ flowchart LR
 | USB-C | Alimentation et données | USB 2.0 Full Speed (12 Mbit/s), Rd 5.1 kΩ sur CC1/CC2 (sink), ESD sur D+/D-/VBUS. **Lecture des tensions CC1/CC2 par l'ADC** pour connaître le courant annoncé par la source (défaut USB / 1.5 A / 3 A). |
 | Protection d'entrée | Protéger le port USB du PC | Limitation du courant total tiré sur VBUS, TVS sur VBUS. Pas de protection contre l'inversion de polarité (inutile, USB-C détrompé). |
 | Buck 3V3 | Logique HIL + rails 3V3 du DUT | ≥ 1.5 A en sortie, pour garder de la marge sur une charge max ≈ 0.87 A (un LDO dissiperait ≈ 1.5 W, voir `NOTES.md`). Choix du composant en Phase 1. |
-| Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Limiteur de courant** sur chaque rail fixe, **actif dès la mise sous tension** (EN tiré à l'état actif) mais **coupable par le firmware** (budget USB insuffisant, FAULT persistant), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. Les rails 5 V ne sont pas régulés : ≈ 4.45 V au pire cas (VBUS 4.75 V moins les chutes du PTC, du limiteur et du shunt), avant la chute du câble USB. |
+| Rails fixes 5V / 3V3 | Alimenter le DUT en permanence | **Tension relue par l'ADC** (diviseur ×0.5). **Limiteur de courant** sur chaque rail fixe, **actif dès la mise sous tension** (EN tiré à l'état actif) mais **coupable par le firmware** (budget USB insuffisant, FAULT persistant), flag FAULT relu par le MCU. Un court-circuit sur un rail fixe ne fait pas tomber le 3V3 de la carte HIL. Les rails 5 V ne sont pas régulés : ≈ 4.45 V au pire cas (VBUS 4.75 V moins les chutes du PTC, du limiteur et du shunt), avant la chute du câble USB. |
 | Rails commutés 3V3_SW / 5V_SW | Hard reboot du DUT | Load switch / eFuse avec limitation de courant, enable piloté par le MCU, flag FAULT relu par le MCU, décharge de sortie (vrai 0 V à l'arrêt), état OFF au démarrage du MCU. |
-| Mesure V/I | Consommation du DUT | Un moniteur par rail commuté : **INA226** (résolution 50 µA sur 5V_SW, 25 µA sur 3V3_SW), remplaçable sans modifier le PCB par l'INA228 (même brochage, ≈ 6 / 3 µA) quand il sera disponible. Shunt côté haut, sur le bus I2C **interne** (séparé de l'I2C exposé au DUT). |
+| Mesure V/I | Consommation du DUT | **Double calibre** sur chaque rail commuté : shunt fin 100 Ω (veille, **0.1 µA de résolution, de ~1 µA à ~0.5 mA**) court-circuité par un MOSFET dès que la chute dépasse ~48 mV, **bascule matérielle en < 1 µs** (comparateur + bascule D), retour au calibre fin commandé par le firmware. Deux amplis INA190 par rail lus par l'ADC du STM32 (les deux calibres échantillonnés au même instant). L'**INA226** reste sur le shunt fort (25 / 50 µA, I2C interne, remplaçable par l'INA228). Chute vue par le DUT : ≤ 60 mV en calibre fin, 80 mV (3V3_SW, 0.5 A) / 100 mV (5V_SW, 1 A) en calibre fort. Détail dans `NOTES.md`. |
 | Écran | Affichage local | **Module OLED 0.91" 128 × 32, contrôleur SSD1306, I2C** (adresse 0x3C), 4 broches GND/VCC/SCL/SDA, ~36 × 12.5 mm. Sur le bus I2C interne. Monté sur un header 4 broches. Affiche par exemple la consommation de chaque rail commuté, l'état ON/OFF/FAULT des rails et la tension VIO. Référence exacte et approvisionnement en Phase 1. |
 | VIO | Tension des signaux côté DUT | Sélectionnable par logiciel : **1.8 / 3.3 / 5 V internes ou VIO externe** (référence VTref fournie par le DUT, comme une sonde de debug classique). Le 5 V est pris en sortie du limiteur du rail 5 V fixe : un court-circuit sur VIO ne peut pas faire tomber la carte HIL. |
 | Level shifters | Adapter 3V3 (MCU) ↔ VIO (DUT) | Lignes unidirectionnelles : buffers à direction fixe (famille 74LVC1T45/LVC8T245, 1.65–5.5 V). SWDIO : direction pilotée par le MCU. I2C : buffer bidirectionnel TCA9517A (le PCA9306 ne couvre pas VIO de 1.8 à 5 V, voir `NOTES.md`). Sortie haute impédance (OE) tant que VIO n'est pas établi. |
@@ -143,7 +145,7 @@ Le nombre exact et l'ordre des broches seront figés en Phase 2 (schéma).
 | LED heartbeat | 1 |
 | **Total** | **~42** → boîtier 48 broches au minimum, **64 broches recommandé** pour la marge |
 
-En pratique, le schéma a utilisé les 52 GPIO du LQFP-64 (directions SWCLK / BOOT, sélection VIO sur 3 broches, CC1/CC2, I2C_DUT_EN…) ; l'ajout de la coupure des rails fixes et des boutons a imposé le **LQFP-80** (66 GPIO, 10 encore libres).
+En pratique, le schéma a utilisé les 52 GPIO du LQFP-64 (directions SWCLK / BOOT, sélection VIO sur 3 broches, CC1/CC2, I2C_DUT_EN…) ; l'ajout de la coupure des rails fixes et des boutons a imposé le **LQFP-80** (66 GPIO). La mesure double calibre et la relecture des rails fixes (6 entrées ADC, 4 lignes de calibre) occupent les 10 dernières broches libres.
 
 ## 5. Logiciel (hors PCB, impacte le choix du MCU)
 

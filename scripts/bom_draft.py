@@ -1,6 +1,7 @@
 """Generate the preliminary BOM (bom/bom_draft.csv) and print a cost summary.
 
-Data was researched on 2026-10-19 (LCSC product pages and JLCPCB part API).
+Data was researched on 2026-10-19 (LCSC product pages and JLCPCB part API); dual-range
+current sensing parts added on 2026-10-20 (TASK-010).
 References are functional groups; final designators are assigned in the schematic (Phase 2).
 
 Usage: python scripts/bom_draft.py
@@ -62,15 +63,15 @@ PARTS = [
          "5V_SW, 5V fixed, 3V3_SW, 3V3 fixed; FAULT, output discharge, reverse blocking"),
     Part("R_ILIM_5V, R_ILIM_3V3SW", "39k 1%", 2, "0402WGF3902TCE", *R_0402, "C25783",
          "Extended", 0.0024, "717600 (LCSC)", "", "ILIM ~636 mA typ"),
-    Part("R_ILIM_3V3", "68k 1%", 1, "0402WGF6802TCE", *R_0402, "C36871", "Extended", 0.0020,
-         "125791 (JLC)", "", "ILIM ~354 mA typ"),
+    Part("R_ILIM_3V3, R_THR_3V3SW", "68k 1%", 2, "0402WGF6802TCE", *R_0402, "C36871", "Extended", 0.0020,
+         "125791 (JLC)", "", "ILIM ~354 mA typ; 3V3_SW range threshold divider bottom"),
     Part("D_PWR", "LED yellow-green", 1, "XL-1608SYGC-06", "XINGLIGHT", "0603",
          "LED_SMD:LED_0603_1608Metric", "C965805", "Extended", 0.0066, "743900 (LCSC)",
          "https://www.lcsc.com/datasheet/C965805.pdf", "Power OK, Vf ~2 V"),
     Part("D_HB", "LED red", 1, "KT-0603R", "Hubei KENTO", "0603", "LED_SMD:LED_0603_1608Metric",
          "C2286", "Basic", 0.0077, "6011600 (LCSC)", "", "Heartbeat"),
-    Part("R_LED", "1k 1%", 2, "0402WGF1001TCE", *R_0402, "C11702", "Basic", 0.0013,
-         "9195500 (LCSC)", "", "~1.3 mA per LED"),
+    Part("R_LED, R_THR", "1k 1%", 4, "0402WGF1001TCE", *R_0402, "C11702", "Basic", 0.0013,
+         "9195500 (LCSC)", "", "~1.3 mA per LED; range threshold divider tops x2"),
 
     # --- MCU --------------------------------------------------------------
     Part("U_MCU", "STM32G431MBT6", 1, "STM32G431MBT6", "STMicroelectronics", "LQFP-80",
@@ -99,6 +100,29 @@ PARTS = [
     Part("R_SHUNT_3V3SW", "100mR 1% 1W", 1, "STE1206M1W0R100F", "Walter", "1206",
          "Resistor_SMD:R_1206_3216Metric", "C201308", "Extended", 0.055, "28651 (JLC)",
          "", "Kelvin routing; Vishay WSL1206R1000FEA18 C843879 as alternative"),
+    # Dual-range current sensing (per switched rail: R_low -> R_high 100R bypassed by a P-FET)
+    Part("U_ISENSE", "INA190 x50 shunt amp", 4, "INA190A2IDCKR", "Texas Instruments", "SC-70-6",
+         "Package_TO_SOT_SMD:SOT-363_SC-70-6", "C2870223", "Extended", 1.538, "3732 (JLC)",
+         "https://www.ti.com/lit/ds/symlink/ina190.pdf",
+         "LO (100R) and HI (existing shunt) per rail -> ADC; DCK pins 1 REF 2 GND 3 VS 4 IN+ 5 IN- 6 OUT"),
+    Part("U_RANGE_CMP", "TLV7021 open-drain comparator", 2, "TLV7021DBVR", "Texas Instruments",
+         "SOT-23-5", "Package_TO_SOT_SMD:SOT-23-5", "C2860939", "Extended", 0.374, "6068 (JLC)",
+         "https://www.ti.com/lit/ds/symlink/tlv7011.pdf",
+         "Trips at ~48 mV across R_high; supplied from +5V; pins 1 OUT 2 VEE 3 IN+ 4 IN- 5 VCC"),
+    Part("U_RANGE_FF", "SN74LVC1G74 D flip-flop", 2, "SN74LVC1G74DCUR", "Texas Instruments",
+         "VSSOP-8", "Package_SO:VSSOP-8_2.3x2mm_P0.5mm", "C70285", "Extended", 0.297,
+         "4432 (JLC)", "https://www.ti.com/lit/ds/symlink/sn74lvc1g74.pdf",
+         "PRE from comparator (set HI range), CLK from MCU with D=GND (back to LO range)"),
+    Part("Q_BYPASS", "AO3401A P-MOSFET", 2, "AO3401A", "Alpha & Omega", "SOT-23",
+         "Package_TO_SOT_SMD:SOT-23", "C15127", "Basic", 0.102, "710865 (JLC)",
+         "https://www.aosmd.com/res/datasheets/AO3401A.pdf",
+         "Bypass of R_high; 60 mOhm max at VGS -4.5 V, 85 mOhm max at -2.5 V"),
+    Part("D_RANGE_CLAMP", "1N4148W", 2, "1N4148W", "Semtech", "SOD-123", "Diode_SMD:D_SOD-123",
+         "C81598", "Basic", 0.0124, "4310000 (JLC)", "https://www.lcsc.com/datasheet/C81598.pdf",
+         "Limits the drop across R_high while the range switches (IFSM 4 A at 1 us); silicon for low forward leakage"),
+    Part("R_SHUNT_LO", "100R 0.1% 25ppm", 2, "RT0603BRD07100RL", "YAGEO", "0603",
+         "Resistor_SMD:R_0603_1608Metric", "C122970", "Extended", 0.032, "428064 (JLC)",
+         "", "Low-range shunt, 5 mV/uA after x50"),
     Part("R_I2C_INT", "2.2k 1%", 2, "0402WGF2201TCE", *R_0402, "C25879", "Basic", 0.0012,
          "2528400 (LCSC)", "", "Internal I2C pull-ups (INA + OLED)"),
     Part("U_DAC_BUF", "TLV9001 RRIO op-amp", 1, "TLV9001IDBVR", "Texas Instruments",
@@ -129,11 +153,11 @@ PARTS = [
          "364590 (JLC)", "", "LDO bottom -> 1.800 V"),
     Part("R_VIO_R2B", "16k 1%", 1, "0402WGF1602TCE", *R_0402, "C25759", "Extended", 0.0127,
          "223924 (JLC)", "", "Switched in parallel -> 3.300 V"),
-    Part("C_VIO_FF", "1nF X7R 50V", 1, "0402B102K500NT", "FH", "0402", C_0402, "C1523",
-         "Basic", 0.0038, "2822982 (JLC)", "", "LDO feed-forward"),
-    Part("Q_VSEL, Q_RESET", "2N7002", 2, "2N7002", "CJ", "SOT-23",
+    Part("C_VIO_FF, C_ISENSE", "1nF X7R 50V", 5, "0402B102K500NT", "FH", "0402", C_0402, "C1523",
+         "Basic", 0.0038, "2822982 (JLC)", "", "LDO feed-forward; INA190 outputs to ADC x4"),
+    Part("Q_VSEL, Q_RESET, Q_RANGE", "2N7002", 4, "2N7002", "CJ", "SOT-23",
          "Package_TO_SOT_SMD:SOT-23", "C8545", "Basic", 0.0175, "2544313 (JLC)",
-         "https://www.lcsc.com/datasheet/C8545.pdf", "VIO select + open-drain RESET"),
+         "https://www.lcsc.com/datasheet/C8545.pdf", "VIO select + open-drain RESET + range bypass drivers x2"),
     Part("U_LS_OUT, U_LS_IN", "SN74LVC8T245", 2, "SN74LVC8T245PWR", "Texas Instruments",
          "TSSOP-24", "Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm", "C27643", "Extended", 0.3395,
          "38675 (LCSC)", "https://www.ti.com/lit/ds/symlink/sn74lvc8t245.pdf",
@@ -150,8 +174,8 @@ PARTS = [
          "Package_SON:USON-10_2.5x1.0mm_P0.5mm", "C138714", "Extended", 0.0837,
          "212835 (LCSC)", "https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf",
          "7 for ~26 signals, 1 for header power pins, 1 for USB-C CC1/CC2"),
-    Part("R_SER", "100R 1%", 20, "0402WGF1000TCE", *R_0402, "C25076", "Basic", 0.0013,
-         "3162300 (LCSC)", "", "Series R on exposed signals + DAC output"),
+    Part("R_SER", "100R 1%", 24, "0402WGF1000TCE", *R_0402, "C25076", "Basic", 0.0013,
+         "3162300 (LCSC)", "", "Series R on exposed signals + DAC output; INA190 outputs to ADC x4"),
     Part("R_PU_TCA", "4.7k 1%", 4, "0402WGF4701TCE", *R_0402, "C25900", "Basic", 0.0021,
          "8743200 (LCSC)", "", "TCA9517A pull-ups, both sides"),
 
@@ -164,9 +188,9 @@ PARTS = [
          0.0582, "44180 (LCSC)", "", "JLC type to confirm"),
 
     # --- Shared passives --------------------------------------------------
-    Part("C_100N", "100nF X7R 50V", 36, "CL05B104KB54PNC", "Samsung", "0402", C_0402,
+    Part("C_100N", "100nF X7R 50V", 46, "CL05B104KB54PNC", "Samsung", "0402", C_0402,
          "C307331", "Basic", 0.0095, "3067200 (LCSC)", "",
-         "Decoupling: MCU 8, buck 1, switches 8, VBUS 1, +5V 1, INA 2, op-amp 1, shifters 10, TCA 2; button debounce 2"),
+         "Decoupling: MCU 8, buck 1, switches 8, VBUS 1, +5V 1, INA 2, op-amp 1, shifters 10, TCA 2; button debounce 2; INA190 4, comparators 2, flip-flops 2, fixed-rail ADC filters 2"),
     Part("C_10N", "10nF X7R 50V", 4, "CL05B103KB5NNNC", "Samsung", "0402", C_0402, "C15195",
          "Basic", 0.0041, "5993469 (JLC)", "", "VDDA, AIN filters x2, VIO_MON filter"),
     Part("C_1U", "1uF X5R 25V", 7, "CL05A105KA5NQNC", "Samsung", "0402", C_0402, "C52923",
@@ -179,11 +203,12 @@ PARTS = [
          "C15850", "Basic", 0.0882, "3110200 (LCSC)", "", "Buck Cin (keeps ~4-5 uF under 5 V DC bias), 5V switch outputs x2"),
     Part("C_22U", "22uF X5R 25V", 2, "CL21A226MAQNNNE", "Samsung", "0805", C_0805, "C45783",
          "Basic", 0.1959, "229400 (LCSC)", "", "Buck Cout"),
-    Part("R_10K", "10k 1%", 11, "0402WGF1002TCE", *R_0402, "C25744", "Basic", 0.0015,
-         "19469071 (JLC)", "", "BOOT0, PR1 (from +5V), LS /OE, FAULT x4, INA ALERT, I2C_DUT_EN pull-down, buttons x2"),
-    Part("R_100K", "100k 1%", 16, "0402WGF1003TCE", *R_0402, "C25741", "Basic", 0.0015,
+    Part("R_10K", "10k 1%", 13, "0402WGF1002TCE", *R_0402, "C25744", "Basic", 0.0015,
+         "19469071 (JLC)", "", "BOOT0, PR1 (from +5V), LS /OE, FAULT x4, INA ALERT, I2C_DUT_EN pull-down, buttons x2, comparator open-drain pull-ups x2"),
+    Part("R_100K", "100k 1%", 25, "0402WGF1003TCE", *R_0402, "C25741", "Basic", 0.0015,
          "2505000 (LCSC)", "",
-         "EN pull-downs x2, fixed-rail EN pull-ups x2, AIN dividers x4, VIO_MON x2, MODE/VSEL/RESET/BOOT-DIR/SWCLK-DIR/SWDIO-DIR pull-downs x6"),
+         "EN pull-downs x2, fixed-rail EN pull-ups x2, AIN dividers x4, VIO_MON x2, MODE/VSEL/RESET/BOOT-DIR/SWCLK-DIR/SWDIO-DIR pull-downs x6, "
+         "range: 5V_SW threshold bottom, P-FET gate pull-ups x2, CLK pull-downs x2; fixed-rail readback dividers x4"),
     Part("R_1M", "1M 1%", 18, "0402WGF1004TCE", *R_0402, "C26083", "Basic", 0.0024,
          "2793881 (JLC)", "", "Weak bias on translator B-side pins (no floating CMOS inputs while /OE is high)"),
 ]
