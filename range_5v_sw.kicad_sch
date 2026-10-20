@@ -2544,6 +2544,17 @@
 	)
 	(text "M7: clamps the drop while the range switches. JP open: bridge it to bypass the 100R."
 		(exclude_from_sim no)
+		(at 20 270.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "82883960-ea0e-5389-bf1e-23618e60da2f")
+	)
+	(text "100R, JP (BYPASS), M7 and AO3401A are in parallel between *_MID and the rail output."
+		(exclude_from_sim no)
 		(at 20 265.43 0)
 		(effects
 			(font
@@ -6231,7 +6242,7 @@
 				)
 			)
 		)
-		(property "Value" "1uF DNP"
+		(property "Value" "1uF/25V X7R"
 			(at 36.83 167.64 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6252,7 +6263,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C29936.html"
 			(at 36.83 163.83 0)
 			(hide yes)
 			(show_name no)
@@ -6264,6 +6275,39 @@
 			)
 		)
 		(property "Description" ""
+			(at 36.83 163.83 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "CL10B105KA8NNNC"
+			(at 36.83 163.83 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "Samsung"
+			(at 36.83 163.83 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC_DNP" "C29936"
 			(at 36.83 163.83 0)
 			(hide yes)
 			(show_name no)

@@ -3534,7 +3534,7 @@
 		)
 		(uuid "5e88f2c2-4d8c-550f-a763-a9d84f9c4baf")
 	)
-	(text "PB6 may carry a UCPD dead-battery pull-down at reset (PA9 = DBCC1 is pulled high); I2C_DUT_EN has an external pull-down anyway. Firmware sets PWR_CR3.UCPD1_DBDIS first."
+	(text "PB6 may carry a UCPD dead-battery pull-down at reset (PA9 = DBCC1 is pulled high); I2C_DUT_EN has an external pull-down anyway. Same for PB4 (CC2): PA10 = DBCC2 is held low by the 100k on RANGE_CLK_5VSW; PB4 also has the NJTRST pull-up at reset. Firmware sets PWR_CR3.UCPD1_DBDIS first, then drives PB4 low."
 		(exclude_from_sim no)
 		(at 20 260.35 0)
 		(effects

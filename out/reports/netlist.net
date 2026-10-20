@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "C:\\Users\\alexandr.perrot\\Documents\\Personal work\\Hard\\OOTY-\\OOTY.kicad_sch")
-		(date "2026-10-20T13:25:46")
+		(date "2026-10-20T13:32:45")
 		(tool "Eeschema 10.0.7")
 		(sheet
 			(number "1")
@@ -15399,14 +15399,20 @@
 		)
 		(comp
 			(ref "C58")
-			(value "1uF DNP")
+			(value "1uF/25V X7R")
 			(footprint "Capacitor_SMD:C_0603_1608Metric")
+			(datasheet "https://www.lcsc.com/product-detail/C29936.html")
 			(fields
+				(field
+					(name "MPN") "CL10B105KA8NNNC")
+				(field
+					(name "Manufacturer") "Samsung")
+				(field
+					(name "LCSC_DNP") "C29936")
 				(field
 					(name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
 				(field
-					(name "Datasheet")
-				)
+					(name "Datasheet") "https://www.lcsc.com/product-detail/C29936.html")
 				(field
 					(name "Description")
 				)
@@ -15415,6 +15421,18 @@
 				(lib "Device")
 				(part "C")
 				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "MPN")
+				(value "CL10B105KA8NNNC")
+			)
+			(property
+				(name "Manufacturer")
+				(value "Samsung")
+			)
+			(property
+				(name "LCSC_DNP")
+				(value "C29936")
 			)
 			(property
 				(name "Sheetname")
@@ -17373,14 +17391,20 @@
 		)
 		(comp
 			(ref "C65")
-			(value "1uF DNP")
+			(value "1uF/25V X7R")
 			(footprint "Capacitor_SMD:C_0603_1608Metric")
+			(datasheet "https://www.lcsc.com/product-detail/C29936.html")
 			(fields
+				(field
+					(name "MPN") "CL10B105KA8NNNC")
+				(field
+					(name "Manufacturer") "Samsung")
+				(field
+					(name "LCSC_DNP") "C29936")
 				(field
 					(name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
 				(field
-					(name "Datasheet")
-				)
+					(name "Datasheet") "https://www.lcsc.com/product-detail/C29936.html")
 				(field
 					(name "Description")
 				)
@@ -17389,6 +17413,18 @@
 				(lib "Device")
 				(part "C")
 				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "MPN")
+				(value "CL10B105KA8NNNC")
+			)
+			(property
+				(name "Manufacturer")
+				(value "Samsung")
+			)
+			(property
+				(name "LCSC_DNP")
+				(value "C29936")
 			)
 			(property
 				(name "Sheetname")

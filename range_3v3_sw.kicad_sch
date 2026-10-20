@@ -2496,7 +2496,7 @@
 		)
 		(uuid "162bed2d-ed11-5403-b700-6ddc63030e19")
 	)
-	(text "M7: clamps the drop while the range switches. JP open: bridge it to bypass the 100R."
+	(text "100R, JP (BYPASS), M7 and AO3401A are in parallel between *_MID and the rail output."
 		(exclude_from_sim no)
 		(at 20 265.43 0)
 		(effects
@@ -2552,6 +2552,17 @@
 			(justify left bottom)
 		)
 		(uuid "593d6d96-eabe-5a3f-9941-6a490b96b8ff")
+	)
+	(text "M7: clamps the drop while the range switches. JP open: bridge it to bypass the 100R."
+		(exclude_from_sim no)
+		(at 20 270.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b93de2f1-b66c-55e2-b011-66f7de6187a7")
 	)
 	(text "3V3_SW amplifiers (x50)"
 		(exclude_from_sim no)
@@ -6826,7 +6837,7 @@
 				)
 			)
 		)
-		(property "Value" "1uF DNP"
+		(property "Value" "1uF/25V X7R"
 			(at 38.1 171.45 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6847,7 +6858,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C29936.html"
 			(at 38.1 167.64 0)
 			(hide yes)
 			(show_name no)
@@ -6859,6 +6870,39 @@
 			)
 		)
 		(property "Description" ""
+			(at 38.1 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "CL10B105KA8NNNC"
+			(at 38.1 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer" "Samsung"
+			(at 38.1 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC_DNP" "C29936"
 			(at 38.1 167.64 0)
 			(hide yes)
 			(show_name no)

@@ -264,7 +264,9 @@ def mcu_sheet():
     sh.note("USB FS runs crystal-less (HSI48 + CRS). BOOT0 solder jumper: bridge it to force the "
             "system bootloader.")
     sh.note("PB6 may carry a UCPD dead-battery pull-down at reset (PA9 = DBCC1 is pulled high); "
-            "I2C_DUT_EN has an external pull-down anyway. Firmware sets PWR_CR3.UCPD1_DBDIS first.")
+            "I2C_DUT_EN has an external pull-down anyway. Same for PB4 (CC2): PA10 = DBCC2 is held low "
+            "by the 100k on RANGE_CLK_5VSW; PB4 also has the NJTRST pull-up at reset. Firmware sets "
+            "PWR_CR3.UCPD1_DBDIS first, then drives PB4 low.")
     sh.note("Pin choice follows the PCB floor plan (MCU rotated 180 deg): see NOTES.md.")
     return sh
 
@@ -514,8 +516,11 @@ def dual_range_sheet(rail, pre, r_thr):
         part(sh, "Q", "Transistor_FET:AO3401A", "C15127", {"S": mid, "D": rail, "G": gate})
         res(sh, R100K, gate, pre)
         part(sh, "Q", "Transistor_FET:2N7002", "C8545", {"G": q, "S": "GND", "D": gate})
-        sh.add("C", "Device:C", "1uF DNP", {"1": rail, "2": "GND"}, rot=90, in_bom=False,
-               dnp=True, fields={"Footprint": "Capacitor_SMD:C_0603_1608Metric"})
+        # Fallback for DUTs with little decoupling: X7R (low leakage at 5 V), not fitted.
+        sh.add("C", "Device:C", "1uF/25V X7R", {"1": rail, "2": "GND"}, rot=90, in_bom=False,
+               dnp=True, fields={"Footprint": "Capacitor_SMD:C_0603_1608Metric",
+                                 "MPN": "CL10B105KA8NNNC", "Manufacturer": "Samsung",
+                                 "LCSC_DNP": "C29936", "Datasheet": LCSC_PAGE.format("C29936")})
 
         sh.group(f"{rail} range comparator and flip-flop", column_break=True)
         cmp_in, thr = f"{rail}_CMP", f"{rail}_THR"
@@ -548,6 +553,7 @@ def dual_range_sheet(rail, pre, r_thr):
     sh.note("LO range: 100R x 50 = 5 mV/uA. HI range: existing shunt (also read by the INA226).")
     sh.note("Comparator trips when the drop across 100R exceeds the threshold -> /PRE low -> Q high "
             "-> 2N7002 on -> AO3401A bypasses 100R. Firmware toggles the range with CLK and reads Q.")
+    sh.note("100R, JP (BYPASS), M7 and AO3401A are in parallel between *_MID and the rail output.")
     sh.note("M7: clamps the drop while the range switches. JP open: bridge it to bypass the 100R.")
     return sh
 
